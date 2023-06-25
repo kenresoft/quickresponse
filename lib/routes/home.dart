@@ -61,14 +61,27 @@ class _HomeState extends State<Home> {
           // 8
         ]),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        ],
-      ),
+      bottomNavigationBar: BottomNav(
+      labelStyle: const TextStyle(fontStyle: FontStyle.italic),
+      height: 82,
+      padding: const EdgeInsets.all(25).copyWith(top: 5, bottom: 5),
+      backgroundSelected: Colors.blue.shade900,
+      divider: const Divider(height: 0),
+      borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+      onTap: (index) => buildNavSwitch(index, context, widget.ref),
+      iconSize: 23,
+      labelSize: 20,
+      backgroundColor: Colors.white.withOpacity(0.2),
+      color: Colors.white.withOpacity(0.5),
+      colorSelected: Colors.white,
+      indexSelected: widget.ref.watch(tabProvider.select((value) => value)),
+      items: const [
+        BottomNavItem(label: 'Home', child: CupertinoIcons.home),
+        BottomNavItem(label: 'Book', child: CupertinoIcons.book),
+        BottomNavItem(label: 'Bubble', child: CupertinoIcons.bubble_left),
+        BottomNavItem(label: 'Bookmark', child: CupertinoIcons.bookmark),
+      ],
+    ),
     );
   }
 }
