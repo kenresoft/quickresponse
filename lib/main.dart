@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
             highlightColor: Colors.transparent,
             splashColor: Colors.transparent,
             typography: Typography.material2021(englishLike: Typography.dense2021),
-            textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.white)),
+            textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.black87)),
           ),
           darkTheme: ThemeData(
             useMaterial3: true,
