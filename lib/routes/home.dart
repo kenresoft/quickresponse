@@ -1,7 +1,12 @@
+import 'package:bottom_nav/bottom_nav.dart';
 import 'package:extensionresoft/extensionresoft.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quickresponse/data/constants/constants.dart';
+import 'package:quickresponse/widgets/suggestion_card.dart';
 
+import '../providers/providers.dart';
 import '../widgets/alert_button.dart';
 
 class Home extends StatefulWidget {
@@ -17,7 +22,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       body: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          30.spaceY(),
+          10.spY,
 
           // 1
           const Row(
@@ -34,54 +39,61 @@ class _HomeState extends State<Home> {
           ),
 
           // 2
-          const Text('Emergency help...'),
+          const Text('Emergency help needed?', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
 
           // 3
-          const Text('Just hold the button to call'),
+          const Text('Just hold the button to call', style: TextStyle(fontSize: 20)),
 
           // 4
           const AlertButton(),
 
           // 5
-          const Text(''),
+          const Text('Not sure what to do?', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
 
           // 6
-          const Text(''),
+          const Text('Pick the subject to chat'),
 
           // 7
-          /*ListView.builder(
+          ListView.builder(
             shrinkWrap: true,
             scrollDirection: Axis.horizontal,
-            itemCount: 1,
+            itemCount: 3,
             itemBuilder: (BuildContext context, int index) {
-              return const SuggestionCard();
+              return const SuggestionCard(text: 'He had an accident');
             },
-          ),*/
+          ),
+
+          10.spY,
 
           // 8
         ]),
       ),
-      bottomNavigationBar: BottomNav(
-      labelStyle: const TextStyle(fontStyle: FontStyle.italic),
-      height: 82,
-      padding: const EdgeInsets.all(25).copyWith(top: 5, bottom: 5),
-      backgroundSelected: Colors.blue.shade900,
-      divider: const Divider(height: 0),
-      borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-      onTap: (index) => buildNavSwitch(index, context, widget.ref),
-      iconSize: 23,
-      labelSize: 20,
-      backgroundColor: Colors.white.withOpacity(0.2),
-      color: Colors.white.withOpacity(0.5),
-      colorSelected: Colors.white,
-      indexSelected: widget.ref.watch(tabProvider.select((value) => value)),
-      items: const [
-        BottomNavItem(label: 'Home', child: CupertinoIcons.home),
-        BottomNavItem(label: 'Book', child: CupertinoIcons.book),
-        BottomNavItem(label: 'Bubble', child: CupertinoIcons.bubble_left),
-        BottomNavItem(label: 'Bookmark', child: CupertinoIcons.bookmark),
-      ],
-    ),
+      bottomNavigationBar: Consumer(
+        builder: (BuildContext context, WidgetRef ref, Widget? child) {
+          return BottomNav(
+            labelStyle: const TextStyle(color: Colors.deepPurple),
+            height: 78,
+            // Attention: limit maximum height
+            padding: const EdgeInsets.all(25).copyWith(top: 5, bottom: 5),
+            backgroundSelected: Colors.blue.shade900,
+            divider: null,
+            borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+            onTap: (index) => ref.watch(tabProvider.notifier).setTab = index,
+            iconSize: 23,
+            labelSize: 20,
+            backgroundColor: Colors.deepPurple.withOpacity(0.5),
+            color: Colors.white.withOpacity(0.5),
+            colorSelected: Colors.deepPurple,
+            indexSelected: ref.watch(tabProvider.select((value) => value)),
+            items: const [
+              BottomNavItem(label: 'Home', child: CupertinoIcons.home),
+              BottomNavItem(label: 'Book', child: CupertinoIcons.book),
+              BottomNavItem(label: 'Bubble', child: CupertinoIcons.bubble_left),
+              BottomNavItem(label: 'Bookmark', child: CupertinoIcons.bookmark),
+            ],
+          );
+        },
+      ),
     );
   }
 }

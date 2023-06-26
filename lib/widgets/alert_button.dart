@@ -10,6 +10,13 @@ class AlertButton extends StatefulWidget {
 class _AlertButtonState extends State<AlertButton> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(80),
+        color: Colors.redAccent,
+      ),
+      width: 150,
+      height: 150,
+    );
   }
 }
