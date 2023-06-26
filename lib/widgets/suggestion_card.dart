@@ -7,7 +7,7 @@ class SuggestionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(height: 200,
+    return Card(
       child: Column(children: [
         Text(text),
         const Row(
