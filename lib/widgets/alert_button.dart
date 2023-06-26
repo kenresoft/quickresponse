@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AlertButton extends StatefulWidget {
@@ -12,11 +13,17 @@ class _AlertButtonState extends State<AlertButton> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(80),
+        borderRadius: BorderRadius.circular(100),
         color: Colors.redAccent,
+        border: Border.all(width: 5, color: Colors.grey), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), spreadRadius: 15)]
       ),
-      width: 150,
-      height: 150,
+      width: 160,
+      height: 160,
+      child: const Icon(
+        CupertinoIcons.waveform_path,
+        size: 45,
+        color: CupertinoColors.white,
+      ),
     );
   }
 }
