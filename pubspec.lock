@@ -142,8 +142,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: master
-      resolved-ref: e731971bff703e16b4204cc1d4d69cf445f97f44
+      ref: feature
+      resolved-ref: "7647367987cb52d3568ffb533bae41d2cb54c08a"
       url: "git@github.com:kenresoft/extensionresoft.git"
     source: git
     version: "0.0.1"

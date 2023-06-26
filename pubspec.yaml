@@ -19,7 +19,7 @@ dependencies:
   extensionresoft:
     git:
       url: git@github.com:kenresoft/extensionresoft.git
-      ref: master
+      ref: feature
   bottom_nav:
     git:
       url: git@github.com:kenresoft/bottom_nav.git
