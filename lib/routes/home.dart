@@ -27,14 +27,32 @@ class _HomeState extends State<Home> {
           // 1
           const Row(
             children: [
-              Image(
-                image: ExactAssetImage(Constants.tech),
-                height: 24,
-                width: 24,
+              Row(
+                children: [
+                  Image(
+                    image: ExactAssetImage(Constants.tech),
+                    height: 45,
+                    width: 45,
+                  ),
+                  Column(
+                    children: [
+                      Text('Hi Susan!', style: TextStyle(fontSize: 15)),
+                      Text('Complete profile', style: TextStyle(fontSize: 15, color: Colors.redAccent)),
+                    ],
+                  )
+                ],
               ),
-              Column(
-                children: [],
-              )
+              Row(
+                children: [
+                  Column(
+                    children: [
+                      Text('Ludwika Waryn...', style: TextStyle(fontSize: 15)),
+                      Text('See your location', style: TextStyle(fontSize: 15, color: Colors.redAccent)),
+                      Icon(Icons.location_on_rounded),
+                    ],
+                  )
+                ],
+              ),
             ],
           ),
 
@@ -54,13 +72,16 @@ class _HomeState extends State<Home> {
           const Text('Pick the subject to chat'),
 
           // 7
-          ListView.builder(
-            shrinkWrap: true,
-            scrollDirection: Axis.horizontal,
-            itemCount: 3,
-            itemBuilder: (BuildContext context, int index) {
-              return const SuggestionCard(text: 'He had an accident');
-            },
+          SizedBox(
+            height: 100,
+            child: ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              itemCount: 6,
+              itemBuilder: (BuildContext context, int index) {
+                return const SuggestionCard(text: 'He had an accident');
+              },
+            ),
           ),
 
           10.spY,
