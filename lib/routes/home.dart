@@ -25,45 +25,39 @@ class _HomeState extends State<Home> {
           10.spY,
 
           // 1
-          const Row(
-            children: [
-              Row(
+          const Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Row(children: [
+              Image(
+                image: ExactAssetImage(Constants.tech),
+                height: 45,
+                width: 45,
+              ),
+              Column(children: [
+                Text('Hi Susan!', style: TextStyle(fontSize: 15)),
+                Text('Complete profile', style: TextStyle(fontSize: 15, color: Colors.redAccent)),
+              ])
+            ]),
+            Row(children: [
+              Column(
                 children: [
-                  Image(
-                    image: ExactAssetImage(Constants.tech),
-                    height: 45,
-                    width: 45,
-                  ),
-                  Column(
-                    children: [
-                      Text('Hi Susan!', style: TextStyle(fontSize: 15)),
-                      Text('Complete profile', style: TextStyle(fontSize: 15, color: Colors.redAccent)),
-                    ],
-                  )
+                  Text('Ludwika Waryn...', style: TextStyle(fontSize: 15)),
+                  Text('See your location', style: TextStyle(fontSize: 15, color: Colors.redAccent)),
                 ],
               ),
-              Row(
-                children: [
-                  Column(
-                    children: [
-                      Text('Ludwika Waryn...', style: TextStyle(fontSize: 15)),
-                      Text('See your location', style: TextStyle(fontSize: 15, color: Colors.redAccent)),
-                      Icon(Icons.location_on_rounded),
-                    ],
-                  )
-                ],
-              ),
-            ],
-          ),
+              Icon(Icons.location_on_rounded, color: Colors.redAccent),
+            ]),
+          ]),
 
           // 2
           const Text('Emergency help needed?', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
 
           // 3
           const Text('Just hold the button to call', style: TextStyle(fontSize: 20)),
+          10.spY,
 
           // 4
           const AlertButton(),
+          20.spY,
 
           // 5
           const Text('Not sure what to do?', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
@@ -93,12 +87,12 @@ class _HomeState extends State<Home> {
         builder: (BuildContext context, WidgetRef ref, Widget? child) {
           return BottomNav(
             labelStyle: const TextStyle(color: Colors.deepPurple),
-            height: 78,
+            height: 75,
             // Attention: limit maximum height
             padding: const EdgeInsets.all(25).copyWith(top: 5, bottom: 5),
             backgroundSelected: Colors.blue.shade900,
             divider: null,
-            borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+            //borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
             onTap: (index) => ref.watch(tabProvider.notifier).setTab = index,
             iconSize: 23,
             labelSize: 20,
