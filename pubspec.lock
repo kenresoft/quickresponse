@@ -41,6 +41,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  bottom_nav:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: "5dcc6ea99c2d5e28c12950f78b1ca2d91cd0bb8c"
+      url: "git@github.com:kenresoft/bottom_nav.git"
+    source: git
+    version: "0.0.1"
   characters:
     dependency: transitive
     description:
@@ -134,7 +143,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: c18c015c3386fe9dff7287651d8588ea4f9d1e4c
+      resolved-ref: e731971bff703e16b4204cc1d4d69cf445f97f44
       url: "git@github.com:kenresoft/extensionresoft.git"
     source: git
     version: "0.0.1"
