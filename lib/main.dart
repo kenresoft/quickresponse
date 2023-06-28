@@ -8,7 +8,7 @@ import 'package:fontresoft/fontresoft.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/providers/providers.dart';
-import 'package:quickresponse/routes/contact.dart';
+import 'package:quickresponse/routes/contacts.dart';
 import 'package:quickresponse/routes/dashboard.dart';
 import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/routes/home.dart';
@@ -84,7 +84,7 @@ class MyApp extends StatelessWidget {
       route(Constants.root, const Home()),
       route(Constants.dashboard, const Dashboard()),
       route(Constants.home, const Home()),
-      route(Constants.contact, const Contact()),
+      route(Constants.contact, const Contacts()),
       route(Constants.error, const ErrorPage()),
     ],
     errorBuilder: (context, state) => const ErrorPage(),
@@ -116,6 +116,18 @@ GoRoute routeTransition(String path, Widget route) {
 launch(BuildContext context, String route, [Object? extra]) {
   GoRouter.of(context).push(route, extra: extra);
 }
+
+// Next Page without toolbar leading arrow
+replace(BuildContext context, String route, [Object? extra]) {
+  GoRouter.of(context).replace(route, extra: extra);
+}
+
+// Next Page with toolbar leading arrow
+launchReplace(BuildContext context, String route, [Object? extra]) {
+  GoRouter.of(context).pushReplacement(route, extra: extra);
+}
+
+finish(BuildContext context) => GoRouter.of(context).pop();
 
 FutureOr appCallback(void value) async {
   //await Firebase.initializeApp();
