@@ -1,6 +1,5 @@
 import 'package:bottom_nav/bottom_nav.dart';
 import 'package:extensionresoft/extensionresoft.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quickresponse/data/constants/colors.dart';
@@ -8,6 +7,7 @@ import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/constants/density.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 
+import '../main.dart';
 import '../providers/providers.dart';
 import '../widgets/alert_button.dart';
 
@@ -37,7 +37,7 @@ class _HomeState extends State<Home> {
             0.04.dpH(dp).spY,
 
             // 2
-            (0.7.dpW(dp)).spaceX(Text(
+            0.7.dpW(dp).spaceX(Text(
               'Emergency help needed?',
               style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: AppColor.title),
               textAlign: TextAlign.center,
@@ -80,7 +80,16 @@ class _HomeState extends State<Home> {
             height: 68,
             // Attention: limit maximum height
             padding: const EdgeInsets.all(25).copyWith(top: 5, bottom: 10),
-            onTap: (index) => ref.watch(tabProvider.notifier).setTab = index,
+            onTap: (index) {
+              ref.watch(tabProvider.notifier).setTab = index;
+              if (index == 0) {
+                launch(context, Constants.home);
+              } else if (index == 1) {
+                launch(context, Constants.dashboard);
+              } else if (index == 2) {
+                launch(context, Constants.contact);
+              }
+            },
             iconSize: 23,
             labelSize: 0,
             backgroundColor: Colors.white,
