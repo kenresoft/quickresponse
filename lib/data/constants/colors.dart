@@ -7,7 +7,7 @@ class AppColor {
   static Color title_2 = const Color(0xff4D5366);
   static Color black = const Color(0xff2D344B);
   static Color text = const Color(0xffA5ACBF);
-
+  static Color white = const Color(0xffFFFFFF);
   static Color alertBorder = const Color(0xffB1B6C7);
   static Color alert_1 = const Color(0xffFE6464);
   static Color alert_2 = const Color(0xffD80000);
