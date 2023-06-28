@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:extensionresoft/extensionresoft.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fontresoft/fontresoft.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/providers/providers.dart';
+import 'package:quickresponse/routes/contact.dart';
 import 'package:quickresponse/routes/dashboard.dart';
 import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/routes/home.dart';
@@ -17,6 +17,13 @@ import 'data/constants/constants.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: AppColor.background,
+      systemNavigationBarColor: AppColor.alert_1,
+      systemNavigationBarDividerColor: AppColor.action,
+    ),
+  );
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -41,7 +48,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.light,
-            colorSchemeSeed: Colors.purpleAccent,
+            colorSchemeSeed: Colors.redAccent,
             fontFamily: FontResoft.sourceSansPro,
             package: FontResoft.package,
             highlightColor: Colors.transparent,
@@ -52,7 +59,7 @@ class MyApp extends StatelessWidget {
           darkTheme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.dark,
-            colorSchemeSeed: Colors.purple,
+            colorSchemeSeed: Colors.redAccent,
             fontFamily: FontResoft.inter,
             package: FontResoft.package,
             highlightColor: Colors.transparent,
@@ -77,6 +84,7 @@ class MyApp extends StatelessWidget {
       route(Constants.root, const Home()),
       route(Constants.dashboard, const Dashboard()),
       route(Constants.home, const Home()),
+      route(Constants.contact, const Contact()),
       route(Constants.error, const ErrorPage()),
     ],
     errorBuilder: (context, state) => const ErrorPage(),
