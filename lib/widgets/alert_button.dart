@@ -19,8 +19,16 @@ class _AlertButtonState extends State<AlertButton> {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.elliptical(widget.width, widget.height)),
           gradient: AppColor.alert,
-          border: Border.all(width: 5, color: Colors.grey),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), spreadRadius: 15)]),
+          border: Border.all(width: 8, color: Colors.grey),
+          boxShadow: [
+            const BoxShadow(color: Colors.white, spreadRadius: 3),
+            BoxShadow(color: Colors.white.withOpacity(0.8), offset: const Offset(0, -20), blurRadius: 5),
+            BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(10, 20), blurRadius: 5),
+            BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(10, 0), blurRadius: 5),
+            BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(-10, 10), blurRadius: 5),
+            BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(-10, 0), blurRadius: 5),
+            BoxShadow(color: Colors.black.withOpacity(0.03), spreadRadius: 15),
+          ]),
       width: widget.width,
       height: widget.height,
       child: const Icon(
