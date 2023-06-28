@@ -1,13 +1,14 @@
 class Constants {
   Constants._();
 
-  static const String appName = 'Image Recommendation System';
+  static const String appName = 'QuickResponse';
   static const String root = '/';
 
   //Navigation routes
   static const String dashboard = '/dashboard';
   static const String home = '/home';
-  static const String contact = '/contact';
+  static const String contacts = '/contacts';
+  static const String contactDetails = '/contact-details';
   static const String error = '/error';
 
   //Images route

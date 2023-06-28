@@ -8,6 +8,7 @@ import 'package:fontresoft/fontresoft.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/providers/providers.dart';
+import 'package:quickresponse/routes/contact_details.dart';
 import 'package:quickresponse/routes/contacts.dart';
 import 'package:quickresponse/routes/dashboard.dart';
 import 'package:quickresponse/routes/error.dart';
@@ -84,7 +85,8 @@ class MyApp extends StatelessWidget {
       route(Constants.root, const Home()),
       route(Constants.dashboard, const Dashboard()),
       route(Constants.home, const Home()),
-      route(Constants.contact, const Contacts()),
+      route(Constants.contacts, const Contacts()),
+      route(Constants.contactDetails, const ContactDetails()),
       route(Constants.error, const ErrorPage()),
     ],
     errorBuilder: (context, state) => const ErrorPage(),

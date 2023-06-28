@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quickresponse/data/constants/colors.dart';
 
 import '../data/constants/constants.dart';
 
@@ -17,7 +18,7 @@ class ErrorPage extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 40,
-              color: Colors.deepPurple.shade200,
+              color: AppColor.action,
             ),
           ),
         ),
