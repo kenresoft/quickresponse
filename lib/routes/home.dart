@@ -27,24 +27,25 @@ class _HomeState extends State<Home> {
       body: SingleChildScrollView(
         child: Center(
           child: Column(children: [
-            20.dpH(dp).spY,
+            0.05.dpH(dp).spY,
 
             // 1
-            buildRow(),
-            40.dpH(dp).spY,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: buildRow(),
+            ),
+            0.04.dpH(dp).spY,
 
             // 2
-            (7.dpW(dp)).spaceX(
-                  Text(
-                    'Emergency help needed?',
-                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: AppColor.title),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-            10.dpH(dp).spY,
+            (0.7.dpW(dp)).spaceX(Text(
+              'Emergency help needed?',
+              style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: AppColor.title),
+              textAlign: TextAlign.center,
+            )),
+            0.01.dpH(dp).spY,
 
             // 3
-            Text('Just hold the button to call', style: TextStyle(fontSize: 20, color: AppColor.text)),
+            Text('Just hold the button to call', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20, color: AppColor.text)),
             0.05.dpH(dp).spY,
 
             // 4
@@ -52,26 +53,22 @@ class _HomeState extends State<Home> {
             0.08.dpH(dp).spY,
 
             // 5
-            Text('Not sure what to do?', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColor.title)),
+            Text('Not sure what to do?', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColor.title)),
 
             // 6
             Text('Pick the subject to chat', style: TextStyle(fontSize: 16, color: AppColor.text)),
-            0.02.dpH(dp).spY,
+            0.03.dpH(dp).spY,
 
             // 7
-            SizedBox(
-              height: 100.dpH(dp),
-              child: ListView.builder(
+            .12.dpH(dp).spaceY(ListView.builder(
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
                 itemCount: 6,
                 itemBuilder: (BuildContext context, int index) {
                   return const SuggestionCard(text: 'He had an accident');
-                },
-              ),
-            ),
+                })),
 
-            0.02.dpH(dp).spY,
+            0.03.dpH(dp).spY,
 
             // 8
           ]),
@@ -91,10 +88,10 @@ class _HomeState extends State<Home> {
             colorSelected: AppColor.navIconSelected,
             indexSelected: ref.watch(tabProvider.select((value) => value)),
             items: const [
-              BottomNavItem(label: '', child: CupertinoIcons.home),
-              BottomNavItem(label: '', child: CupertinoIcons.book),
-              BottomNavItem(label: '', child: CupertinoIcons.bubble_left),
-              BottomNavItem(label: '', child: CupertinoIcons.bookmark),
+              BottomNavItem(label: '', child: Icons.cabin),
+              BottomNavItem(label: '', child: Icons.health_and_safety_outlined),
+              BottomNavItem(label: '', child: Icons.sensor_occupied),
+              BottomNavItem(label: '', child: Icons.sentiment_satisfied),
             ],
           );
         },
@@ -117,23 +114,21 @@ class _HomeState extends State<Home> {
           ),
           Text(
             'Complete profile',
-            style: TextStyle(fontSize: 15, color: AppColor.action),
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColor.action),
           ),
         ])
       ]),
       Row(children: [
-        Column(
-          children: [
-            Text(
-              'Ludwika Waryn...',
-              style: TextStyle(fontSize: 15, color: AppColor.text),
-            ),
-            Text(
-              'See your location',
-              style: TextStyle(fontSize: 15, color: AppColor.action),
-            ),
-          ],
-        ),
+        Column(children: [
+          Text(
+            'Ludwika Waryn...',
+            style: TextStyle(fontSize: 15, color: AppColor.text),
+          ),
+          Text(
+            'See your location',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColor.action),
+          ),
+        ]),
         Icon(Icons.location_on_rounded, color: AppColor.action),
       ]),
     ]);
