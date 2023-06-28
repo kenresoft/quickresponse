@@ -21,7 +21,7 @@ void main() {
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
       statusBarColor: AppColor.background,
-      systemNavigationBarColor: AppColor.alert_1,
+      systemNavigationBarColor: AppColor.text,
       systemNavigationBarDividerColor: AppColor.action,
     ),
   );
