@@ -8,11 +8,13 @@ import 'package:fontresoft/fontresoft.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/providers/providers.dart';
+import 'package:quickresponse/routes/call.dart';
 import 'package:quickresponse/routes/contact_details.dart';
 import 'package:quickresponse/routes/contacts.dart';
 import 'package:quickresponse/routes/dashboard.dart';
 import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/routes/home.dart';
+import 'package:quickresponse/widgets/map.dart';
 
 import 'data/constants/constants.dart';
 
@@ -22,7 +24,7 @@ void main() {
     SystemUiOverlayStyle(
       statusBarColor: AppColor.background,
       systemNavigationBarColor: AppColor.text,
-      systemNavigationBarDividerColor: AppColor.action,
+      systemNavigationBarDividerColor: AppColor.divider,
     ),
   );
   SystemChrome.setPreferredOrientations([
@@ -87,6 +89,7 @@ class MyApp extends StatelessWidget {
       route(Constants.home, const Home()),
       route(Constants.contacts, const Contacts()),
       route(Constants.contactDetails, const ContactDetails()),
+      route(Constants.call, const Call()),
       route(Constants.error, const ErrorPage()),
     ],
     errorBuilder: (context, state) => const ErrorPage(),
