@@ -6,6 +6,7 @@ import 'package:quickresponse/data/constants/density.dart';
 import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 
+import '../main.dart';
 import '../widgets/alert_button.dart';
 
 class Home extends StatefulWidget {
@@ -46,7 +47,10 @@ class _HomeState extends State<Home> {
             0.05.dpH(dp).spY,
 
             // 4
-            const AlertButton(height: 190, width: 185),
+            GestureDetector(
+              onLongPress: () => launch(context, Constants.call, (false, '')),
+              child: const AlertButton(height: 190, width: 185, borderWidth: 3, shadowWidth: 15, iconSize: 45),
+            ),
             0.08.dpH(dp).spY,
 
             // 5

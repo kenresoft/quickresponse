@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/model/contact.dart';
 import 'package:quickresponse/main.dart';
-import 'package:quickresponse/routes/appbar.dart';
+import 'package:quickresponse/widgets/appbar.dart';
 import 'package:quickresponse/widgets/contact_searchbar.dart';
 
 import '../data/constants/colors.dart';
@@ -18,13 +18,13 @@ class Contacts extends StatelessWidget {
     final dp = Density.init(context);
     return Scaffold(
       backgroundColor: AppColor.background,
-      appBar: const Appbar(title: 'Contacts', actionTitle: 'Add', actionIcon: Icons.add) as AppBar,
+      appBar: appBar(title: 'Contacts', actionTitle: 'Add', actionIcon: Icons.add),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: ContactSearchBar(
           contacts: contacts,
-          onSelected: (String value) {
-            launch(context, Constants.contactDetails);
+          onSelected: (Contact value) {
+            launch(context, Constants.contactDetails, value);
           },
         ),
       ),
