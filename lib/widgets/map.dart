@@ -60,7 +60,7 @@ class _CallState extends State<Call> {
               );
             }
             else {
-              return const Text("Loading..");
+              return const Center(child: Text("Loading.."));
             }
           }
       ),
