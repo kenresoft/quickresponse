@@ -9,6 +9,7 @@ class Constants {
   static const String home = '/home';
   static const String contacts = '/contacts';
   static const String contactDetails = '/contact-details';
+  static const String call = '/call';
   static const String error = '/error';
 
   //Images route
