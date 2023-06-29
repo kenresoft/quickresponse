@@ -29,6 +29,9 @@ dependencies:
   go_router: ^8.2.0
   flutter_riverpod: ^2.3.6
 
+  geolocator: ^9.0.2
+  google_maps_flutter: ^2.3.1
+
   firebase_core: ^2.14.0
   cloud_firestore: ^4.8.1
 
