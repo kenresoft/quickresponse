@@ -3,10 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 
 class AlertButton extends StatefulWidget {
-  const AlertButton({super.key, required this.height, required this.width});
+  const AlertButton({
+    super.key,
+    required this.height,
+    required this.width,
+    required this.borderWidth,
+    required this.shadowWidth,
+    required this.iconSize,
+  });
 
   final double height;
   final double width;
+  final double borderWidth;
+  final double shadowWidth;
+  final double iconSize;
 
   @override
   State<AlertButton> createState() => _AlertButtonState();
@@ -19,7 +29,7 @@ class _AlertButtonState extends State<AlertButton> {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.all(Radius.elliptical(widget.width, widget.height)),
           gradient: AppColor.alert,
-          border: Border.all(width: 8, color: Colors.grey),
+          border: Border.all(width: widget.borderWidth, color: Colors.grey),
           boxShadow: [
             const BoxShadow(color: Colors.white, spreadRadius: 3),
             BoxShadow(color: Colors.white.withOpacity(0.8), offset: const Offset(0, -20), blurRadius: 5),
@@ -27,13 +37,13 @@ class _AlertButtonState extends State<AlertButton> {
             BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(10, 0), blurRadius: 5),
             BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(-10, 10), blurRadius: 5),
             BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(-10, 0), blurRadius: 5),
-            BoxShadow(color: Colors.black.withOpacity(0.03), spreadRadius: 15),
+            BoxShadow(color: Colors.black.withOpacity(0.03), spreadRadius: widget.shadowWidth),
           ]),
       width: widget.width,
       height: widget.height,
-      child: const Icon(
+      child: Icon(
         CupertinoIcons.waveform_path,
-        size: 45,
+        size: widget.iconSize,
         color: CupertinoColors.white,
       ),
     );

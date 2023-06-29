@@ -18,12 +18,8 @@ AppBar appBar({required String title, required String actionTitle, required Icon
           textAlign: TextAlign.center,
         ),
         2.spX,
-        Icon(
-          actionIcon,
-          color: AppColor.navIconSelected,
-          size: 18,
-        ),
-        20.spX
+        Icon(actionIcon, color: AppColor.navIconSelected, size: 18),
+        20.spX,
       ])
     ],
   );
