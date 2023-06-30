@@ -1,12 +1,17 @@
+import 'dart:developer';
+
 import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/constants/density.dart';
+import 'package:quickresponse/utils/init.dart';
 import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 
 import '../main.dart';
+import '../utils/util.dart';
 import '../widgets/alert_button.dart';
 
 class Home extends StatefulWidget {
@@ -17,21 +22,58 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  late Future<Position?> position;
+
+  @override
+  void initState() {
+    super.initState();
+
+  }
+
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
+    Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
+      log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
+      position = Future.value(position);
+    });
+    position = Geolocator.getLastKnownPosition();
     return Scaffold(
       backgroundColor: AppColor.background,
+      appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.background),
       body: SingleChildScrollView(
         child: Center(
           child: Column(children: [
-            0.05.dpH(dp).spY,
+            //0.05.dpH(dp).spY,
+            Util.loadFuture(Geolocator.checkPermission(), (permission) {
+              if (permission == LocationPermission.denied) {
+                Util.loadFuture(Geolocator.requestPermission(), (request) {
+                  if (permission == LocationPermission.denied) {
+                    Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
+                      log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
+                      position = Future.value(p);
+                    });
+                    position = Geolocator.getLastKnownPosition();
+                    log(permission.toString());
+                  }
+                }, (a) {
+                  return const SizedBox();
+                });
+              }
+            }, (a) {
+              return const SizedBox();
+            }),
 
-            // 1
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: buildRow(),
+            Util.loadFuture(
+              position,
+              (data) {},
+              (pos) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: buildRow(context, pos as Position),
+              ),
             ),
+            // 1
+
             0.04.dpH(dp).spY,
 
             // 2
@@ -79,7 +121,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Row buildRow() {
+  Row buildRow(BuildContext context, Position position) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Row(children: [
         const Image(
@@ -98,19 +140,22 @@ class _HomeState extends State<Home> {
           ),
         ])
       ]),
-      Row(children: [
-        Column(children: [
-          Text(
-            'Ludwika Waryn...',
-            style: TextStyle(fontSize: 15, color: AppColor.text),
-          ),
-          Text(
-            'See your location',
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColor.action),
-          ),
+      GestureDetector(
+        onTap: () => launch(context, Constants.locationMap, position),
+        child: Row(children: [
+          Column(children: [
+            Text(
+              'Ludwika Waryn...',
+              style: TextStyle(fontSize: 15, color: AppColor.text),
+            ),
+            Text(
+              'See your location',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColor.action),
+            ),
+          ]),
+          Icon(Icons.location_on_rounded, color: AppColor.action),
         ]),
-        Icon(Icons.location_on_rounded, color: AppColor.action),
-      ]),
+      ),
     ]);
   }
 }

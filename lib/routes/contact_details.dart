@@ -45,7 +45,7 @@ class _ContactDetailsState extends State<ContactDetails> {
     final dp = Density.init(context);
     return Scaffold(
       backgroundColor: AppColor.background,
-      appBar: appBar(title: 'Contacts', actionTitle: 'Delete', actionIcon: CupertinoIcons.trash),
+      appBar: appBar(title: const Text('Contacts'), actionTitle: 'Delete', actionIcon: CupertinoIcons.trash),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Card(
