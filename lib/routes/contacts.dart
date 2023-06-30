@@ -18,7 +18,7 @@ class Contacts extends StatelessWidget {
     final dp = Density.init(context);
     return Scaffold(
       backgroundColor: AppColor.background,
-      appBar: appBar(title: 'Contacts', actionTitle: 'Add', actionIcon: Icons.add),
+      appBar: appBar(title: const Text('Contacts'), actionTitle: 'Add', actionIcon: Icons.add),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: ContactSearchBar(
