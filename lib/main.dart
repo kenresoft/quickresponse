@@ -14,7 +14,7 @@ import 'package:quickresponse/routes/contacts.dart';
 import 'package:quickresponse/routes/dashboard.dart';
 import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/routes/home.dart';
-import 'package:quickresponse/widgets/map.dart';
+import 'package:quickresponse/routes/map.dart';
 
 import 'data/constants/constants.dart';
 
@@ -90,6 +90,7 @@ class MyApp extends StatelessWidget {
       route(Constants.contacts, const Contacts()),
       route(Constants.contactDetails, const ContactDetails()),
       route(Constants.call, const Call()),
+      route(Constants.locationMap, const LocationMap()),
       route(Constants.error, const ErrorPage()),
     ],
     errorBuilder: (context, state) => const ErrorPage(),

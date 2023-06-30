@@ -5,17 +5,18 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:label="quickresponse"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
-        <!--<meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDZF_oNL8olqMqAbgcjl6HU1vj2eEjx1Hw"/>--> <!--Copied online-->
-
         <meta-data android:name="com.google.android.geo.API_KEY"
-                android:value="AIzaSyDa65bAL30pzz0WId8e5u5vpmFn5VgHs2U"/>  <!--// Quick Response old-->
+            android:value="AIzaSyDZF_oNL8olqMqAbgcjl6HU1vj2eEjx1Hw"/> <!--Copied online-->
+
+        <!--<meta-data android:name="com.google.android.geo.API_KEY"
+                android:value="AIzaSyDa65bAL30pzz0WId8e5u5vpmFn5VgHs2U"/>-->  <!--// Quick Response old-->
 
         <activity
             android:name=".MainActivity"
