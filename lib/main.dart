@@ -14,7 +14,7 @@ import 'package:quickresponse/routes/contacts.dart';
 import 'package:quickresponse/routes/dashboard.dart';
 import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/routes/home.dart';
-import 'package:quickresponse/routes/map.dart';
+import 'package:quickresponse/routes/location_map.dart';
 
 import 'data/constants/constants.dart';
 

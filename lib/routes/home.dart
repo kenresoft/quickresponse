@@ -11,7 +11,6 @@ import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 
 import '../main.dart';
-import '../utils/util.dart';
 import '../widgets/alert_button.dart';
 
 class Home extends StatefulWidget {
@@ -22,22 +21,56 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  late Future<Position?> position;
+  //late Future<Position?> position;
+  late LocationPermission _permission;
+  late Position _position;
 
   @override
   void initState() {
     super.initState();
+    _requestPermission();
+    _startLocationUpdates();
+  }
 
+  void _requestPermission() async {
+    _permission = await Geolocator.requestPermission();
+    if (_permission == LocationPermission.denied) {
+      _showPermissionDeniedDialog();
+    }
+  }
+
+  void _showPermissionDeniedDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Permission denied'),
+        content: const Text('You need to grant location permission in order to use this app.'),
+        actions: [
+          TextButton(
+            child: const Text('OK'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              _requestPermission();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _startLocationUpdates() async {
+    Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
+      log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
+      setState(() {
+        _position = p!;
+      });
+    });
+    _position = (await Geolocator.getLastKnownPosition())!;
   }
 
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
-    Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
-      log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
-      position = Future.value(position);
-    });
-    position = Geolocator.getLastKnownPosition();
     return Scaffold(
       backgroundColor: AppColor.background,
       appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.background),
@@ -45,10 +78,10 @@ class _HomeState extends State<Home> {
         child: Center(
           child: Column(children: [
             //0.05.dpH(dp).spY,
-            Util.loadFuture(Geolocator.checkPermission(), (permission) {
+            /*Util.loadFuture(Geolocator.checkPermission(), (permission) {
               if (permission == LocationPermission.denied) {
                 Util.loadFuture(Geolocator.requestPermission(), (request) {
-                  if (permission == LocationPermission.denied) {
+                  if (request != LocationPermission.denied) {
                     Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
                       log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
                       position = Future.value(p);
@@ -62,17 +95,21 @@ class _HomeState extends State<Home> {
               }
             }, (a) {
               return const SizedBox();
-            }),
+            }),*/
 
-            Util.loadFuture(
+            /*Util.loadFuture(
               position,
               (data) {},
               (pos) => Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: buildRow(context, pos as Position),
               ),
-            ),
+            ),*/
             // 1
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: buildRow(context, _position),
+            ),
 
             0.04.dpH(dp).spY,
 
