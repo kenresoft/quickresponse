@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
 LocationSettings get locationSettings {
+
   late LocationSettings locationSettings;
 
   if (defaultTargetPlatform == TargetPlatform.android) {
@@ -9,7 +10,7 @@ LocationSettings get locationSettings {
       accuracy: LocationAccuracy.high,
       distanceFilter: 100,
       forceLocationManager: true,
-      intervalDuration: const Duration(seconds: 10),
+      intervalDuration: const Duration(seconds: 1),
       //(Optional) Set foreground notification config to keep the app alive
       //when going to the background
       foregroundNotificationConfig: const ForegroundNotificationConfig(
