@@ -28,6 +28,8 @@ class Constants {
 
   //Icons
   static const String appIcon = "$iconDir/icon.png";
+  static const String drivingPin = "$iconDir/driving_pin.png";
+  static const String destinationMapMarker = "$iconDir/destination_map_marker.png";
 
   static var maps = {
     1: profile,
