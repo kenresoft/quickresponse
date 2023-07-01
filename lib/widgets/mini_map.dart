@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:quickresponse/routes/map.dart';
+
+import '../routes/location_map.dart';
 
 class MiniMap extends StatelessWidget {
   const MiniMap({super.key});
