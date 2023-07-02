@@ -42,18 +42,18 @@ class _LocationMapState extends State<LocationMap> {
   late PolylinePoints polylinePoints;
 
   // for my custom marker pins
-  late BitmapDescriptor sourceIcon;
-  late BitmapDescriptor destinationIcon;
+  BitmapDescriptor sourceIcon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor destinationIcon = BitmapDescriptor.defaultMarker;
 
   // the user's initial location and current location as it moves
-  late Position? currentLocation;
+  Position? currentLocation;
 
   // a reference to the destination location
-  late Position? destinationLocation;
+  Position? destinationLocation;
 
   late GeolocatorPlatform geolocator;
 
-  double pinPillPosition = -100;
+  double pinPillPosition = -150;
   PinInformation currentlySelectedPin = PinInformation(
     pinPath: '',
     avatarPath: '',
@@ -76,28 +76,22 @@ class _LocationMapState extends State<LocationMap> {
     getLocation();
     // set the initial location
     setInitialLocation();
-
-    setCurrentLocation();
+    // set custom marker pins
+    setSourceAndDestinationIcons();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // set custom marker pins
-    setSourceAndDestinationIcons();
-
   }
 
   void getLocation() {
     geolocator.getPositionStream(locationSettings: locationSettings).listen((Position p) {
-      currentLocation = p;
-      updatePinOnMap();
+      setState(() {
+        currentLocation = p;
+        updatePinOnMap();
+      });
     });
-  }
-
-  void setCurrentLocation() async {
-    final position = GoRouterState.of(context).extra as Position;
-    currentLocation = position /*await geolocator.getLastKnownPosition()*/;
   }
 
   void setSourceAndDestinationIcons() async {
@@ -119,7 +113,10 @@ class _LocationMapState extends State<LocationMap> {
   void setInitialLocation() async {
     // set the initial location by pulling the user's
     // current location from the location's getLocation()
-    currentLocation = await geolocator.getCurrentPosition(locationSettings: locationSettings);
+    final k = await geolocator.getCurrentPosition(locationSettings: locationSettings);
+    setState(() {
+      currentLocation = k;
+    });
 
     // hard-coded destination for this example
     destinationLocation = Position.fromMap({"latitude": DEST_LOCATION.latitude, "longitude": DEST_LOCATION.longitude});
@@ -133,21 +130,30 @@ class _LocationMapState extends State<LocationMap> {
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
+    final position = GoRouterState.of(context).extra as Position;
+    //currentLocation = position /*await geolocator.getLastKnownPosition()*/;
 
     CameraPosition initialCameraPosition = CameraPosition(
-      target: LatLng(currentLocation!.latitude, currentLocation!.longitude),
+      target: LatLng(position.latitude, position.longitude),
       zoom: CAMERA_ZOOM,
       tilt: CAMERA_TILT,
       bearing: CAMERA_BEARING,
     );
-/*    if (currentLocation != null) {
+    if (currentLocation != null) {
       initialCameraPosition = CameraPosition(
         target: LatLng(currentLocation!.latitude, currentLocation!.longitude),
         zoom: CAMERA_ZOOM,
         tilt: CAMERA_TILT,
         bearing: CAMERA_BEARING,
       );
-    }*/
+    } else {
+      initialCameraPosition = CameraPosition(
+        target: LatLng(position.latitude, position.longitude),
+        zoom: CAMERA_ZOOM,
+        tilt: CAMERA_TILT,
+        bearing: CAMERA_BEARING,
+      );
+    }
 
     return Scaffold(
       body: Stack(children: <Widget>[
@@ -161,7 +167,7 @@ class _LocationMapState extends State<LocationMap> {
           initialCameraPosition: initialCameraPosition,
           onTap: (LatLng loc) {
             setState(() {
-              pinPillPosition = -100;
+              pinPillPosition = -150;
             });
             log(loc.toString());
           },
