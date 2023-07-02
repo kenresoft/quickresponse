@@ -20,7 +20,7 @@ class MapPinPillComponentState extends State<MapPinPillComponent> {
   @override
   Widget build(BuildContext context) {
     return AnimatedPositioned(
-      top: widget.pinPillPosition,
+      top: widget.pinPillPosition + 40,
       right: 0,
       left: 0,
       duration: const Duration(milliseconds: 200),
