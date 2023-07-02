@@ -13,7 +13,7 @@ class LoadingDialog extends StatelessWidget {
           CircularProgressIndicator(),
           SizedBox(width: 10),
           Text('Fetching your current location...'),
-          //Text('Please wait while we fetch your current location.'),
+          // Text('Please wait while we fetch your current location.'),
         ],
       ),
       backgroundColor: Colors.white,
