@@ -113,34 +113,7 @@ class _HomeState extends State<Home> {
           children: [
             Center(
               child: Column(children: [
-                //0.05.dpH(dp).spY,
-                /*Util.loadFuture(_geolocator.checkPermission(), (permission) {
-                  if (permission == LocationPermission.denied) {
-                    Util.loadFuture(_geolocator.requestPermission(), (request) {
-                      if (request != LocationPermission.denied) {
-                        _geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
-                          log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
-                          position = Future.value(p);
-                        });
-                        position = _geolocator.getLastKnownPosition();
-                        log(permission.toString());
-                      }
-                    }, (a) {
-                      return const SizedBox();
-                    });
-                  }
-                }, (a) {
-                  return const SizedBox();
-                }),*/
 
-                /*Util.loadFuture(
-                  position,
-                  (data) {},
-                  (pos) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: buildRow(context, pos as Position),
-                  ),
-                ),*/
                 // 1
                 StreamBuilder<bool>(
                   stream: Geolocator.isLocationServiceEnabled().asStream(),
