@@ -5,7 +5,6 @@ class Constants {
   static const String root = '/';
 
   //Navigation routes
-  static const String dashboard = '/dashboard';
   static const String home = '/home';
   static const String contacts = '/contacts';
   static const String contactDetails = '/contactDetails';
