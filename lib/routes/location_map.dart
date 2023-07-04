@@ -5,6 +5,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -15,6 +16,7 @@ import 'package:quickresponse/utils/map_style.dart';
 import '../data/constants/api.dart';
 import '../data/constants/density.dart';
 import '../data/model/pin_pill_info.dart';
+import '../providers/location_providers.dart';
 import '../utils/init.dart';
 import '../widgets/map_pin_pill.dart';
 
@@ -86,12 +88,31 @@ class _LocationMapState extends State<LocationMap> {
   }
 
   void getLocation() {
-    geolocator.getPositionStream(locationSettings: locationSettings).listen((Position p) {
-      setState(() {
-        currentLocation = p;
-        updatePinOnMap();
-      });
-    });
+    Consumer(
+      builder: (context, ref, child) {
+        // Get the current location from the provider
+        var locationStream = ref.watch(locationProvider.select((value) => value)) /* as Stream<Position>*/;
+        // Listen to the location stream
+        locationStream.when(
+          data: (Position? p) {
+            // Update the UI
+            if (p != null) {
+              // Update the location provider
+              currentLocation = p;
+              updatePinOnMap();
+              log('Current location: ${p.toString()}');
+            }
+          },
+          error: (Object error, StackTrace stackTrace) {
+            log("ERROR: $error");
+          },
+          loading: () {
+            log('Map Loading...');
+          },
+        );
+        return const SizedBox();
+      },
+    );
   }
 
   void setSourceAndDestinationIcons() async {
