@@ -8,6 +8,7 @@ import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/constants/density.dart';
 import 'package:quickresponse/utils/init.dart';
+import 'package:quickresponse/utils/util.dart';
 import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 
@@ -93,13 +94,17 @@ class _HomeState extends State<Home> {
   }
 
   void _startLocationUpdates() {
-    _geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
+    _geolocator.getServiceStatusStream();
+    /*_geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
       log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
       setState(() {
         _position = p;
         showToast = false;
       });
-    });
+    });*/
+/*    Util.loadStream(_geolocator.getServiceStatusStream(), (data) {
+
+    }, );*/
   }
 
   @override
@@ -113,45 +118,49 @@ class _HomeState extends State<Home> {
           children: [
             Center(
               child: Column(children: [
-
                 // 1
-                Consumer(
-                  builder: (context, ref, child) {
-                    // Get the current location from the provider
-                    var locationStream = ref.watch(locationProvider.select((value) => value)) /* as Stream<Position>*/;
-                    // Listen to the location stream
-                    locationStream.when(
-                      data: (Position? p) {
-                        // Update the UI
-                        if (p != null) {
-                          //LocationNotifier().build();
-                          // Update the location provider
-                          //ref.read(locationProvider.runNotifierBuild(LocationNotifier()) as ProviderListenable);
-                          _position = p;
-                          showToast = false;
-                          log('Current location: ${p.toString()}');
-                        }
-                      },
-                      error: (Object error, StackTrace stackTrace) {
-                        log("ERROR: $error");
-                      },
-                      loading: () {
-                        /*showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return const LoadingDialog();
+                StreamBuilder<Obje_geolocator.getServiceStatusStream()>(
+                  stream: null,
+                  builder: (context, snapshot) {
+                    return Consumer(
+                      builder: (context, ref, child) {
+                        // Get the current location from the provider
+                        var locationStream = ref.watch(locationProvider.select((value) => value)) /* as Stream<Position>*/;
+                        // Listen to the location stream
+                        locationStream.when(
+                          data: (Position? p) {
+                            // Update the UI
+                            if (p != null) {
+                              //LocationNotifier().build();
+                              // Update the location provider
+                              //ref.read(locationProvider.runNotifierBuild(LocationNotifier()) as ProviderListenable);
+                              _position = p;
+                              showToast = false;
+                              log('Current location: ${p.toString()}');
+                            }
                           },
-                        );*/
+                          error: (Object error, StackTrace stackTrace) {
+                            log("ERROR: $error");
+                          },
+                          loading: () {
+                            /*showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return const LoadingDialog();
+                              },
+                            );*/
 
-                        log('Loading...');
+                            log('Loading...');
+                          },
+                        );
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: buildRow(context, _position),
+                        );
                       },
                     );
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: buildRow(context, _position),
-                    );
-                  },
+                  }
                 ),
 
                 0.04.dpH(dp).spY,
@@ -202,7 +211,7 @@ class _HomeState extends State<Home> {
                 // 8
               ]),
             ),
-            Toast(show: showToast),
+            Toast(text: "Current location not available!", show: showToast),
           ],
         ),
       ),

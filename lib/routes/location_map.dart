@@ -17,8 +17,8 @@ import '../data/constants/api.dart';
 import '../data/constants/density.dart';
 import '../data/model/pin_pill_info.dart';
 import '../providers/location_providers.dart';
-import '../utils/init.dart';
 import '../widgets/map_pin_pill.dart';
+import '../widgets/toast.dart';
 
 const double CAMERA_ZOOM = 16;
 const double CAMERA_TILT = 80;
@@ -26,14 +26,14 @@ const double CAMERA_BEARING = 30;
 //const LatLng SOURCE_LOCATION = LatLng(42.747932, -71.167889);
 const LatLng DEST_LOCATION = LatLng(5.476310, 7.025853);
 
-class LocationMap extends StatefulWidget {
+class LocationMap extends ConsumerStatefulWidget {
   const LocationMap({super.key});
 
   @override
-  State<LocationMap> createState() => _LocationMapState();
+  ConsumerState<LocationMap> createState() => _LocationMapState();
 }
 
-class _LocationMapState extends State<LocationMap> {
+class _LocationMapState extends ConsumerState<LocationMap> {
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
 
   final Set<Marker> _markers = <Marker>{};
@@ -56,6 +56,9 @@ class _LocationMapState extends State<LocationMap> {
   late GeolocatorPlatform geolocator;
 
   double pinPillPosition = -150;
+
+  bool showToast = false;
+
   PinInformation currentlySelectedPin = PinInformation(
     pinPath: '',
     avatarPath: '',
@@ -77,7 +80,7 @@ class _LocationMapState extends State<LocationMap> {
     // subscribe to changes in the user's location by "listening" to the location's onLocationChanged event
     getLocation();
     // set the initial location
-    setInitialLocation();
+    //setInitialLocation();
     // set custom marker pins
     setSourceAndDestinationIcons();
   }
@@ -88,29 +91,28 @@ class _LocationMapState extends State<LocationMap> {
   }
 
   void getLocation() {
-    Consumer(
-      builder: (context, ref, child) {
-        // Get the current location from the provider
-        var locationStream = ref.watch(locationProvider.select((value) => value)) /* as Stream<Position>*/;
-        // Listen to the location stream
-        locationStream.when(
-          data: (Position? p) {
-            // Update the UI
-            if (p != null) {
-              // Update the location provider
-              currentLocation = p;
-              updatePinOnMap();
-              log('Current location: ${p.toString()}');
-            }
-          },
-          error: (Object error, StackTrace stackTrace) {
-            log("ERROR: $error");
-          },
-          loading: () {
-            log('Map Loading...');
-          },
-        );
-        return const SizedBox();
+    // Get the current location from the provider
+    var locationStream = ref.watch(locationProvider.select((value) => value)) /* as Stream<Position>*/;
+    // Listen to the location stream
+    locationStream.when(
+      data: (Position? p) {
+        // Update the UI
+        if (p != null) {
+          // Update the location provider
+          currentLocation = p;
+          // hard-coded destination for this example
+          destinationLocation = Position.fromMap({"latitude": DEST_LOCATION.latitude, "longitude": DEST_LOCATION.longitude});
+
+          updatePinOnMap();
+          showToast = true;
+          log('Current location: ${p.toString()}');
+        }
+      },
+      error: (Object error, StackTrace stackTrace) {
+        log("ERROR: $error");
+      },
+      loading: () {
+        log('Map Loading...');
       },
     );
   }
@@ -131,7 +133,7 @@ class _LocationMapState extends State<LocationMap> {
     });
   }
 
-  void setInitialLocation() async {
+/*  void setInitialLocation() async {
     // set the initial location by pulling the user's
     // current location from the location's getLocation()
     final k = await geolocator.getCurrentPosition(locationSettings: locationSettings);
@@ -141,7 +143,7 @@ class _LocationMapState extends State<LocationMap> {
 
     // hard-coded destination for this example
     destinationLocation = Position.fromMap({"latitude": DEST_LOCATION.latitude, "longitude": DEST_LOCATION.longitude});
-  }
+  }*/
 
   final CameraPosition _destination = const CameraPosition(
     target: DEST_LOCATION,
@@ -202,6 +204,7 @@ class _LocationMapState extends State<LocationMap> {
             showPinsOnMap();
           },
         ),
+        Toast(text: "Current location not available!", show: showToast),
         Align(
           alignment: Alignment.bottomCenter,
           child: SizedBox(
@@ -216,7 +219,7 @@ class _LocationMapState extends State<LocationMap> {
               },
               child: Row(children: [
                 Icon(Icons.directions_run, color: AppColor.white),
-                Text('Move to Destination!', style: TextStyle(color: AppColor.white)),
+                Text('Destination', style: TextStyle(color: AppColor.white)),
               ]),
             ),
           ),
@@ -292,6 +295,7 @@ class _LocationMapState extends State<LocationMap> {
           setState(() {
             currentlySelectedPin = sourcePinInfo;
             pinPillPosition = 0;
+            showToast = true;
           });
         },
         icon: sourceIcon,
@@ -306,6 +310,7 @@ class _LocationMapState extends State<LocationMap> {
           setState(() {
             currentlySelectedPin = destinationPinInfo;
             pinPillPosition = 0;
+            showToast = true;
           });
         },
         icon: destinationIcon,
