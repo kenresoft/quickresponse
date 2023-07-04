@@ -25,7 +25,7 @@ class BottomNavigator extends StatelessWidget {
             if (index == 0) {
               replace(context, Constants.home);
             } else if (index == 1) {
-              replace(context, Constants.dashboard);
+              replace(context, Constants.contactDetails); 
             } else if (index == 2) {
               replace(context, Constants.contacts);
             }

@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 
 class Toast extends StatelessWidget {
-  const Toast({super.key, required this.show});
+  const Toast({
+    super.key,
+    required this.show,
+    required this.text,
+  });
 
   final bool show;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedPositioned(
+      key: ValueKey(text),
       top: show ? 25 : -100,
       right: 0,
       left: 0,
@@ -30,8 +36,8 @@ class Toast extends StatelessWidget {
               ),
             ],
           ),
-          child: const Center(
-            child: Text("Current location not available!", textAlign: TextAlign.center),
+          child: Center(
+            child: Text(text, textAlign: TextAlign.center),
           ),
         ),
       ),

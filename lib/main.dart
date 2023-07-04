@@ -11,7 +11,6 @@ import 'package:quickresponse/providers/providers.dart';
 import 'package:quickresponse/routes/call.dart';
 import 'package:quickresponse/routes/contact_details.dart';
 import 'package:quickresponse/routes/contacts.dart';
-import 'package:quickresponse/routes/dashboard.dart';
 import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/routes/home.dart';
 import 'package:quickresponse/routes/location_map.dart';

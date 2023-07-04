@@ -30,11 +30,12 @@ class Util {
   }
 
   static Widget loadStream<T>(
-    Stream<T> stream,
-    void Function(Object data) data,
-  ) {
+      Stream<T> future,
+      void Function(Object data) data,
+      Widget Function(T? data) child,
+      ) {
     return StreamBuilder<T>(
-      stream: stream,
+      stream: future,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final result = snapshot.data;
@@ -43,7 +44,7 @@ class Util {
           } else {
             data('Null data returned.');
           }
-          return const SizedBox();
+          return child(result);
         } else if (snapshot.hasError) {
           data('Error: ${snapshot.error}');
           return const SizedBox();
@@ -53,5 +54,4 @@ class Util {
       },
     );
   }
-
 }
