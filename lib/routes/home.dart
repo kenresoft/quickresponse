@@ -13,7 +13,6 @@ import 'package:quickresponse/widgets/suggestion_card.dart';
 import '../main.dart';
 import '../utils/init.dart';
 import '../widgets/alert_button.dart';
-import '../widgets/location_dialog.dart';
 import '../widgets/toast.dart';
 
 class Home extends StatefulWidget {
@@ -130,28 +129,6 @@ class _HomeState extends State<Home> {
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: buildRow(context, _position),
                   );
-                  /* Consumer(
-                    builder: (context, ref, child) {
-                      // Get the current location from the provider
-                      var locationStream = ref.watch(locationProvider.select((value) => value));
-                      // Listen to the location stream
-                      locationStream.when(
-                        data: (Position? p) {
-                          // Update the UI
-                          if (p != null) {
-                            //LocationNotifier().build();
-                            // Update the location provider
-                            //ref.read(locationProvider.runNotifierBuild(LocationNotifier()) as ProviderListenable);
-                            _position = p;
-                            showToast = false;
-                            log('Current location: ${p.toString()}');
-                          }
-                        },
-                        error: (Object error, StackTrace stackTrace) {
-                          log("ERROR: $error");
-                        },
-                        loading: () {
-                          */
                 }),
 
                 0.04.dpH(dp).spY,
