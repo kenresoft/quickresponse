@@ -2,6 +2,7 @@ class Constants {
   Constants._();
 
   static const String appName = 'QuickResponse';
+  static const String packageName = 'quickresponse';
   static const String root = '/';
 
   //Navigation routes
@@ -10,6 +11,7 @@ class Constants {
   static const String contactDetails = '/contactDetails';
   static const String call = '/call';
   static const String locationMap = '/locationMap';
+  static const String mapScreen = '/mapScreen';
   static const String error = '/error';
 
   //Images route
