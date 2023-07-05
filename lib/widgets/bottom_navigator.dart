@@ -28,6 +28,8 @@ class BottomNavigator extends StatelessWidget {
               replace(context, Constants.contactDetails); 
             } else if (index == 2) {
               replace(context, Constants.contacts);
+            } else if (index == 3) {
+              replace(context, Constants.mapScreen);
             }
           },
           iconSize: 23,
