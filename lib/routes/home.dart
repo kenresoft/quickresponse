@@ -2,18 +2,16 @@ import 'dart:developer';
 
 import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/constants/density.dart';
-import 'package:quickresponse/utils/init.dart';
 import 'package:quickresponse/utils/util.dart';
 import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 
 import '../main.dart';
-import '../providers/location_providers.dart';
+import '../utils/init.dart';
 import '../widgets/alert_button.dart';
 import '../widgets/location_dialog.dart';
 import '../widgets/toast.dart';
@@ -37,12 +35,13 @@ class _HomeState extends State<Home> {
     super.initState();
     _geolocator = GeolocatorPlatform.instance;
     _requestPermission();
+
     // Check if the location service is enabled.
-    _requestGPS();
-    //_startLocationUpdates();
+    //_requestGPS();
+    _startLocationUpdates();
   }
 
-  Future<void> _requestGPS() async {
+/*  Future<void> _requestGPS() async {
     // Check if the location service is enabled.
     isLocationServiceEnabled = await _geolocator.isLocationServiceEnabled();
 
@@ -56,16 +55,16 @@ class _HomeState extends State<Home> {
         }
       });
     }
-  }
+  }*/
 
-  void _showDialog(BuildContext context) {
+/*  void _showDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return const LocationDialog();
       },
     );
-  }
+  }*/
 
   void _requestPermission() async {
     _permission = await _geolocator.requestPermission();
@@ -94,17 +93,13 @@ class _HomeState extends State<Home> {
   }
 
   void _startLocationUpdates() {
-    _geolocator.getServiceStatusStream();
-    /*_geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
+    _geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
       log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
       setState(() {
         _position = p;
         showToast = false;
       });
-    });*/
-/*    Util.loadStream(_geolocator.getServiceStatusStream(), (data) {
-
-    }, );*/
+    });
   }
 
   @override
@@ -119,49 +114,45 @@ class _HomeState extends State<Home> {
             Center(
               child: Column(children: [
                 // 1
-                StreamBuilder<Obje_geolocator.getServiceStatusStream()>(
-                  stream: null,
-                  builder: (context, snapshot) {
-                    return Consumer(
-                      builder: (context, ref, child) {
-                        // Get the current location from the provider
-                        var locationStream = ref.watch(locationProvider.select((value) => value)) /* as Stream<Position>*/;
-                        // Listen to the location stream
-                        locationStream.when(
-                          data: (Position? p) {
-                            // Update the UI
-                            if (p != null) {
-                              //LocationNotifier().build();
-                              // Update the location provider
-                              //ref.read(locationProvider.runNotifierBuild(LocationNotifier()) as ProviderListenable);
-                              _position = p;
-                              showToast = false;
-                              log('Current location: ${p.toString()}');
-                            }
-                          },
-                          error: (Object error, StackTrace stackTrace) {
-                            log("ERROR: $error");
-                          },
-                          loading: () {
-                            /*showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return const LoadingDialog();
-                              },
-                            );*/
-
-                            log('Loading...');
-                          },
-                        );
-
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: buildRow(context, _position),
-                        );
-                      },
-                    );
+                Util.loadStream(Geolocator.getServiceStatusStream(), (data) {
+                  log(data.toString());
+                  if (_position == null && data == ServiceStatus.enabled || data == null) {
+                    log('message');
+                    _geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
+                      log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
+                      setState(() {
+                        _position = p;
+                        showToast = false;
+                      });
+                    });
                   }
-                ),
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: buildRow(context, _position),
+                  );
+                  /* Consumer(
+                    builder: (context, ref, child) {
+                      // Get the current location from the provider
+                      var locationStream = ref.watch(locationProvider.select((value) => value));
+                      // Listen to the location stream
+                      locationStream.when(
+                        data: (Position? p) {
+                          // Update the UI
+                          if (p != null) {
+                            //LocationNotifier().build();
+                            // Update the location provider
+                            //ref.read(locationProvider.runNotifierBuild(LocationNotifier()) as ProviderListenable);
+                            _position = p;
+                            showToast = false;
+                            log('Current location: ${p.toString()}');
+                          }
+                        },
+                        error: (Object error, StackTrace stackTrace) {
+                          log("ERROR: $error");
+                        },
+                        loading: () {
+                          */
+                }),
 
                 0.04.dpH(dp).spY,
 
@@ -182,7 +173,7 @@ class _HomeState extends State<Home> {
 
                 // 4
                 GestureDetector(
-                  onLongPress: () => launch(context, Constants.call, (false, '')),
+                  onTap: () => setState(() {}) /*launch(context, Constants.call, (false, ''))*/,
                   child: const AlertButton(height: 190, width: 185, borderWidth: 3, shadowWidth: 15, iconSize: 45),
                 ),
                 0.08.dpH(dp).spY,
@@ -240,7 +231,7 @@ class _HomeState extends State<Home> {
       ]),
       GestureDetector(
         onTap: () {
-          log(position.toString());
+          // log(position.toString());
           if (position == null) {
             setState(() {
               showToast = true;

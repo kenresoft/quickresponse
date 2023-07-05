@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/toast.dart';
+
 class Util {
   Util._();
 
@@ -30,26 +32,34 @@ class Util {
   }
 
   static Widget loadStream<T>(
-      Stream<T> future,
-      void Function(Object data) data,
-      Widget Function(T? data) child,
-      ) {
+    Stream<T> stream,
+    //void Function(Object data) data,
+    Widget Function(T? data) child,
+  ) {
     return StreamBuilder<T>(
-      stream: future,
+      stream: stream,
       builder: (context, snapshot) {
+        T? result;
         if (snapshot.hasData) {
-          final result = snapshot.data;
+          result = snapshot.data;
           if (result != null) {
-            data(result);
+            //data(result);
+            return child(result);
           } else {
-            data('Null data returned.');
+            //data('Null data returned.');
+            return const Toast(
+              show: true,
+              text: 'Null data returned.',
+            );
           }
-          return child(result);
         } else if (snapshot.hasError) {
-          data('Error: ${snapshot.error}');
-          return const SizedBox();
+          //data('Error: ${snapshot.error}');
+          return Toast(
+            show: true,
+            text: 'Error: ${snapshot.error}',
+          );
         } else {
-          return const SizedBox();
+          return child(result);
         }
       },
     );
