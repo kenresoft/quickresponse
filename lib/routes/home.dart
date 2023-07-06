@@ -2,27 +2,28 @@ import 'dart:developer';
 
 import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/constants/density.dart';
-import 'package:quickresponse/utils/util.dart';
+import 'package:quickresponse/utils/init.dart';
 import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 
 import '../main.dart';
-import '../utils/init.dart';
+import '../providers/location_providers.dart';
 import '../widgets/alert_button.dart';
 import '../widgets/toast.dart';
 
-class Home extends StatefulWidget {
+class Home extends ConsumerStatefulWidget {
   const Home({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  ConsumerState<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends ConsumerState<Home> {
   bool isLocationServiceEnabled = false;
   late LocationPermission _permission;
   late GeolocatorPlatform _geolocator;
@@ -37,7 +38,7 @@ class _HomeState extends State<Home> {
 
     // Check if the location service is enabled.
     //_requestGPS();
-    _startLocationUpdates();
+    //_startLocationUpdates();
   }
 
 /*  Future<void> _requestGPS() async {
@@ -91,100 +92,117 @@ class _HomeState extends State<Home> {
     );
   }
 
-  void _startLocationUpdates() {
+/*  void _startLocationUpdates() {
     _geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
       log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
-      setState(() {
-        _position = p;
-        showToast = false;
-      });
+      ref.watch(positionProvider.notifier).setPosition = p;
+      showToast = false;
     });
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
-    return Scaffold(
-      backgroundColor: AppColor.background,
-      appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.background),
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Center(
-              child: Column(children: [
-                // 1
-                Util.loadStream(Geolocator.getServiceStatusStream(), (data) {
-                  log(data.toString());
-                  if (_position == null && data == ServiceStatus.enabled || data == null) {
-                    log('message');
-                    _geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
-                      log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
-                      setState(() {
-                        _position = p;
-                        showToast = false;
-                      });
-                    });
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: buildRow(context, _position),
-                  );
-                }),
+    _position = ref.watch(positionProvider.select((value) => value));
+    log('Pos: $_position');
+/*    if (_position == null) {
+      _geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
+        log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
+        ref.watch(positionProvider.notifier).setPosition = p;
+        showToast = false;
+      });
+    }*/
+    return StreamBuilder<Position>(
+        stream: _geolocator.getPositionStream(),
+        builder: (context, snapshot) {
+          Position? position;
+          var isLoading = true;
+          if (snapshot.hasData) {
+            position = snapshot.data;
+            if (position != null) {
+              Future(() => ref.watch(positionProvider.notifier).setPosition = position);
+              isLoading = false;
+              showToast = false;
+            }
+          } else if (snapshot.hasError) {
+            log(snapshot.error.toString());
+          } else {
+            Toast('Loading position...', show: isLoading);
+          }
+          return Scaffold(
+            backgroundColor: AppColor.background,
+            appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.background),
+            body: SingleChildScrollView(
+              child: Stack(
+                children: [
+                  Center(
+                    child: Column(children: [
+                      // 1
+                      //Util.loadStream(Geolocator.getServiceStatusStream(), (data) {
+                      /*if (data == ServiceStatus.enabled && _position == null) {
+                        setState(() {});
+                      }*/
+                      /* return */ Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: buildRow(context, _position),
+                      ),
+                      //}),
 
-                0.04.dpH(dp).spY,
+                      0.04.dpH(dp).spY,
 
-                // 2
-                0.7.dpW(dp).spaceX(Text(
-                      'Emergency help needed?',
-                      style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: AppColor.title),
-                      textAlign: TextAlign.center,
-                    )),
-                0.01.dpH(dp).spY,
+                      // 2
+                      0.7.dpW(dp).spaceX(Text(
+                            'Emergency help needed?',
+                            style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: AppColor.title),
+                            textAlign: TextAlign.center,
+                          )),
+                      0.01.dpH(dp).spY,
 
-                // 3
-                Text(
-                  'Just hold the button to call',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20, color: AppColor.text),
-                ),
-                0.05.dpH(dp).spY,
+                      // 3
+                      Text(
+                        'Just hold the button to call',
+                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20, color: AppColor.text),
+                      ),
+                      0.05.dpH(dp).spY,
 
-                // 4
-                GestureDetector(
-                  onTap: () => setState(() {}) /*launch(context, Constants.call, (false, ''))*/,
-                  child: const AlertButton(height: 190, width: 185, borderWidth: 3, shadowWidth: 15, iconSize: 45),
-                ),
-                0.08.dpH(dp).spY,
+                      // 4
+                      GestureDetector(
+                        onTap: () => setState(() {}) /*launch(context, Constants.call, (false, ''))*/,
+                        child: const AlertButton(height: 190, width: 185, borderWidth: 3, shadowWidth: 15, iconSize: 45),
+                      ),
+                      0.08.dpH(dp).spY,
 
-                // 5
-                Text(
-                  'Not sure what to do?',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColor.title),
-                ),
+                      // 5
+                      Text(
+                        'Not sure what to do?',
+                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColor.title),
+                      ),
 
-                // 6
-                Text('Pick the subject to chat', style: TextStyle(fontSize: 16, color: AppColor.text)),
-                0.03.dpH(dp).spY,
+                      // 6
+                      Text('Pick the subject to chat', style: TextStyle(fontSize: 16, color: AppColor.text)),
+                      0.03.dpH(dp).spY,
 
-                // 7
-                .12.dpH(dp).spaceY(ListView.builder(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 6,
-                    itemBuilder: (BuildContext context, int index) {
-                      return const SuggestionCard(text: 'He had an accident');
-                    })),
+                      // 7
+                      .12.dpH(dp).spaceY(ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 6,
+                          itemBuilder: (BuildContext context, int index) {
+                            return const SuggestionCard(text: 'He had an accident');
+                          })),
 
-                0.03.dpH(dp).spY,
+                      0.03.dpH(dp).spY,
 
-                // 8
-              ]),
+                      // 8
+                    ]),
+                  ),
+                  Toast("Current location not available!", show: showToast),
+                ],
+              ),
             ),
-            Toast(text: "Current location not available!", show: showToast),
-          ],
-        ),
-      ),
-      bottomNavigationBar: const BottomNavigator(currentIndex: 0),
-    );
+            bottomNavigationBar: const BottomNavigator(currentIndex: 0),
+          );
+        });
   }
 
   Row buildRow(BuildContext context, Position? position) {
@@ -217,7 +235,7 @@ class _HomeState extends State<Home> {
             setState(() {
               showToast = false;
             });
-            launch(context, Constants.locationMap, position);
+            launch(context, Constants.locationMap /*, position*/);
           }
         },
         child: Row(children: [
