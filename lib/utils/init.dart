@@ -9,7 +9,7 @@ LocationSettings get locationSettings {
     locationSettings = AndroidSettings(
       accuracy: LocationAccuracy.high,
       distanceFilter: 100,
-      intervalDuration: const Duration(seconds: 1),
+      intervalDuration: const Duration(seconds: 10),
       //(Optional) Set foreground notification config to keep the app alive
       //when going to the background
       /*foregroundNotificationConfig: const ForegroundNotificationConfig(
