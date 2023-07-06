@@ -47,17 +47,11 @@ class Util {
             return child(result);
           } else {
             //data('Null data returned.');
-            return const Toast(
-              show: true,
-              text: 'Null data returned.',
-            );
+            return const Toast('Null data returned.', show: true);
           }
         } else if (snapshot.hasError) {
           //data('Error: ${snapshot.error}');
-          return Toast(
-            show: true,
-            text: 'Error: ${snapshot.error}',
-          );
+          return Toast('Error: ${snapshot.error}', show: true);
         } else {
           return child(result);
         }
