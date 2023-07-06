@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class Toast extends StatelessWidget {
-  const Toast({
+  const Toast(
+    this.text, {
     super.key,
     required this.show,
-    required this.text,
   });
 
   final bool show;
@@ -12,7 +12,7 @@ class Toast extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return /*AnimatedPositioned(
+    return AnimatedPositioned(
       key: ValueKey(text),
       top: show ? 25 : -100,
       right: 0,
@@ -41,6 +41,6 @@ class Toast extends StatelessWidget {
           ),
         ),
       ),
-    );*/ SizedBox();
+    );
   }
 }
