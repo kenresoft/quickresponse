@@ -9,7 +9,7 @@ import '../utils/init.dart';
 //   return Geolocator.getPositionStream(locationSettings: locationSettings);
 // });
 
-final locationProvider = StreamNotifierProvider<LocationNotifier, Position?>(() {
+/*final locationProvider = StreamNotifierProvider<LocationNotifier, Position?>(() {
   return LocationNotifier();
 });
 
@@ -22,7 +22,7 @@ class LocationNotifier extends StreamNotifier<Position?> {
   }
 
   set setPosition(AsyncValue<Position> position) => state = position;
-}
+}*/
 
 /*final locationProvider = StateNotifierProvider<PositionNotifier, bool>((ref) {
   return PositionNotifier();
@@ -34,12 +34,12 @@ class PositionNotifier extends StateNotifier<bool> {
   void toggleTheme(bool isDarkEnabled) => state = isDarkEnabled;
 }*/
 
-/*final tabProvider = StateNotifierProvider<TabNotifier, int>((ref) {
-  return TabNotifier();
+final positionProvider = StateNotifierProvider<PositionNotifier, Position?>((ref) {
+  return PositionNotifier();
 });
 
-class TabNotifier extends StateNotifier<int> {
-  TabNotifier() : super(0);
+class PositionNotifier extends StateNotifier<Position?> {
+  PositionNotifier() : super(null);
 
-  set setTab(int index) => state = index;
-}*/
+  set setPosition(Position? index) => state = index;
+}
