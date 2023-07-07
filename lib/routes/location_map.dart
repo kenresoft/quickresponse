@@ -56,6 +56,8 @@ class _LocationMapState extends ConsumerState<LocationMap> {
   double pinPillPosition = -150;
 
   bool showToast = false;
+  bool needToUpdate = true;
+  int count = 0;
 
   PinInformation currentlySelectedPin = PinInformation(
     pinPath: Constants.spaceship,
@@ -68,14 +70,6 @@ class _LocationMapState extends ConsumerState<LocationMap> {
   late PinInformation sourcePinInfo;
   late PinInformation destinationPinInfo;
 
-/*  final StreamController<Position> _streamController = StreamController<Position>();
-
-  void _refreshStream() {
-    Geolocator.getPositionStream(locationSettings: locationSettings).listen((event) {
-      _streamController.add(event);
-    });
-  }*/
-
   @override
   void initState() {
     super.initState();
@@ -85,20 +79,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
 
     // set custom marker pins
     setSourceAndDestinationIcons();
-
-    // Set a timer to refresh the stream every 5 seconds.
-    //Timer.periodic(const Duration(seconds: 55), (timer) => _refreshStream());
   }
-
-/*  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // set the initial location
-    currentLocation = ref.watch(positionProvider.select((value) => value));
-    // hard-coded destination for this example
-    destinationLocation = Position.fromMap({"latitude": DEST_LOCATION.latitude, "longitude": DEST_LOCATION.longitude});
-    //setSourceAndDestinationIcons();
-  }*/
 
   void setSourceAndDestinationIcons() async {
     BitmapDescriptor.fromAssetImage(
@@ -133,8 +114,10 @@ class _LocationMapState extends ConsumerState<LocationMap> {
 
   @override
   Widget build(BuildContext context) {
+    //needToUpdate = true;
     final dp = Density.init(context);
     //final position = GoRouterState.of(context).extra as Position;
+
     _currentLocation();
     destinationLocation = Position.fromMap({"latitude": DEST_LOCATION.latitude, "longitude": DEST_LOCATION.longitude});
     updatePinOnMap();
@@ -227,7 +210,11 @@ class _LocationMapState extends ConsumerState<LocationMap> {
   }
 
   void _currentLocation() async {
-    currentLocation = await Future.delayed(const Duration(seconds: 15), () => ref.watch(positionProvider.select((value) => value)));
+    if (needToUpdate) {
+      currentLocation = ref.watch(positionProvider.select((value) => value));
+    } else {
+      currentLocation = await Geolocator.getCurrentPosition();
+    }
   }
 
   void setPolyLines() async {
