@@ -56,8 +56,6 @@ class _LocationMapState extends ConsumerState<LocationMap> {
   double pinPillPosition = -150;
 
   bool showToast = false;
-  bool needToUpdate = true;
-  int count = 0;
 
   PinInformation currentlySelectedPin = PinInformation(
     pinPath: Constants.spaceship,
@@ -81,32 +79,6 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     setSourceAndDestinationIcons();
   }
 
-  void setSourceAndDestinationIcons() async {
-    BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(devicePixelRatio: 2.0),
-      Constants.drivingPin,
-    ).then((onValue) {
-      sourceIcon = onValue;
-    });
-
-    BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(devicePixelRatio: 2.0),
-      Constants.destinationMapMarker,
-    ).then((onValue) {
-      destinationIcon = onValue;
-    });
-  }
-
-/*  void setInitialLocation() async {
-    // set the initial location by pulling the user's
-    // current location from the location's getLocation()
-    final p = await geolocator.getCurrentPosition(locationSettings: locationSettings);
-    ref.watch(positionProvider.notifier).setPosition = p;
-
-    // hard-coded destination for this example
-    destinationLocation = Position.fromMap({"latitude": DEST_LOCATION.latitude, "longitude": DEST_LOCATION.longitude});
-  }*/
-
   final CameraPosition _destination = const CameraPosition(
     target: DEST_LOCATION,
     zoom: 14.4746,
@@ -114,14 +86,9 @@ class _LocationMapState extends ConsumerState<LocationMap> {
 
   @override
   Widget build(BuildContext context) {
-    //needToUpdate = true;
     final dp = Density.init(context);
-    //final position = GoRouterState.of(context).extra as Position;
 
-    _currentLocation();
-    destinationLocation = Position.fromMap({"latitude": DEST_LOCATION.latitude, "longitude": DEST_LOCATION.longitude});
-    updatePinOnMap();
-    //setSourceAndDestinationIcons();
+    updatePosition();
 
     CameraPosition initialCameraPosition = const CameraPosition(
       target: SOURCE_LOCATION,
@@ -140,25 +107,6 @@ class _LocationMapState extends ConsumerState<LocationMap> {
 
     return Scaffold(
       body: Stack(children: <Widget>[
-/*        StreamBuilder<Position>(
-            stream: _streamController.stream,
-            builder: (context, snapshot) {
-              Position? position;
-              if (snapshot.hasData) {
-                position = snapshot.data;
-                if (position != null) {
-                  Future(() =>
-                  ref
-                      .watch(positionProvider.notifier)
-                      .setPosition = position);
-                  showToast = false;
-                }
-              } else if (snapshot.hasError) {
-                log(snapshot.error.toString());
-              } else {
-                log('Loading position 2...');
-              }
-              return*/
         GoogleMap(
           myLocationEnabled: true,
           compassEnabled: true,
@@ -209,12 +157,26 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     );
   }
 
-  void _currentLocation() async {
-    if (needToUpdate) {
-      currentLocation = ref.watch(positionProvider.select((value) => value));
-    } else {
-      currentLocation = await Geolocator.getCurrentPosition();
-    }
+  void updatePosition() {
+    currentLocation = ref.watch(positionProvider.select((value) => value));
+    destinationLocation = Position.fromMap({"latitude": DEST_LOCATION.latitude, "longitude": DEST_LOCATION.longitude});
+    updatePinOnMap();
+  }
+
+  void setSourceAndDestinationIcons() async {
+    BitmapDescriptor.fromAssetImage(
+      const ImageConfiguration(devicePixelRatio: 2.0),
+      Constants.drivingPin,
+    ).then((onValue) {
+      sourceIcon = onValue;
+    });
+
+    BitmapDescriptor.fromAssetImage(
+      const ImageConfiguration(devicePixelRatio: 2.0),
+      Constants.destinationMapMarker,
+    ).then((onValue) {
+      destinationIcon = onValue;
+    });
   }
 
   void setPolyLines() async {
@@ -306,17 +268,18 @@ class _LocationMapState extends ConsumerState<LocationMap> {
   }
 
   void updatePinOnMap() async {
-    // create a new CameraPosition instance
-    // every time the location changes, so the camera
+    // create a new CameraPosition instance every time the location changes, so the camera
     // follows the pin as it moves with an animation
-    CameraPosition cPosition = CameraPosition(
+    //Attention: Uncomment if you want the map to constantly rebuild based on new location
+    /*CameraPosition cPosition = CameraPosition(
       zoom: CAMERA_ZOOM,
       tilt: CAMERA_TILT,
       bearing: CAMERA_BEARING,
       target: LatLng(currentLocation!.latitude, currentLocation!.longitude),
     );
     final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
+    controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));*/
+
     // do this inside the setState() so Flutter gets notified
     // that a widget update is due
     setState(() {
