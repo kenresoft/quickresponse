@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 ///import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:open_route_service/open_route_service.dart';
@@ -109,6 +110,9 @@ class _LocationMapState extends ConsumerState<LocationMap> {
       );
     }
 
+    getPlacemark();
+
+
     return Scaffold(
       body: Stack(children: <Widget>[
         GoogleMap(
@@ -159,6 +163,17 @@ class _LocationMapState extends ConsumerState<LocationMap> {
         ),
       ]),
     );
+  }
+
+  void getPlacemark() async {
+    List<Placemark> placemarks = await GeocodingPlatform.instance.placemarkFromCoordinates(
+        currentLocation!.latitude, currentLocation!.longitude);
+    for (var placemark in placemarks) {
+      log('Name: ${placemark.name!}');
+      log('Locality: ${placemark.locality!}');
+      log('Postal code: ${placemark.postalCode!}');
+      log('Country: ${placemark.country!}');
+    }
   }
 
   void updatePosition() {
@@ -351,9 +366,9 @@ class _LocationMapState extends ConsumerState<LocationMap> {
             polylineId: const PolylineId("poly"),
             color: Colors.pink,
             points: polylineCoordinates,
-            jointType: JointType.round,
+            /*jointType: JointType.round,
             endCap: Cap.roundCap,
-            patterns: [PatternItem.dash(10)],
+            patterns: [PatternItem.dash(10)],*/
           ),
         );
       });

@@ -31,6 +31,7 @@ dependencies:
 
   geolocator: ^9.0.2
   google_maps_flutter: ^2.3.1
+  geocoding: ^2.1.0
   #flutter_polyline_points: ^1.0.0 # --- uses a higher version of http
   open_route_service: ^1.2.3 # --- uses a lower version of http
 
