@@ -90,7 +90,7 @@ class MyApp extends StatelessWidget {
       route(Constants.contactDetails, const ContactDetails()),
       route(Constants.call, const Call()),
       route(Constants.locationMap, const LocationMap()),
-      route(Constants.mapScreen, const MapScreen()),
+      //route(Constants.mapScreen, const MapScreen()),
       route(Constants.error, const ErrorPage()),
     ],
     errorBuilder: (context, state) => const ErrorPage(),
