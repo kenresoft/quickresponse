@@ -1,5 +1,6 @@
+/*
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+//import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quickresponse/data/constants/api.dart';
 
@@ -61,7 +62,9 @@ class _MapScreenState extends State<MapScreen> {
           zoomGesturesEnabled: true,
           onMapCreated: _onMapCreated,
           markers: Set<Marker>.of(markers.values),
-          polylines: p/*Set<Polyline>.of(polylines.values)*/,
+          polylines: p*/
+/*Set<Polyline>.of(polylines.values)*//*
+,
         ),
         bottomNavigationBar: const BottomNavigator(currentIndex: 3),
       ),
@@ -98,3 +101,4 @@ class _MapScreenState extends State<MapScreen> {
   }
 
 }
+*/
