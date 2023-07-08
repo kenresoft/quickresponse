@@ -8,13 +8,17 @@ class Toast extends StatelessWidget {
   });
 
   final bool show;
-  final String text;
+  final String? text;
+
+  bool get _show {
+    return text == null ? false : show;
+  }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedPositioned(
       key: ValueKey(text),
-      top: show ? 25 : -100,
+      top: _show ? 35 : -300,
       right: 0,
       left: 0,
       duration: const Duration(milliseconds: 300),
@@ -37,7 +41,7 @@ class Toast extends StatelessWidget {
             ],
           ),
           child: Center(
-            child: Text(text, textAlign: TextAlign.center),
+            child: Text(text!, textAlign: TextAlign.center),
           ),
         ),
       ),
