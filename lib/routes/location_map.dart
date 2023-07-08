@@ -4,15 +4,15 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+
+///import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:open_route_service/open_route_service.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
-import 'package:quickresponse/utils/map_style.dart';
 
-import '../data/constants/api.dart';
 import '../data/constants/density.dart';
 import '../data/model/pin_pill_info.dart';
 import '../providers/location_providers.dart';
@@ -39,7 +39,9 @@ class _LocationMapState extends ConsumerState<LocationMap> {
   // for my drawn routes on the map
   final Set<Polyline> _polyLines = <Polyline>{};
   List<LatLng> polylineCoordinates = [];
-  late PolylinePoints polylinePoints;
+
+  ///late PolylinePoints polylinePoints;
+  late Polyline routePolyline;
 
   // for my custom marker pins
   BitmapDescriptor sourceIcon = BitmapDescriptor.defaultMarker;
@@ -73,7 +75,9 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     super.initState();
 
     geolocator = GeolocatorPlatform.instance;
-    polylinePoints = PolylinePoints();
+
+    ///polylinePoints = PolylinePoints();
+    routePolyline = const Polyline(polylineId: PolylineId('route'));
 
     // set custom marker pins
     setSourceAndDestinationIcons();
@@ -124,7 +128,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
           trafficEnabled: true,
           mapToolbarEnabled: true,
           onMapCreated: (GoogleMapController controller) {
-            controller.setMapStyle(MapStyle.getStyle);
+            //controller.setMapStyle(MapStyle.getStyle);
             _controller.complete(controller);
             showPinsOnMap();
           },
@@ -179,13 +183,15 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     });
   }
 
-  void setPolyLines() async {
+/*  void setPolyLines() async {
     PolylineResult polyline = await polylinePoints.getRouteBetweenCoordinates(
       Api.googleAPIKey,
       PointLatLng(currentLocation!.latitude, currentLocation!.longitude),
       PointLatLng(destinationLocation!.latitude, destinationLocation!.longitude),
     );
     List<PointLatLng> result = polyline.points;
+
+    log('POLYLINE: $result');
 
     if (result.isNotEmpty) {
       for (var point in result) {
@@ -202,7 +208,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
         );
       });
     }
-  }
+  }*/
 
   void showPinsOnMap() {
     // get a LatLng for the source location
@@ -264,7 +270,8 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     );
     // set the route lines on the map from source to destination
     // for more info follow this tutorial
-    setPolyLines();
+    ///setPolyLines();
+    polyL();
   }
 
   void updatePinOnMap() async {
@@ -305,5 +312,62 @@ class _LocationMapState extends ConsumerState<LocationMap> {
         ),
       );
     });
+  }
+
+  void polyL() async {
+    // Initialize the openrouteservice with your API key.
+    final OpenRouteService client = OpenRouteService(apiKey: '5b3ce3597851110001cf624845eab8e52e2b413aa1473372f592099d');
+
+    // Example coordinates to test between
+/*    const double startLat = 37.4220698;
+    const double startLng = -122.0862784;
+    const double endLat = 37.4111466;
+    const double endLng = -122.0792365;*/
+
+    // Form Route between coordinates
+    final List<ORSCoordinate> routeCoordinates = await client.directionsRouteCoordsGet(
+      startCoordinate: ORSCoordinate(latitude: currentLocation!.latitude, longitude: currentLocation!.longitude),
+      endCoordinate: ORSCoordinate(latitude: destinationLocation!.latitude, longitude: destinationLocation!.longitude),
+    );
+
+    // Print the route coordinates
+    for (var element in routeCoordinates) {
+      log(element.toString());
+    }
+
+    // Map route coordinates to a list of LatLng (requires google_maps_flutter package)
+    // to be used in the Map route Polyline.
+    final List<LatLng> routePoints = routeCoordinates.map((coordinate) => LatLng(coordinate.latitude, coordinate.longitude)).toList();
+
+    if (routePoints.isNotEmpty) {
+      for (var point in routePoints) {
+        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      }
+      setState(() {
+        _polyLines.add(
+          Polyline(
+            width: 10,
+            // set the width of the polyLines
+            polylineId: const PolylineId("poly"),
+            color: Colors.pink,
+            points: polylineCoordinates,
+            jointType: JointType.round,
+            endCap: Cap.roundCap,
+            patterns: [PatternItem.dash(10)],
+          ),
+        );
+      });
+    }
+
+    // Create Polyline (requires Material UI for Color)
+    /*routePolyline = Polyline(
+      polylineId: const PolylineId('route'),
+      visible: true,
+      points: routePoints,
+      color: Colors.red,
+      width: 4,
+    );*/
+
+    // Use Polyline to draw route on map or do anything else with the data :)
   }
 }
