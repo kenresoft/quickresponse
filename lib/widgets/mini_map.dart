@@ -8,8 +8,8 @@ class MiniMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const SizedBox(
-      height: 300,
-      child: LocationMap(),
+      height: 250,
+      child: LocationMap(disableWidgets: true),
     );
   }
 }
