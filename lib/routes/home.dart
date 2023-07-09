@@ -3,11 +3,11 @@ import 'dart:developer';
 import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/constants/density.dart';
-import 'package:quickresponse/utils/init.dart';
 import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 
@@ -29,6 +29,7 @@ class _HomeState extends ConsumerState<Home> {
   late GeolocatorPlatform _geolocator;
   Position? _position;
   bool showToast = false;
+  List<Placemark>? placemarks;
 
   @override
   void initState() {
@@ -105,13 +106,7 @@ class _HomeState extends ConsumerState<Home> {
     final dp = Density.init(context);
     _position = ref.watch(positionProvider.select((value) => value));
     log('Pos: $_position');
-/*    if (_position == null) {
-      _geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
-        log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
-        ref.watch(positionProvider.notifier).setPosition = p;
-        showToast = false;
-      });
-    }*/
+    getPlacemarks();
     return StreamBuilder<Position>(
         stream: _geolocator.getPositionStream(),
         builder: (context, snapshot) {
@@ -205,7 +200,22 @@ class _HomeState extends ConsumerState<Home> {
         });
   }
 
+  Future<void> getPlacemarks() async {
+    if (_position != null) {
+      placemarks = await GeocodingPlatform.instance.placemarkFromCoordinates(_position!.latitude, _position!.longitude);
+    }
+  }
+
   Row buildRow(BuildContext context, Position? position) {
+/*    void getPlacemark() async {
+      for (var placemark in placemarks) {
+        log('Name: ${placemark.name!}');
+        log('Locality: ${placemark.locality!}');
+        log('Postal code: ${placemark.postalCode!}');
+        log('Country: ${placemark.country!}');
+      }
+    }*/
+
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Row(children: [
         const Image(
@@ -241,7 +251,7 @@ class _HomeState extends ConsumerState<Home> {
         child: Row(children: [
           Column(children: [
             Text(
-              'Ludwika Waryn...',
+              '${placemarks == null ? 'Loading' : placemarks?.last.name}...',
               style: TextStyle(fontSize: 15, color: AppColor.text),
             ),
             Text(
