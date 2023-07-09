@@ -4,13 +4,13 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-
 ///import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:open_route_service/open_route_service.dart';
+import 'package:quickresponse/data/constants/api.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 
@@ -26,7 +26,9 @@ const LatLng SOURCE_LOCATION = LatLng(42.747932, -71.167889);
 const LatLng DEST_LOCATION = LatLng(5.476310, 7.025853);
 
 class LocationMap extends ConsumerStatefulWidget {
-  const LocationMap({super.key});
+  const LocationMap({super.key, this.disableWidgets = false});
+
+  final bool disableWidgets;
 
   @override
   ConsumerState<LocationMap> createState() => _LocationMapState();
@@ -59,6 +61,8 @@ class _LocationMapState extends ConsumerState<LocationMap> {
   double pinPillPosition = -150;
 
   bool showToast = false;
+
+  List<Placemark>? placemarks;
 
   PinInformation currentlySelectedPin = PinInformation(
     pinPath: Constants.spaceship,
@@ -94,6 +98,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     final dp = Density.init(context);
 
     updatePosition();
+    polyL();
 
     CameraPosition initialCameraPosition = const CameraPosition(
       target: SOURCE_LOCATION,
@@ -110,70 +115,74 @@ class _LocationMapState extends ConsumerState<LocationMap> {
       );
     }
 
-    getPlacemark();
-
-
     return Scaffold(
       body: Stack(children: <Widget>[
         GoogleMap(
           myLocationEnabled: true,
-          compassEnabled: true,
+          compassEnabled: !widget.disableWidgets,
           tiltGesturesEnabled: false,
           markers: _markers,
           polylines: _polyLines,
           mapType: MapType.normal,
           initialCameraPosition: initialCameraPosition,
           onTap: (LatLng loc) {
-            setState(() {
-              pinPillPosition = -150;
-            });
-            log(loc.toString());
+            if (!widget.disableWidgets) {
+              setState(() {
+                pinPillPosition = -150;
+                showToast = true;
+              });
+              getPlacemarks((loc.latitude, loc.longitude));
+              log(loc.toString());
+            }
           },
-          trafficEnabled: true,
-          mapToolbarEnabled: true,
+          trafficEnabled: !widget.disableWidgets,
+          mapToolbarEnabled: !widget.disableWidgets,
           onMapCreated: (GoogleMapController controller) {
             //controller.setMapStyle(MapStyle.getStyle);
             _controller.complete(controller);
             showPinsOnMap();
           },
         ),
-        //}),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: SizedBox(
-            width: 0.43.dpW(dp),
-            child: MaterialButton(
-              color: AppColor.alert_1.withOpacity(0.7),
-              padding: const EdgeInsets.all(10),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-              onPressed: () async {
-                final GoogleMapController controller = await _controller.future;
-                controller.animateCamera(CameraUpdate.newCameraPosition(_destination));
-              },
-              child: Row(children: [
-                Icon(Icons.directions_run, color: AppColor.white),
-                Text('Destination', style: TextStyle(color: AppColor.white)),
-              ]),
-            ),
-          ),
-        ),
-        MapPinPillComponent(
-          pinPillPosition: pinPillPosition,
-          currentlySelectedPin: currentlySelectedPin,
-        ),
+        //Toast(placemarks?.lastOrNull.toString(), show: showToast),
+        ...[
+          widget.disableWidgets
+              ? const SizedBox()
+              : Align(
+                  alignment: Alignment.bottomCenter,
+                  widthFactor: 2.2,
+                  child: SizedBox(
+                    width: 0.30.dpW(dp),
+                    height: 35,
+                    child: MaterialButton(
+                      color: AppColor.alert_1.withOpacity(0.7),
+                      padding: const EdgeInsets.all(10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                      onPressed: () async {
+                        final GoogleMapController controller = await _controller.future;
+                        controller.animateCamera(CameraUpdate.newCameraPosition(_destination));
+                      },
+                      child: Row(children: [
+                        Icon(Icons.directions_run, color: AppColor.white),
+                        Text('Destination', style: TextStyle(color: AppColor.white)),
+                      ]),
+                    ),
+                  ),
+                )
+        ],
+        ...[
+          widget.disableWidgets
+              ? const SizedBox()
+              : MapPinPillComponent(
+                  pinPillPosition: pinPillPosition,
+                  currentlySelectedPin: currentlySelectedPin,
+                ),
+        ]
       ]),
     );
   }
 
-  void getPlacemark() async {
-    List<Placemark> placemarks = await GeocodingPlatform.instance.placemarkFromCoordinates(
-        currentLocation!.latitude, currentLocation!.longitude);
-    for (var placemark in placemarks) {
-      log('Name: ${placemark.name!}');
-      log('Locality: ${placemark.locality!}');
-      log('Postal code: ${placemark.postalCode!}');
-      log('Country: ${placemark.country!}');
-    }
+  Future<void> getPlacemarks((double, double) location) async {
+    placemarks = await GeocodingPlatform.instance.placemarkFromCoordinates(location.$1, location.$2);
   }
 
   void updatePosition() {
@@ -264,6 +273,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
           setState(() {
             currentlySelectedPin = sourcePinInfo;
             pinPillPosition = 0;
+            showToast = false;
           });
         },
         icon: sourceIcon,
@@ -278,6 +288,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
           setState(() {
             currentlySelectedPin = destinationPinInfo;
             pinPillPosition = 0;
+            showToast = false;
           });
         },
         icon: destinationIcon,
@@ -286,7 +297,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     // set the route lines on the map from source to destination
     // for more info follow this tutorial
     ///setPolyLines();
-    polyL();
+    //polyL();
   }
 
   void updatePinOnMap() async {
@@ -320,6 +331,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
             setState(() {
               currentlySelectedPin = sourcePinInfo;
               pinPillPosition = 0;
+              showToast = false;
             });
           },
           position: pinPosition, // updated position
@@ -331,13 +343,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
 
   void polyL() async {
     // Initialize the openrouteservice with your API key.
-    final OpenRouteService client = OpenRouteService(apiKey: '5b3ce3597851110001cf624845eab8e52e2b413aa1473372f592099d');
-
-    // Example coordinates to test between
-/*    const double startLat = 37.4220698;
-    const double startLng = -122.0862784;
-    const double endLat = 37.4111466;
-    const double endLng = -122.0792365;*/
+    final OpenRouteService client = OpenRouteService(apiKey: Api.openRouteAPIKey);
 
     // Form Route between coordinates
     final List<ORSCoordinate> routeCoordinates = await client.directionsRouteCoordsGet(
