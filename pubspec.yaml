@@ -35,6 +35,10 @@ dependencies:
   #flutter_polyline_points: ^1.0.0 # --- uses a higher version of http
   open_route_service: ^1.2.3 # --- uses a lower version of http
 
+  sqflite: ^2.2.8+4
+  path_provider: ^2.0.15
+  path: ^1.8.3
+
   firebase_core: ^2.14.0
   cloud_firestore: ^4.8.1
 
