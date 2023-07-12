@@ -29,16 +29,25 @@ dependencies:
   go_router: ^8.2.0
   flutter_riverpod: ^2.3.6
 
+  # Location/Map
   geolocator: ^9.0.2
   google_maps_flutter: ^2.3.1
   geocoding: ^2.1.0
   #flutter_polyline_points: ^1.0.0 # --- uses a higher version of http
   open_route_service: ^1.2.3 # --- uses a lower version of http
 
+  # Data
+  shared_preferences: ^2.2.0
   sqflite: ^2.2.8+4
+
+  # File
   path_provider: ^2.0.15
   path: ^1.8.3
 
+  # Networking
+  dio: ^5.2.1+1
+
+  # Firebase
   firebase_core: ^2.14.0
   cloud_firestore: ^4.8.1
 
