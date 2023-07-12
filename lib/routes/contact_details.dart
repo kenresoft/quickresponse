@@ -1,27 +1,35 @@
+import 'dart:developer';
+
 import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickresponse/data/model/contact.dart';
+import 'package:quickresponse/widgets/mini_map.dart';
 
 import '../data/constants/colors.dart';
 import '../data/constants/constants.dart';
 import '../data/constants/density.dart';
 import '../main.dart';
+import '../providers/location_providers.dart';
 import '../widgets/alert_button.dart';
 import '../widgets/appbar.dart';
 import '../widgets/arrow_divider.dart';
 
-class ContactDetails extends StatefulWidget {
+class ContactDetails extends ConsumerStatefulWidget {
   const ContactDetails({super.key});
 
   @override
-  State<ContactDetails> createState() => _ContactDetailsState();
+  ConsumerState<ContactDetails> createState() => _ContactDetailsState();
 }
 
-class _ContactDetailsState extends State<ContactDetails> {
+class _ContactDetailsState extends ConsumerState<ContactDetails> {
   final ScrollController _scrollController = ScrollController();
   bool _bottomSheetVisible = false;
+  List<Placemark>? placemarks;
 
   @override
   void initState() {
@@ -43,6 +51,11 @@ class _ContactDetailsState extends State<ContactDetails> {
   Widget build(BuildContext context) {
     final contact = GoRouterState.of(context).extra as Contact;
     final dp = Density.init(context);
+
+    final location = ref.watch(positionProvider.select((value) => value!));
+    log('Pos: $location');
+    getPlacemarks(location);
+
     return Scaffold(
       backgroundColor: AppColor.background,
       appBar: appBar(title: const Text('Contacts'), actionTitle: 'Delete', actionIcon: CupertinoIcons.trash),
@@ -126,8 +139,9 @@ class _ContactDetailsState extends State<ContactDetails> {
 
                   /// MAP
                   const Text('Current Location', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                  Text('ul. Krakrowskie Przedmiescie 23', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColor.text)),
+                  Text('${placemarks?.last.street}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColor.text)),
                   0.02.dpH(dp).spY,
+                  MiniMap(),
                 ]),
               ),
             ),
@@ -215,5 +229,9 @@ class _ContactDetailsState extends State<ContactDetails> {
         ),
       ]),
     );
+  }
+
+  Future<void> getPlacemarks(Position position) async {
+    placemarks = await GeocodingPlatform.instance.placemarkFromCoordinates(position.latitude, position.longitude);
   }
 }
