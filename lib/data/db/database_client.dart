@@ -18,7 +18,7 @@ class DatabaseClient {
     });
   }
 
-  late Database? _db;
+  Database? _db;
 
   Future<Database?> get db async {
     if (_db == null) {
@@ -27,10 +27,30 @@ class DatabaseClient {
     return _db;
   }
 
+/*  Future<Database?> get db async {
+    _db ??= await create();
+    return _db;
+  }*/
+
   Future<Database> create() async {
     Directory path = await getApplicationDocumentsDirectory();
     String dbPath = join(path.path, "location_db.db");
 
-    return openDatabase(dbPath, version: 9, onUpgrade: (d, o, n) {}, onOpen: (d) {});
+    return openDatabase(
+      dbPath,
+      version: 1,
+      onUpgrade: (db, o, n) {},
+      onOpen: (db) {},
+      onCreate: (db, version) {
+        db.execute(
+          '''CREATE TABLE location (
+            id INTEGER PRIMARY KEY,
+            latitude REAL, 
+            longitude REAL, 
+            address TEXT
+          )''',
+        );
+      },
+    );
   }
 }
