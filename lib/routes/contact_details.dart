@@ -141,7 +141,7 @@ class _ContactDetailsState extends ConsumerState<ContactDetails> {
                   const Text('Current Location', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   Text('${placemarks?.last.street}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColor.text)),
                   0.02.dpH(dp).spY,
-                  MiniMap(),
+                  const MiniMap(),
                 ]),
               ),
             ),
