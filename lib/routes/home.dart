@@ -11,6 +11,7 @@ import 'package:quickresponse/data/constants/density.dart';
 import 'package:quickresponse/data/db/location_db.dart';
 import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../main.dart';
 import '../providers/location_providers.dart';
@@ -33,13 +34,10 @@ class _HomeState extends ConsumerState<Home> {
   bool showToast = false;
   List<Placemark>? placemarks;
 
-  late LocationDbNotifier dbStateNotifier;
-
   @override
   void initState() {
     super.initState();
-    dbStateNotifier = LocationDbNotifier();
-    dbStateNotifier.initialize();
+    Future(() => ref.watch(locationDbProvider.notifier).initialize());
     _geolocator = GeolocatorPlatform.instance;
     _requestPermission();
 
@@ -75,12 +73,10 @@ class _HomeState extends ConsumerState<Home> {
 
   void _requestPermission() async {
     _permission = await _geolocator.requestPermission();
-    if (_permission == LocationPermission.denied) {
-      _showPermissionDeniedDialog();
-    }
   }
 
   void _showPermissionDeniedDialog() {
+    launchReplace(context, Constants.home);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -109,12 +105,17 @@ class _HomeState extends ConsumerState<Home> {
 
   @override
   Widget build(BuildContext context) {
+    if (_permission == LocationPermission.whileInUse) {
+      // _showPermissionDeniedDialog();
+      launchReplace(context, Constants.home);
+    }
     final dp = Density.init(context);
+    Database? db = ref.watch(locationDbProvider.select((value) => value));
     _position = ref.watch(positionProvider.select((value) => value));
-    getLocationFromStorage();
+    getLocationFromStorage(db);
     log('Loc: $_location');
     log('Pos: $_position');
-    getPlacemarks();
+    getPlacemarks(db);
     return StreamBuilder<Position>(
         stream: _geolocator.getPositionStream(),
         builder: (context, snapshot) {
@@ -140,7 +141,7 @@ class _HomeState extends ConsumerState<Home> {
               Future(() => ref.watch(positionProvider.notifier).setPosition = Position.fromMap(map));
               ref.watch(positionProvider.select((value) => value));
             } else {
-              initLocationDb();
+              //initLocationDb(db);
               ref.watch(positionProvider.select((value) => value));
             }
           }
@@ -220,18 +221,18 @@ class _HomeState extends ConsumerState<Home> {
         });
   }
 
-  Future<void> initLocationDb() async {
-    await LocationDB().initialize();
+  Future<void> initLocationDb(Database? db) async {
+    await LocationDB(db).initialize();
   }
 
-  Future<void> getLocationFromStorage() async {
-    _location = await LocationDB().getLocation();
+  Future<void> getLocationFromStorage(Database? db) async {
+    _location = await LocationDB(db).getLocation();
   }
 
-  Future<void> getPlacemarks() async {
+  Future<void> getPlacemarks(Database? db) async {
     if (_position != null) {
       placemarks = await GeocodingPlatform.instance.placemarkFromCoordinates(_position!.latitude, _position!.longitude);
-      await LocationDB().updateLocation(_position!, placemarks!);
+      await LocationDB(db).updateLocation(_position!, placemarks!);
     }
   }
 
