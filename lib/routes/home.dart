@@ -8,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/constants/density.dart';
+import 'package:quickresponse/data/db/location_db.dart';
 import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 
@@ -28,12 +29,17 @@ class _HomeState extends ConsumerState<Home> {
   late LocationPermission _permission;
   late GeolocatorPlatform _geolocator;
   Position? _position;
+  List<Map>? _location;
   bool showToast = false;
   List<Placemark>? placemarks;
+
+  late LocationDbNotifier dbStateNotifier;
 
   @override
   void initState() {
     super.initState();
+    dbStateNotifier = LocationDbNotifier();
+    dbStateNotifier.initialize();
     _geolocator = GeolocatorPlatform.instance;
     _requestPermission();
 
@@ -105,6 +111,8 @@ class _HomeState extends ConsumerState<Home> {
   Widget build(BuildContext context) {
     final dp = Density.init(context);
     _position = ref.watch(positionProvider.select((value) => value));
+    getLocationFromStorage();
+    log('Loc: $_location');
     log('Pos: $_position');
     getPlacemarks();
     return StreamBuilder<Position>(
@@ -123,6 +131,18 @@ class _HomeState extends ConsumerState<Home> {
             log(snapshot.error.toString());
           } else {
             Toast('Loading position...', show: isLoading);
+            if (_location != null) {
+              // Create a map of the current location.
+              Map<String, Object> map = {
+                'latitude': _location?.single['latitude'],
+                'longitude': _location?.single['longitude'],
+              };
+              Future(() => ref.watch(positionProvider.notifier).setPosition = Position.fromMap(map));
+              ref.watch(positionProvider.select((value) => value));
+            } else {
+              initLocationDb();
+              ref.watch(positionProvider.select((value) => value));
+            }
           }
           return Scaffold(
             backgroundColor: AppColor.background,
@@ -200,9 +220,18 @@ class _HomeState extends ConsumerState<Home> {
         });
   }
 
+  Future<void> initLocationDb() async {
+    await LocationDB().initialize();
+  }
+
+  Future<void> getLocationFromStorage() async {
+    _location = await LocationDB().getLocation();
+  }
+
   Future<void> getPlacemarks() async {
     if (_position != null) {
       placemarks = await GeocodingPlatform.instance.placemarkFromCoordinates(_position!.latitude, _position!.longitude);
+      await LocationDB().updateLocation(_position!, placemarks!);
     }
   }
 
