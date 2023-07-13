@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:sqflite/sqflite.dart';
 
+import '../data/db/database_client.dart';
 import '../utils/init.dart';
 
 //final locationProvider = StateProvider<Position?>((ref) => null);
@@ -42,4 +44,18 @@ class PositionNotifier extends StateNotifier<Position?> {
   PositionNotifier() : super(null);
 
   set setPosition(Position? index) => state = index;
+}
+
+final locationDbProvider = StateNotifierProvider<LocationDbNotifier, Database?>((ref) {
+  return LocationDbNotifier();
+});
+
+class LocationDbNotifier extends StateNotifier<Database?> {
+  LocationDbNotifier() : super(null);
+
+  Future<void> initialize() async {
+    Database? db = await DatabaseClient().db;
+    state = db;
+  }
+
 }
