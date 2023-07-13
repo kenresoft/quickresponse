@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fontresoft/fontresoft.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickresponse/data/constants/colors.dart';
+import 'package:quickresponse/data/db/location_db.dart';
 import 'package:quickresponse/providers/providers.dart';
 import 'package:quickresponse/routes/call.dart';
 import 'package:quickresponse/routes/contact_details.dart';
@@ -14,9 +15,10 @@ import 'package:quickresponse/routes/contacts.dart';
 import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/routes/home.dart';
 import 'package:quickresponse/routes/location_map.dart';
-import 'package:quickresponse/routes/map_screen.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'data/constants/constants.dart';
+import 'data/db/database_client.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +42,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //initLocationDb();
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
         var state = ref.watch(themeProvider.select((value) => value));
