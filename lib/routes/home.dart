@@ -9,6 +9,7 @@ import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/constants/density.dart';
 import 'package:quickresponse/data/db/location_db.dart';
+import 'package:quickresponse/providers/permission_provider.dart';
 import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 import 'package:sqflite/sqflite.dart';
@@ -27,7 +28,7 @@ class Home extends ConsumerStatefulWidget {
 
 class _HomeState extends ConsumerState<Home> {
   bool isLocationServiceEnabled = false;
-  late LocationPermission _permission;
+  LocationPermission? _permission;
   late GeolocatorPlatform _geolocator;
   Position? _position;
   List<Map>? _location;
@@ -39,7 +40,7 @@ class _HomeState extends ConsumerState<Home> {
     super.initState();
     Future(() => ref.watch(locationDbProvider.notifier).initialize());
     _geolocator = GeolocatorPlatform.instance;
-    _requestPermission();
+
 
     // Check if the location service is enabled.
     //_requestGPS();
@@ -72,7 +73,7 @@ class _HomeState extends ConsumerState<Home> {
   }*/
 
   void _requestPermission() async {
-    _permission = await _geolocator.requestPermission();
+    Future.value(ref.watch(permissionProvider.notifier).setPermission = await _geolocator.requestPermission());
   }
 
   void _showPermissionDeniedDialog() {
@@ -105,12 +106,14 @@ class _HomeState extends ConsumerState<Home> {
 
   @override
   Widget build(BuildContext context) {
-    if (_permission == LocationPermission.whileInUse) {
-      // _showPermissionDeniedDialog();
-      launchReplace(context, Constants.home);
-    }
     final dp = Density.init(context);
     Database? db = ref.watch(locationDbProvider.select((value) => value));
+    _requestPermission();
+    _permission = ref.watch(permissionProvider.select((value) => value));
+/*    if (_permission == LocationPermission.whileInUse) {
+      // _showPermissionDeniedDialog();
+      launch(context, Constants.error);
+    }*/
     _position = ref.watch(positionProvider.select((value) => value));
     getLocationFromStorage(db);
     log('Loc: $_location');
