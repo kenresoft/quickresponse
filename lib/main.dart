@@ -20,8 +20,9 @@ import 'package:sqflite/sqflite.dart';
 import 'data/constants/constants.dart';
 import 'data/db/database_client.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  DatabaseClient();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
       statusBarColor: AppColor.background,
