@@ -41,7 +41,6 @@ class _HomeState extends ConsumerState<Home> {
     Future(() => ref.watch(locationDbProvider.notifier).initialize());
     _geolocator = GeolocatorPlatform.instance;
 
-
     // Check if the location service is enabled.
     //_requestGPS();
     //_startLocationUpdates();
@@ -77,7 +76,6 @@ class _HomeState extends ConsumerState<Home> {
   }
 
   void _showPermissionDeniedDialog() {
-    launchReplace(context, Constants.home);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -103,6 +101,11 @@ class _HomeState extends ConsumerState<Home> {
       showToast = false;
     });
   }*/
+  @override
+  void dispose() {
+    setState(() {});
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,10 +113,9 @@ class _HomeState extends ConsumerState<Home> {
     Database? db = ref.watch(locationDbProvider.select((value) => value));
     _requestPermission();
     _permission = ref.watch(permissionProvider.select((value) => value));
-/*    if (_permission == LocationPermission.whileInUse) {
-      // _showPermissionDeniedDialog();
-      launch(context, Constants.error);
-    }*/
+    if (_permission == LocationPermission.whileInUse) {
+      _requestPermission();
+    }
     _position = ref.watch(positionProvider.select((value) => value));
     getLocationFromStorage(db);
     log('Loc: $_location');
@@ -138,14 +140,17 @@ class _HomeState extends ConsumerState<Home> {
             if (_location != null) {
               // Create a map of the current location.
               Map<String, Object> map = {
-                'latitude': _location?.single['latitude'],
-                'longitude': _location?.single['longitude'],
+                'latitude': _location?.first['latitude'],
+                'longitude': _location?.first['longitude'],
               };
+              log('if');
               Future(() => ref.watch(positionProvider.notifier).setPosition = Position.fromMap(map));
               ref.watch(positionProvider.select((value) => value));
             } else {
+              log('else');
               //initLocationDb(db);
-              ref.watch(positionProvider.select((value) => value));
+              Future(() => setState(() {}));
+              //ref.watch(positionProvider.select((value) => value));
             }
           }
           return Scaffold(
@@ -236,6 +241,12 @@ class _HomeState extends ConsumerState<Home> {
     if (_position != null) {
       placemarks = await GeocodingPlatform.instance.placemarkFromCoordinates(_position!.latitude, _position!.longitude);
       await LocationDB(db).updateLocation(_position!, placemarks!);
+      log(
+        '${placemarks?.first.subThoroughfare}, ${placemarks?.first.thoroughfare}, '
+        '${placemarks?.first.subLocality}, ${placemarks?.first.locality}, '
+        '${placemarks?.first.subAdministrativeArea},${placemarks?.first.administrativeArea}, '
+        '${placemarks?.first.postalCode}, ${placemarks?.first.country}.',
+      );
     }
   }
 
@@ -284,7 +295,7 @@ class _HomeState extends ConsumerState<Home> {
         child: Row(children: [
           Column(children: [
             Text(
-              '${placemarks == null ? 'Loading' : placemarks?.last.name}...',
+              '${placemarks == null ? 'Loading' : placemarks?.first.name}...',
               style: TextStyle(fontSize: 15, color: AppColor.text),
             ),
             Text(
