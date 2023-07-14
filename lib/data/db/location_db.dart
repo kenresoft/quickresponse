@@ -37,11 +37,11 @@ class LocationDB {
       'longitude': position.longitude,
       'address': placemarks.last.name,
     };
-    await db?.update('location', location, where: 'id = 1');
+    await db?.update('location', location, where: 'id = ?', whereArgs: [1]);
   }
 
   deleteLocation() async {
     // Delete the location from the database.
-    await db?.delete('location', where: 'id = 1');
+    await db?.delete('location', where: 'id = ?', whereArgs: [1]);
   }
 }
