@@ -109,7 +109,7 @@ class NetworkCommon {
       debugPrint("Response From:${response.requestOptions.method},${response.requestOptions.baseUrl}${response.requestOptions.path}");
       debugPrint("Response From:${response.toString()}");
       return handler.next(response); // continue
-    }, onError: (DioError e, handler) {
+    }, onError: (DioException e, handler) {
       // Do something with response error
       return handler.next(e); //continue
     }));
