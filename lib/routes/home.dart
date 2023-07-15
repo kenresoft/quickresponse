@@ -10,11 +10,12 @@ import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/constants/density.dart';
 import 'package:quickresponse/data/db/location_db.dart';
 import 'package:quickresponse/providers/permission_provider.dart';
+import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/widgets/bottom_navigator.dart';
+import 'package:quickresponse/widgets/loading_dialog.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../main.dart';
 import '../providers/location_providers.dart';
 import '../widgets/alert_button.dart';
 import '../widgets/toast.dart';
@@ -26,14 +27,17 @@ class Home extends ConsumerStatefulWidget {
   ConsumerState<Home> createState() => _HomeState();
 }
 
-class _HomeState extends ConsumerState<Home> {
+class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
   bool isLocationServiceEnabled = false;
-  LocationPermission? _permission;
+
+  //LocationPermission? _permission;
   late GeolocatorPlatform _geolocator;
   Position? _position;
   List<Map>? _location;
   bool showToast = false;
   List<Placemark>? placemarks;
+
+  final bool _restarted = false;
 
   @override
   void initState() {
@@ -44,6 +48,25 @@ class _HomeState extends ConsumerState<Home> {
     // Check if the location service is enabled.
     //_requestGPS();
     //_startLocationUpdates();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    log('disposed');
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed && !_restarted) {
+      //_restarted = true;
+      debugPrint('App resumed');
+      // Restart the app.
+      //WidgetsBinding.instance.reassembleApplication();
+    }
   }
 
 /*  Future<void> _requestGPS() async {
@@ -101,26 +124,58 @@ class _HomeState extends ConsumerState<Home> {
       showToast = false;
     });
   }*/
-  @override
-  void dispose() {
-    setState(() {});
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
     Database? db = ref.watch(locationDbProvider.select((value) => value));
-    _requestPermission();
-    _permission = ref.watch(permissionProvider.select((value) => value));
-    if (_permission == LocationPermission.whileInUse) {
-      _requestPermission();
-    }
-    _position = ref.watch(positionProvider.select((value) => value));
+    /*_requestPermission();
+    //_permission = ref.watch(permissionProvider.select((value) => value));
+    _geolocator.requestPermission().then((permission) {
+      while (permission != LocationPermission.always) {
+        _geolocator.requestPermission().then((value) {
+          if (value == LocationPermission.always) {
+            log(value.toString());
+            SystemNavigator.pop().then((value) => launch(context, Constants.error));
+          }
+        });
+        //_restarted = false;
+      }
+    });
+*/
+    //_position = ref.watch(positionProvider.select((value) => value));
     getLocationFromStorage(db);
     log('Loc: $_location');
     log('Pos: $_position');
     getPlacemarks(db);
+    return FutureBuilder(
+        future: _geolocator.requestPermission(),
+        builder: (context, snapshot) {
+          LocationPermission? locationPermission;
+          if (snapshot.hasData) {
+            locationPermission = snapshot.data;
+            if (locationPermission != null && locationPermission == LocationPermission.always) {
+              return buildStreamBuilder(dp);
+            }
+            if (locationPermission != null && locationPermission != LocationPermission.always) {
+              return FutureBuilder(
+                future: _geolocator.requestPermission(),
+                builder: (context, snapshot) {
+                  return buildStreamBuilder(dp);
+                },
+              );
+            }
+            return const ErrorPage(error: 'Null Permission');
+          } else if (snapshot.hasError) {
+            log("FutureError: ${snapshot.error}");
+            return ErrorPage(error: snapshot.error.toString());
+          } else {
+            return const LoadingDialog();
+          }
+        });
+  }
+
+  StreamBuilder<Position> buildStreamBuilder(Density dp) {
     return StreamBuilder<Position>(
         stream: _geolocator.getPositionStream(),
         builder: (context, snapshot) {
@@ -134,24 +189,33 @@ class _HomeState extends ConsumerState<Home> {
               showToast = false;
             }
           } else if (snapshot.hasError) {
-            log(snapshot.error.toString());
+            log("Error: ${snapshot.error}");
+
+            //rebuild();
           } else {
+            log('block');
+            if (placemarks == null && _position != null) {
+              //restart();
+              //rebuild();
+            }
             Toast('Loading position...', show: isLoading);
             if (_location != null) {
-              // Create a map of the current location.
-              Map<String, Object> map = {
-                'latitude': _location?.first['latitude'],
-                'longitude': _location?.first['longitude'],
-              };
-              log('if');
-              Future(() => ref.watch(positionProvider.notifier).setPosition = Position.fromMap(map));
-              ref.watch(positionProvider.select((value) => value));
-            } else {
-              log('else');
-              //initLocationDb(db);
-              Future(() => setState(() {}));
-              //ref.watch(positionProvider.select((value) => value));
+              if (_location!.isNotEmpty) {
+                // Create a map of the current location.
+                Map<String, Object> map = {
+                  'latitude': _location?.first['latitude'],
+                  'longitude': _location?.first['longitude'],
+                };
+                log('if');
+                Future(() => ref.watch(positionProvider.notifier).setPosition = Position.fromMap(map));
+              }
             }
+            /*else {
+                log('else');
+                //initLocationDb(db);
+                rebuild();
+                //ref.watch(positionProvider.select((value) => value));
+              }*/
           }
           return Scaffold(
             backgroundColor: AppColor.background,
@@ -164,8 +228,8 @@ class _HomeState extends ConsumerState<Home> {
                       // 1
                       //Util.loadStream(Geolocator.getServiceStatusStream(), (data) {
                       /*if (data == ServiceStatus.enabled && _position == null) {
-                        setState(() {});
-                      }*/
+                          setState(() {});
+                        }*/
                       /* return */ Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: buildRow(context, _position),
@@ -229,6 +293,23 @@ class _HomeState extends ConsumerState<Home> {
         });
   }
 
+  void rebuild({dynamic action}) {
+    if (action == null) {
+      Future(() => setState(() {}));
+    } else {
+      Future(() => action);
+    }
+  }
+
+  void restart() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      log('time: $timeStamp');
+      //Future.delayed(const Duration(seconds: 3));
+      setState(() {});
+      //Future.value(() => setState(() {}));
+    });
+  }
+
   Future<void> initLocationDb(Database? db) async {
     await LocationDB(db).initialize();
   }
@@ -285,12 +366,12 @@ class _HomeState extends ConsumerState<Home> {
             setState(() {
               showToast = true;
             });
-          } else {
+          } /*else {
             setState(() {
               showToast = false;
-            });
-            launch(context, Constants.locationMap /*, position*/);
-          }
+            });*/
+          //launch(context, Constants.locationMap /*, position*/);
+          //}
         },
         child: Row(children: [
           Column(children: [
