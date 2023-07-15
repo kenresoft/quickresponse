@@ -3,7 +3,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../data/db/database_client.dart';
-import '../utils/init.dart';
 
 //final locationProvider = StateProvider<Position?>((ref) => null);
 
@@ -57,5 +56,4 @@ class LocationDbNotifier extends StateNotifier<Database?> {
     Database? db = await DatabaseClient().db;
     state = db;
   }
-
 }
