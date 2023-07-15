@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fontresoft/fontresoft.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickresponse/data/constants/colors.dart';
-import 'package:quickresponse/data/db/location_db.dart';
 import 'package:quickresponse/providers/providers.dart';
 import 'package:quickresponse/routes/call.dart';
 import 'package:quickresponse/routes/contact_details.dart';
@@ -15,7 +14,6 @@ import 'package:quickresponse/routes/contacts.dart';
 import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/routes/home.dart';
 import 'package:quickresponse/routes/location_map.dart';
-import 'package:sqflite/sqflite.dart';
 
 import 'data/constants/constants.dart';
 import 'data/db/database_client.dart';
