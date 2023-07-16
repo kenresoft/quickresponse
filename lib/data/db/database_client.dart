@@ -44,7 +44,7 @@ class DatabaseClient {
       onCreate: (db, version) {
         db.execute(
           '''CREATE TABLE location (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY CHECK (id = 1),
             latitude REAL, 
             longitude REAL, 
             address TEXT
