@@ -8,14 +8,14 @@ class LocationDB {
   final Database? db;
   late Map<String, Object?> location;
 
-  Future<void> insert(Position position, List<Placemark> placemarks) async {
+/*  Future<void> insert(Position position, List<Placemark> placemarks) async {
     location = {
       'latitude': position.latitude,
       'longitude': position.longitude,
       'address': placemarks[0].name,
     };
-    await db?.insert('location', location);
-  }
+    await db?.insert('location', location, conflictAlgorithm: ConflictAlgorithm.replace);
+  }*/
 
   Future<void> initialize() async {
     location = {"latitude": 1.0, "longitude": 1.0, "address": "a"};
@@ -29,7 +29,8 @@ class LocationDB {
 
   updateLocation(Position position, List<Placemark> placemarks) async {
     if (await getLocation() == null) {
-      insert(position, placemarks);
+      //insert(position, placemarks);
+      initialize();
     }
     // Update the location in the database.
     var location = {
