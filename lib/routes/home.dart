@@ -10,7 +10,6 @@ import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/constants/density.dart';
 import 'package:quickresponse/data/db/location_db.dart';
 import 'package:quickresponse/providers/permission_provider.dart';
-import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 import 'package:sqflite/sqflite.dart';
@@ -43,9 +42,14 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
   void initState() {
     super.initState();
     //WidgetsBinding.instance.addObserver(this);
+
     Future(() => ref.watch(locationDbProvider.notifier).initialize());
     _geolocator = GeolocatorPlatform.instance;
-    futurePermission = _geolocator.requestPermission();
+    _geolocator.requestPermission().then((value) {
+      if (value == LocationPermission.always || value == LocationPermission.whileInUse) {
+        setState(() {});
+      }
+    });
   }
 
 /*
@@ -65,10 +69,7 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
       debugPrint('App resumed');
       // Restart the app.
       //WidgetsBinding.instance.reassembleApplication();
-      if (placemarks == null && _position != null) {
-        restart();
-        //rebuild();
-      }
+
     }
   }*/
 
@@ -188,15 +189,19 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
             }
           } else if (snapshot.hasError) {
             log("Error: ${snapshot.error}");
-            return ErrorPage(error: snapshot.error.toString());
+            //return ErrorPage(error: snapshot.error.toString());
           } else {
             log('k');
             _restarted = true;
             log('block');
+            if (placemarks == null && _position != null) {
+              //restart();
+              rebuild();
+            }
             log(placemarks.toString());
-            debugPrint(_position.toString());
+            log(_position.toString());
 
-            Toast('Loading position...', show: isLoading);
+            // Toast('Loading position...', show: isLoading);
             if (_location != null) {
               if (_location!.isNotEmpty) {
                 log('l');
@@ -313,7 +318,10 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
   }
 
   Future<void> getLocationFromStorage(Database? db) async {
-    _location = await LocationDB(db).getLocation();
+    _location = await LocationDB(db).getLocation().then((value) {
+      log("Location: $value");
+      return value;
+    });
   }
 
   Future<void> getPlacemarks(Database? db) async {
