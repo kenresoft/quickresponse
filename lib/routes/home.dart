@@ -12,7 +12,6 @@ import 'package:quickresponse/data/db/location_db.dart';
 import 'package:quickresponse/providers/permission_provider.dart';
 import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/widgets/bottom_navigator.dart';
-import 'package:quickresponse/widgets/loading_dialog.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -27,47 +26,51 @@ class Home extends ConsumerStatefulWidget {
   ConsumerState<Home> createState() => _HomeState();
 }
 
-class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
+class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
   bool isLocationServiceEnabled = false;
 
   //LocationPermission? _permission;
+  late Future<LocationPermission> futurePermission;
   late GeolocatorPlatform _geolocator;
   Position? _position;
   List<Map>? _location;
   bool showToast = false;
   List<Placemark>? placemarks;
 
-  final bool _restarted = false;
+  bool _restarted = false;
 
   @override
   void initState() {
     super.initState();
+    //WidgetsBinding.instance.addObserver(this);
     Future(() => ref.watch(locationDbProvider.notifier).initialize());
     _geolocator = GeolocatorPlatform.instance;
-
-    // Check if the location service is enabled.
-    //_requestGPS();
-    //_startLocationUpdates();
-    WidgetsBinding.instance.addObserver(this);
+    futurePermission = _geolocator.requestPermission();
   }
 
+/*
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     log('disposed');
     super.dispose();
   }
+*/
 
-  @override
+/*  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed && !_restarted) {
+    if (state == AppLifecycleState.resumed && _restarted) {
       //_restarted = true;
       debugPrint('App resumed');
       // Restart the app.
       //WidgetsBinding.instance.reassembleApplication();
+      if (placemarks == null && _position != null) {
+        restart();
+        //rebuild();
+      }
     }
-  }
+  }*/
 
 /*  Future<void> _requestGPS() async {
     // Check if the location service is enabled.
@@ -129,78 +132,74 @@ class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final dp = Density.init(context);
     Database? db = ref.watch(locationDbProvider.select((value) => value));
-    /*_requestPermission();
-    //_permission = ref.watch(permissionProvider.select((value) => value));
-    _geolocator.requestPermission().then((permission) {
-      while (permission != LocationPermission.always) {
-        _geolocator.requestPermission().then((value) {
-          if (value == LocationPermission.always) {
-            log(value.toString());
-            SystemNavigator.pop().then((value) => launch(context, Constants.error));
-          }
-        });
-        //_restarted = false;
-      }
-    });
-*/
-    //_position = ref.watch(positionProvider.select((value) => value));
+    _position = ref.watch(positionProvider.select((value) => value));
     getLocationFromStorage(db);
     log('Loc: $_location');
     log('Pos: $_position');
     getPlacemarks(db);
-    return FutureBuilder(
+    return buildStreamBuilder(dp);
+    /*FutureBuilder(
         future: _geolocator.requestPermission(),
         builder: (context, snapshot) {
+          log('a');
           LocationPermission? locationPermission;
           if (snapshot.hasData) {
             locationPermission = snapshot.data;
+            log('b');
             if (locationPermission != null && locationPermission == LocationPermission.always) {
+              log('c');
               return buildStreamBuilder(dp);
-            }
-            if (locationPermission != null && locationPermission != LocationPermission.always) {
+            } else {
+              log('d');
               return FutureBuilder(
                 future: _geolocator.requestPermission(),
                 builder: (context, snapshot) {
+                  log('e');
                   return buildStreamBuilder(dp);
                 },
               );
             }
-            return const ErrorPage(error: 'Null Permission');
           } else if (snapshot.hasError) {
+            log('f');
             log("FutureError: ${snapshot.error}");
             return ErrorPage(error: snapshot.error.toString());
           } else {
-            return const LoadingDialog();
+            log('g');
+            return buildStreamBuilder(dp);
           }
-        });
+        });*/
   }
 
   StreamBuilder<Position> buildStreamBuilder(Density dp) {
     return StreamBuilder<Position>(
         stream: _geolocator.getPositionStream(),
         builder: (context, snapshot) {
+          log('h');
           Position? position;
           var isLoading = true;
           if (snapshot.hasData) {
+            log('i');
             position = snapshot.data;
             if (position != null) {
+              log('j');
               Future(() => ref.watch(positionProvider.notifier).setPosition = position);
               isLoading = false;
               showToast = false;
             }
           } else if (snapshot.hasError) {
             log("Error: ${snapshot.error}");
-
-            //rebuild();
+            return ErrorPage(error: snapshot.error.toString());
           } else {
+            log('k');
+            _restarted = true;
             log('block');
-            if (placemarks == null && _position != null) {
-              //restart();
-              //rebuild();
-            }
+            log(placemarks.toString());
+            debugPrint(_position.toString());
+
             Toast('Loading position...', show: isLoading);
             if (_location != null) {
               if (_location!.isNotEmpty) {
+                log('l');
                 // Create a map of the current location.
                 Map<String, Object> map = {
                   'latitude': _location?.first['latitude'],
@@ -209,13 +208,12 @@ class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
                 log('if');
                 Future(() => ref.watch(positionProvider.notifier).setPosition = Position.fromMap(map));
               }
+            } else {
+              log('else');
+              //initLocationDb(db);
+              rebuild();
+              //ref.watch(positionProvider.select((value) => value));
             }
-            /*else {
-                log('else');
-                //initLocationDb(db);
-                rebuild();
-                //ref.watch(positionProvider.select((value) => value));
-              }*/
           }
           return Scaffold(
             backgroundColor: AppColor.background,
