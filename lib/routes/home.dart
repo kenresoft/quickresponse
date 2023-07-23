@@ -328,12 +328,12 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
     if (_position != null) {
       placemarks = await GeocodingPlatform.instance.placemarkFromCoordinates(_position!.latitude, _position!.longitude);
       await LocationDB(db).updateLocation(_position!, placemarks!);
-      log(
+      /*log(
         '${placemarks?.first.subThoroughfare}, ${placemarks?.first.thoroughfare}, '
         '${placemarks?.first.subLocality}, ${placemarks?.first.locality}, '
         '${placemarks?.first.subAdministrativeArea},${placemarks?.first.administrativeArea}, '
         '${placemarks?.first.postalCode}, ${placemarks?.first.country}.',
-      );
+      );*/
     }
   }
 
