@@ -8,6 +8,7 @@ import 'package:quickresponse/widgets/alert_button.dart';
 
 import '../data/constants/colors.dart';
 import '../data/constants/density.dart';
+import '../widgets/suggestion_card.dart';
 
 class Call extends StatefulWidget {
   const Call({super.key});
@@ -18,15 +19,23 @@ class Call extends StatefulWidget {
 
 class _CallState extends State<Call> {
   CarouselController buttonCarouselController = CarouselController();
-  bool contactTap = false;
+  bool isContactTap = false;
 
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
-    return Scaffold(
-      backgroundColor: AppColor.text,
-      appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.text),
-      body: Container(
+    return WillPopScope(
+      onWillPop: () {
+        log('message');
+        setState(() {
+          isContactTap = false;
+        });
+        return Future(() => false);
+      },
+      child: Scaffold(
+        backgroundColor: AppColor.text,
+        appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.text),
+        body: Container(
           color: AppColor.text,
           child: Center(
             child: Column(children: [
@@ -37,7 +46,11 @@ class _CallState extends State<Call> {
               0.23.dpH(dp).spY,
               Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor.white, fontWeight: FontWeight.w600)),
               0.03.dpH(dp).spY,
-              buildContactsCarousel(),
+              SizedBox(
+                height: 120,
+                width: 310,
+                child: isContactTap ? buildSuggestionAlertMessage(dp) : buildContactsCarousel(),
+              ),
               0.07.dpH(dp).spY,
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -56,7 +69,20 @@ class _CallState extends State<Call> {
                 ]),
               ),
             ]),
-          )),
+          ),
+        ),
+      ),
+    );
+  }
+
+  ListView buildSuggestionAlertMessage(Density dp) {
+    return ListView.builder(
+      shrinkWrap: true,
+      scrollDirection: Axis.horizontal,
+      itemCount: 6,
+      itemBuilder: (BuildContext context, int index) {
+        return const SuggestionCard(text: 'He had an accident', verticalMargin: 15, horizontalMargin: 5);
+      },
     );
   }
 
@@ -71,15 +97,18 @@ class _CallState extends State<Call> {
     );
   }
 
-  SizedBox buildContactsCarousel() {
-    return SizedBox(
-      height: 120,
-      width: 310,
-      child: CarouselSlider.builder(
-        itemCount: 3,
-        itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
-          log("$itemIndex : $pageViewIndex");
-          return Center(
+  CarouselSlider buildContactsCarousel() {
+    return CarouselSlider.builder(
+      itemCount: 3,
+      itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
+        log("$itemIndex : $pageViewIndex");
+        return GestureDetector(
+          onTap: () {
+            setState(() {
+              isContactTap = true;
+            });
+          },
+          child: Center(
             child: Column(children: [
               Stack(
                 children: [
@@ -107,17 +136,17 @@ class _CallState extends State<Call> {
               ),
               Text('$itemIndex', style: TextStyle(fontSize: 18, color: AppColor.white)),
             ]),
-          );
-        },
-        carouselController: buttonCarouselController,
-        options: CarouselOptions(
-          enableInfiniteScroll: false,
-          enlargeCenterPage: true,
-          viewportFraction: 0.35,
-          aspectRatio: 1.0,
-          enlargeFactor: 0.5,
-          enlargeStrategy: CenterPageEnlargeStrategy.zoom,
-        ),
+          ),
+        );
+      },
+      carouselController: buttonCarouselController,
+      options: CarouselOptions(
+        enableInfiniteScroll: false,
+        enlargeCenterPage: true,
+        viewportFraction: 0.35,
+        aspectRatio: 1.0,
+        enlargeFactor: 0.5,
+        enlargeStrategy: CenterPageEnlargeStrategy.zoom,
       ),
     );
   }
