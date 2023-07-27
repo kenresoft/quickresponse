@@ -10,6 +10,7 @@ class AlertButton extends StatefulWidget {
     required this.borderWidth,
     required this.shadowWidth,
     required this.iconSize,
+    this.showSecondShadow = true, this.iconData,
   });
 
   final double height;
@@ -17,6 +18,8 @@ class AlertButton extends StatefulWidget {
   final double borderWidth;
   final double shadowWidth;
   final double iconSize;
+  final bool showSecondShadow;
+  final IconData? iconData;
 
   @override
   State<AlertButton> createState() => _AlertButtonState();
@@ -32,7 +35,7 @@ class _AlertButtonState extends State<AlertButton> {
           border: Border.all(width: widget.borderWidth, color: Colors.grey),
           boxShadow: [
             const BoxShadow(color: Colors.white, spreadRadius: 3),
-            BoxShadow(color: Colors.white.withOpacity(0.8), offset: const Offset(0, -20), blurRadius: 5),
+            widget.showSecondShadow ? BoxShadow(color: Colors.white.withOpacity(0.8), offset: const Offset(0, -20), blurRadius: 5) : const BoxShadow(),
             BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(10, 20), blurRadius: 5),
             BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(10, 0), blurRadius: 5),
             BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(-10, 10), blurRadius: 5),
@@ -42,7 +45,7 @@ class _AlertButtonState extends State<AlertButton> {
       width: widget.width,
       height: widget.height,
       child: Icon(
-        CupertinoIcons.waveform_path,
+        widget.iconData??CupertinoIcons.waveform_path,
         size: widget.iconSize,
         color: CupertinoColors.white,
       ),
