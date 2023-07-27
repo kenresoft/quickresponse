@@ -1,4 +1,8 @@
+import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/material.dart';
+
+import '../data/constants/colors.dart';
+import '../data/constants/density.dart';
 
 class Call extends StatefulWidget {
   const Call({super.key});
@@ -8,42 +12,29 @@ class Call extends StatefulWidget {
 }
 
 class _CallState extends State<Call> {
-  final ScrollController _scrollController = ScrollController();
-  bool _bottomSheetVisible = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(() {
-      if (_scrollController.position.maxScrollExtent == _scrollController.position.pixels) {
-        setState(() {
-          _bottomSheetVisible = true;
-        });
-      } else {
-        setState(() {
-          _bottomSheetVisible = false;
-        });
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final dp = Density.init(context);
     return Scaffold(
-      body: ListView(
-        controller: _scrollController,
-        children: [
-          ...List.generate(50, (index) => ListTile(title: Text('Item $index'))),
-        ],
-      ),
-      bottomSheet: AnimatedContainer(
-        duration: const Duration(seconds: 1),
-        curve: Curves.easeInOut,
-        height: _bottomSheetVisible ? 100 : 0,
-        child: const Center(
-          child: Text('This is the bottom sheet'),
-        ),
-      ),
+      backgroundColor: AppColor.background,
+      appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.background),
+      body: Container(
+          color: AppColor.alertBorder,
+          child: Center(
+            child: Column(children: [
+              0.15.dpH(dp).spY,
+              Icon(Icons.ac_unit, color: AppColor.white, size: 40),
+              Text('112', style: TextStyle(fontSize: 70, color: AppColor.white, fontWeight: FontWeight.w500)),
+              Text('Calling...', style: TextStyle(fontSize: 18, color: AppColor.white)),
+              0.15.dpH(dp).spY,
+              Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor.white, fontWeight: FontWeight.w600)),
+              Expanded(child: ListView.builder(
+                itemBuilder: (context, i) {
+                  return Card();
+                },
+              ))
+            ]),
+          )),
     );
   }
 }
