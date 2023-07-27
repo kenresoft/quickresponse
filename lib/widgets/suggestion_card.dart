@@ -5,26 +5,35 @@ import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/density.dart';
 
 class SuggestionCard extends StatelessWidget {
-  const SuggestionCard({super.key, required this.text});
+  const SuggestionCard({
+    super.key,
+    required this.text,
+    this.verticalMargin,
+    this.horizontalMargin,
+  });
 
   final String text;
+  final double? verticalMargin;
+  final double? horizontalMargin;
 
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
     return Card(
       elevation: 0,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      margin: EdgeInsets.symmetric(vertical: verticalMargin ?? 0, horizontal: horizontalMargin ?? 8),
       color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: 0.3.dpW(dp).spaceX(
               Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                0.13.dpH(dp).spaceX(Text(
-                      text,
-                      maxLines: 2,
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColor.title_2),
-                    )),
+                0.13.dpH(dp).spaceX(
+                      Text(
+                        text,
+                        maxLines: 2,
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: AppColor.title_2),
+                      ),
+                    ),
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   Icon(
                     Icons.arrow_forward,
