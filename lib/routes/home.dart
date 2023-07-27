@@ -14,6 +14,7 @@ import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../main.dart';
 import '../providers/location_providers.dart';
 import '../widgets/alert_button.dart';
 import '../widgets/toast.dart';
@@ -258,7 +259,7 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
 
                       // 4
                       GestureDetector(
-                        onTap: () => setState(() {}) /*launch(context, Constants.call, (false, ''))*/,
+                        onTap: () => launch(context, Constants.call, (false, '')),
                         child: const AlertButton(height: 190, width: 185, borderWidth: 3, shadowWidth: 15, iconSize: 45),
                       ),
                       0.08.dpH(dp).spY,
