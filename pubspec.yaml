@@ -44,6 +44,9 @@ dependencies:
   path_provider: ^2.0.15
   path: ^1.8.3
 
+  # Media
+  carousel_slider: ^4.2.1
+
   # Networking
   dio: ^5.2.1+1
 
