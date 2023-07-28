@@ -12,7 +12,7 @@ class AlertButton extends StatefulWidget {
     required this.iconSize,
     this.showSecondShadow = true,
     this.iconData,
-    this.onPressed,
+    required this.onPressed,
   });
 
   final double height;
@@ -22,7 +22,7 @@ class AlertButton extends StatefulWidget {
   final double iconSize;
   final bool showSecondShadow;
   final IconData? iconData;
-  final GestureTapCallback? onPressed;
+  final Function() onPressed;
 
   @override
   State<AlertButton> createState() => _AlertButtonState();
@@ -32,7 +32,7 @@ class _AlertButtonState extends State<AlertButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => widget.onPressed,
+      onTap: widget.onPressed,
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.elliptical(widget.width, widget.height)),
