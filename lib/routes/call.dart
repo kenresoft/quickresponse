@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/material.dart';
 import 'package:quickresponse/data/constants/constants.dart';
+import 'package:quickresponse/main.dart';
 import 'package:quickresponse/widgets/alert_button.dart';
 
 import '../data/constants/colors.dart';
@@ -56,7 +57,7 @@ class _CallState extends State<Call> {
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
                   buildIconButton(Icons.camera_alt, 22),
-                  const AlertButton(
+                  AlertButton(
                     height: 70,
                     width: 70,
                     borderWidth: 2,
@@ -64,6 +65,7 @@ class _CallState extends State<Call> {
                     iconSize: 25,
                     showSecondShadow: false,
                     iconData: Icons.call_end,
+                    onPressed: () => finish(context),
                   ),
                   buildIconButton(Icons.volume_down_alt, 27),
                 ]),

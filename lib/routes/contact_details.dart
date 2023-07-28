@@ -164,7 +164,7 @@ class _ContactDetailsState extends ConsumerState<ContactDetails> {
               const Text('This is the bottom sheet'),
               GestureDetector(
                 onLongPress: () => launch(context, Constants.call),
-                child: const AlertButton(height: 55, width: 53, borderWidth: 2, shadowWidth: 9, iconSize: 30),
+                child: AlertButton(height: 55, width: 53, borderWidth: 2, shadowWidth: 9, iconSize: 30, onPressed: () {  },),
               ),
             ]),
           ),

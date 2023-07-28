@@ -258,9 +258,13 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
                       0.05.dpH(dp).spY,
 
                       // 4
-                      GestureDetector(
-                        onTap: () => launch(context, Constants.call, (false, '')),
-                        child: const AlertButton(height: 190, width: 185, borderWidth: 3, shadowWidth: 15, iconSize: 45),
+                      AlertButton(
+                        height: 190,
+                        width: 185,
+                        borderWidth: 3,
+                        shadowWidth: 15,
+                        iconSize: 45,
+                        onPressed: () => launch(context, Constants.call, (false, '')),
                       ),
                       0.08.dpH(dp).spY,
 
