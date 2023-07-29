@@ -47,7 +47,7 @@ class _ContactSearchBarState extends State<ContactSearchBar> {
             child: TextField(
               controller: _controller,
               textAlign: TextAlign.center,
-              autofillHints: widget.contacts.map((e) => e.name),
+              autofillHints: widget.contacts.map((e) => e.name!),
               decoration: InputDecoration(
                 fillColor: AppColor.white,
                 filled: true,
@@ -63,7 +63,7 @@ class _ContactSearchBarState extends State<ContactSearchBar> {
               onChanged: (value) {
                 setState(() {
                   _searchTerm = value;
-                  _filteredContacts = widget.contacts.where((contact) => contact.name.toLowerCase().contains(_searchTerm.toLowerCase())).toList();
+                  _filteredContacts = widget.contacts.where((contact) => contact.name!.toLowerCase().contains(_searchTerm.toLowerCase())).toList();
                 });
               },
             ),
@@ -88,8 +88,8 @@ class _ContactSearchBarState extends State<ContactSearchBar> {
                           const Image(image: ExactAssetImage(Constants.moon), height: 50),
                           0.02.dpW(dp).spX,
                           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text(_filteredContacts[index].name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                            Text(_filteredContacts[index].relationship, style: const TextStyle(fontSize: 13)),
+                            Text(_filteredContacts[index].name ?? 'Name not defined', style: const TextStyle(fontWeight: FontWeight.w600)),
+                            Text(_filteredContacts[index].relationship ?? 'Undefined', style: const TextStyle(fontSize: 13)),
                           ]),
                         ]),
                         Icon(Icons.arrow_forward, size: 15, color: AppColor.navIconSelected)
