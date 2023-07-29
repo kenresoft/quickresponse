@@ -13,6 +13,7 @@ class AlertButton extends StatefulWidget {
     this.showSecondShadow = true,
     this.iconData,
     required this.onPressed,
+    this.delay,
   });
 
   final double height;
@@ -23,6 +24,7 @@ class AlertButton extends StatefulWidget {
   final bool showSecondShadow;
   final IconData? iconData;
   final Function() onPressed;
+  final Duration? delay;
 
   @override
   State<AlertButton> createState() => _AlertButtonState();
@@ -41,9 +43,9 @@ class _AlertButtonState extends State<AlertButton> {
             boxShadow: [
               const BoxShadow(color: Colors.white, spreadRadius: 3),
               widget.showSecondShadow ? BoxShadow(color: Colors.white.withOpacity(0.8), offset: const Offset(0, -20), blurRadius: 5) : const BoxShadow(),
-              BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(10, 20), blurRadius: 5),
+              widget.showSecondShadow ? BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(10, 20), blurRadius: 5) : const BoxShadow(),
               BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(10, 0), blurRadius: 5),
-              BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(-10, 10), blurRadius: 5),
+              widget.showSecondShadow ? BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(-10, 10), blurRadius: 5) : const BoxShadow(),
               BoxShadow(color: Colors.grey.withOpacity(0.2), offset: const Offset(-10, 0), blurRadius: 5),
               BoxShadow(color: Colors.black.withOpacity(0.03), spreadRadius: widget.shadowWidth),
             ]),
