@@ -3,12 +3,21 @@ import 'dart:developer';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/material.dart';
+//import 'package:flutter_sms/flutter_sms.dart';
+
+/*import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
+import 'package:flutter_callkit_incoming/entities/ios_params.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';*/
+//import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/main.dart';
 import 'package:quickresponse/widgets/alert_button.dart';
+import 'package:sms_advanced/sms_advanced.dart';
 
 import '../data/constants/colors.dart';
 import '../data/constants/density.dart';
+import '../data/model/contact.dart';
 import '../widgets/suggestion_card.dart';
 
 class Call extends StatefulWidget {
@@ -23,7 +32,63 @@ class _CallState extends State<Call> {
   bool isContactTap = false;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  _callNumber(String number) async {
+    //await FlutterPhoneDirectCaller.callNumber(number);
+
+    //this._currentUuid = _uuid.v4();
+/*    CallKitParams params = const CallKitParams(
+        id: '1a2b3c4d' */ /*this._currentUuid*/ /*,
+        nameCaller: 'Hien Nguyen',
+        handle: '0123456789',
+        type: 1,
+        extra: <String, dynamic>{'userId': '1a2b3c4d'},
+        ios: IOSParams(handleType: 'generic')
+    );
+    await FlutterCallkitIncoming.startCall(params);*/
+
+    /*StreamBuilder<PhoneState>(
+      initialData: PhoneState.nothing(),
+      stream: PhoneState.stream,
+      builder: (context, a) {
+        return SizedBox();
+      },
+    );*/
+/*    void _sendSMS(String message, List<String> recipents) async {
+      String result = await sendSMS(message: message, recipients: recipents)
+          .catchError((onError) {
+        print(onError);
+      });
+      if (kDebugMode) {
+        print(result);
+      }
+    }
+
+    String message = "This is a test message!";
+    List<String> recipents = ["1234567890", "5556787676"];
+
+    _sendSMS(message, recipents);*/
+
+    SmsSender sender = SmsSender();
+
+    SmsMessage message = SmsMessage(number, 'Hello flutter world!');
+    message.onStateChanged.listen((state) {
+      if (state == SmsMessageState.Sent) {
+        debugPrint("SMS is sent!");
+      } else if (state == SmsMessageState.Delivered) {
+        debugPrint("SMS is delivered!");
+      }
+    });
+    sender.sendSms(message);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final contact = GoRouterState.of(context).extra as Contact?;
+    _callNumber(contact?.phone ?? '1');
     final dp = Density.init(context);
     return WillPopScope(
       onWillPop: () {
@@ -42,7 +107,7 @@ class _CallState extends State<Call> {
             child: Column(children: [
               0.12.dpH(dp).spY,
               Icon(Icons.ac_unit, color: AppColor.white, size: 40),
-              Text('112', style: TextStyle(fontSize: 70, color: AppColor.white, fontWeight: FontWeight.w500)),
+              Text(contact?.phone ?? '112', style: TextStyle(fontSize: 65, color: AppColor.white, fontWeight: FontWeight.w500)),
               Text('Calling...', style: TextStyle(fontSize: 18, color: AppColor.white)),
               0.23.dpH(dp).spY,
               Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor.white, fontWeight: FontWeight.w600)),
