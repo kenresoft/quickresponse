@@ -264,7 +264,7 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
                         borderWidth: 3,
                         shadowWidth: 15,
                         iconSize: 45,
-                        onPressed: () => launch(context, Constants.call, (false, '')),
+                        onPressed: () => launch(context, Constants.call),
                       ),
                       0.08.dpH(dp).spY,
 
