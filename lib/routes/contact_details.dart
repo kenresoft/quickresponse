@@ -35,7 +35,7 @@ class _ContactDetailsState extends ConsumerState<ContactDetails> {
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.position.maxScrollExtent == _scrollController.position.pixels) {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 60) {
         setState(() {
           _bottomSheetVisible = true;
         });
@@ -73,8 +73,8 @@ class _ContactDetailsState extends ConsumerState<ContactDetails> {
                   0.02.dpH(dp).spY,
                   const Image(image: ExactAssetImage(Constants.moon), height: 70),
                   0.001.dpH(dp).spY,
-                  Text(contact.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                  Text(contact.relationship, style: const TextStyle(fontSize: 13)),
+                  Text(contact.name ?? 'Name not defined', style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(contact.relationship ?? 'Undefined', style: const TextStyle(fontSize: 13)),
                   0.02.dpH(dp).spY,
 
                   // Horizontal Divider
@@ -141,8 +141,8 @@ class _ContactDetailsState extends ConsumerState<ContactDetails> {
                   const Text('Current Location', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   Text('${placemarks?.last.street}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColor.text)),
                   0.02.dpH(dp).spY,
-                  const MiniMap(),
-                  const SizedBox(height: 20),
+                  MiniMap(showButton: _bottomSheetVisible, contact: contact),
+                  const SizedBox(height: 25),
                 ]),
               ),
             ),
@@ -162,9 +162,13 @@ class _ContactDetailsState extends ConsumerState<ContactDetails> {
             child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               const Image(image: ExactAssetImage(Constants.moon), height: 50),
               const Text('This is the bottom sheet'),
-              GestureDetector(
-                onLongPress: () => launch(context, Constants.call),
-                child: AlertButton(height: 55, width: 53, borderWidth: 2, shadowWidth: 9, iconSize: 30, onPressed: () {  },),
+              AlertButton(
+                height: 55,
+                width: 53,
+                borderWidth: 2,
+                shadowWidth: 9,
+                iconSize: 30,
+                onPressed: () => launch(context, Constants.call, contact),
               ),
             ]),
           ),
