@@ -360,7 +360,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     // to be used in the Map route Polyline.
     final List<LatLng> routePoints = routeCoordinates.map((coordinate) => LatLng(coordinate.latitude, coordinate.longitude)).toList();
 
-    if (routePoints.isNotEmpty) {
+    if (routePoints.isNotEmpty && !widget.disableWidgets) {
       for (var point in routePoints) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       }
