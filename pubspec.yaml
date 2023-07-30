@@ -50,8 +50,12 @@ dependencies:
   # Networking
   dio: ^5.2.1+1
   #flutter_phone_direct_caller: ^2.1.1
-  flutter_callkit_incoming: ^2.0.0+1
+  flutter_callkit_incoming:
+    path: 'packages/flutter_callkit_incoming'
   # flutter_sms: ^2.3.3
+  sms_advanced:
+    path: 'packages/sms_advanced'
+  phone_state: ^1.0.3
 
   # Firebase
   firebase_core: ^2.14.0
