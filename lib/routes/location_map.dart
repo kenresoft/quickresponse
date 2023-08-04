@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:open_route_service/open_route_service.dart';
+//import 'package:open_route_service/open_route_service.dart';
 import 'package:quickresponse/data/constants/api.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
@@ -343,22 +343,22 @@ class _LocationMapState extends ConsumerState<LocationMap> {
 
   void polyL() async {
     // Initialize the openrouteservice with your API key.
-    final OpenRouteService client = OpenRouteService(apiKey: Api.openRouteAPIKey);
+    ////final OpenRouteService client = OpenRouteService(apiKey: Api.openRouteAPIKey);
 
     // Form Route between coordinates
-    final List<ORSCoordinate> routeCoordinates = await client.directionsRouteCoordsGet(
+    /*final List<ORSCoordinate> routeCoordinates = await client.directionsRouteCoordsGet(
       startCoordinate: ORSCoordinate(latitude: currentLocation!.latitude, longitude: currentLocation!.longitude),
       endCoordinate: ORSCoordinate(latitude: destinationLocation!.latitude, longitude: destinationLocation!.longitude),
-    );
+    );*/
 
     // Print the route coordinates
-    for (var element in routeCoordinates) {
+    for (var element in []/*routeCoordinates*/) {
       log(element.toString());
     }
 
     // Map route coordinates to a list of LatLng (requires google_maps_flutter package)
     // to be used in the Map route Polyline.
-    final List<LatLng> routePoints = routeCoordinates.map((coordinate) => LatLng(coordinate.latitude, coordinate.longitude)).toList();
+    final List<LatLng> routePoints = []/*routeCoordinates*/.map((coordinate) => LatLng(coordinate.latitude, coordinate.longitude)).toList();
 
     if (routePoints.isNotEmpty && !widget.disableWidgets) {
       for (var point in routePoints) {
