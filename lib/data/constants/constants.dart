@@ -7,6 +7,7 @@ class Constants {
 
   //Navigation routes
   static const String home = '/home';
+  static const String camera = '/camera';
   static const String contacts = '/contacts';
   static const String contactDetails = '/contactDetails';
   static const String call = '/call';
