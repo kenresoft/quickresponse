@@ -6,6 +6,7 @@ class AppColor {
   static Color title = const Color(0xff3D4459);
   static Color title_2 = const Color(0xff4D5366);
   static Color black = const Color(0xff2D344B);
+  static Color overlay = const Color(0x40A5ACBF);
   static Color text = const Color(0xffA5ACBF);
   static Color white = const Color(0xffFFFFFF);
   static Color alertBorder = const Color(0xffB1B6C7);
