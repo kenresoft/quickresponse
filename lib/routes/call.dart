@@ -10,10 +10,11 @@ import 'package:flutter_callkit_incoming/entities/ios_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';*/
 //import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quickresponse/camera_preview.dart';
 import 'package:quickresponse/data/constants/constants.dart';
-import 'package:quickresponse/main.dart';
 import 'package:quickresponse/widgets/alert_button.dart';
-import 'package:sms_advanced/sms_advanced.dart';
+
+//import 'package:sms_advanced/sms_advanced.dart';
 
 import '../data/constants/colors.dart';
 import '../data/constants/density.dart';
@@ -21,7 +22,18 @@ import '../data/model/contact.dart';
 import '../widgets/suggestion_card.dart';
 
 class Call extends StatefulWidget {
-  const Call({super.key});
+  const Call({
+    super.key,
+    this.onImageCapture,
+    this.onVideoRecord,
+    this.onAudioRecord,
+    this.properties,
+  });
+
+  final GestureTapCallback? onImageCapture;
+  final GestureTapCallback? onVideoRecord;
+  final GestureTapCallback? onAudioRecord;
+  final CallProperties? properties;
 
   @override
   State<Call> createState() => _CallState();
@@ -72,7 +84,7 @@ class _CallState extends State<Call> {
 
     _sendSMS(message, recipents);*/
 
-    SmsSender sender = SmsSender();
+/*    SmsSender sender = SmsSender();
 
     SmsMessage message = SmsMessage(number, 'Hello flutter world!');
     message.onStateChanged.listen((state) {
@@ -82,7 +94,7 @@ class _CallState extends State<Call> {
         debugPrint("SMS is delivered!");
       }
     });
-    sender.sendSms(message);
+    sender.sendSms(message);*/
   }
 
   @override
@@ -99,44 +111,52 @@ class _CallState extends State<Call> {
         return Future(() => false);
       },
       child: Scaffold(
-        backgroundColor: AppColor.text,
-        appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.text),
-        body: Container(
-          color: AppColor.text,
-          child: Center(
-            child: Column(children: [
-              0.12.dpH(dp).spY,
-              Icon(Icons.ac_unit, color: AppColor.white, size: 40),
-              Text(contact?.phone ?? '112', style: TextStyle(fontSize: 65, color: AppColor.white, fontWeight: FontWeight.w500)),
-              Text('Calling...', style: TextStyle(fontSize: 18, color: AppColor.white)),
-              0.23.dpH(dp).spY,
-              Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor.white, fontWeight: FontWeight.w600)),
-              0.03.dpH(dp).spY,
-              SizedBox(
-                height: 120,
-                width: 310,
-                child: isContactTap ? buildSuggestionAlertMessage(dp) : buildContactsCarousel(),
-              ),
-              0.07.dpH(dp).spY,
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                  buildIconButton(Icons.camera_alt, 22),
-                  AlertButton(
-                    height: 70,
-                    width: 70,
-                    borderWidth: 2,
-                    shadowWidth: 10,
-                    iconSize: 25,
-                    showSecondShadow: false,
-                    iconData: Icons.call_end,
-                    onPressed: () => finish(context),
-                  ),
-                  buildIconButton(Icons.volume_down_alt, 27),
-                ]),
-              ),
-            ]),
-          ),
+        backgroundColor: AppColor.overlay,
+        appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.overlay),
+        body: Center(
+          child: Column(children: [
+            0.01.dpH(dp).spY,
+            Icon(Icons.visibility, color: AppColor.white, size: 22),
+            0.12.dpH(dp).spY,
+            Icon(Icons.ac_unit, color: AppColor.white, size: 40),
+            Text(contact?.phone ?? '112', style: TextStyle(fontSize: 65, color: AppColor.white, fontWeight: FontWeight.w500)),
+            Text('Calling...', style: TextStyle(fontSize: 18, color: AppColor.white)),
+            0.23.dpH(dp).spY,
+            Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor.white, fontWeight: FontWeight.w600)),
+            0.03.dpH(dp).spY,
+            SizedBox(
+              height: 120,
+              width: 310,
+              child: isContactTap ? buildSuggestionAlertMessage(dp) : buildContactsCarousel(),
+            ),
+            0.07.dpH(dp).spY,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                buildIconButton(
+                  widget.properties!.isRecordingVideo ? Icons.play_arrow_outlined : Icons.video_collection_outlined,
+                  22,
+                  onPressed: widget.onVideoRecord,
+                ),
+                AlertButton(
+                  height: 70,
+                  width: 70,
+                  borderWidth: 2,
+                  shadowWidth: 10,
+                  iconSize: 25,
+                  showSecondShadow: false,
+                  iconData: Icons.camera_alt,
+                  //iconData: widget.properties!.isCapturingImage ? Icons.play_arrow_outlined : Icons.call_end,
+                  onPressed: widget.onImageCapture /*finish(context)*/,
+                ),
+                buildIconButton(
+                  widget.properties!.isRecordingAudio ? Icons.play_arrow_outlined : Icons.audiotrack_outlined,
+                  22,
+                  onPressed: widget.onAudioRecord,
+                ),
+              ]),
+            ),
+          ]),
         ),
       ),
     );
@@ -153,12 +173,12 @@ class _CallState extends State<Call> {
     );
   }
 
-  IconButton buildIconButton(IconData iconData, double size) {
+  IconButton buildIconButton(IconData iconData, double size, {Function()? onPressed}) {
     return IconButton.filled(
-      onPressed: () {},
+      onPressed: onPressed,
       icon: Icon(iconData, size: size),
       style: ButtonStyle(
-        backgroundColor: MaterialStatePropertyAll(AppColor.title),
+        backgroundColor: MaterialStatePropertyAll(AppColor.overlay),
         fixedSize: const MaterialStatePropertyAll(Size.square(58)),
       ),
     );
