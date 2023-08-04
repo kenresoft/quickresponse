@@ -139,7 +139,17 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
     log('Loc: $_location');
     log('Pos: $_position');
     getPlacemarks(db);
-    return buildStreamBuilder(dp);
+    return WillPopScope(
+      onWillPop: () async {
+        bool isLastPage = true; // Replace with your logic to check if it's the last page
+        if (isLastPage) {
+          return (await showAnimatedDialog(context))!;
+        } else {
+          return true;
+        }
+      },
+      child: buildStreamBuilder(dp),
+    );
     /*FutureBuilder(
         future: _geolocator.requestPermission(),
         builder: (context, snapshot) {
@@ -264,7 +274,7 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
                         borderWidth: 3,
                         shadowWidth: 15,
                         iconSize: 45,
-                        onPressed: () => launch(context, Constants.call),
+                        onPressed: () => launch(context, Constants.camera),
                       ),
                       0.08.dpH(dp).spY,
 
@@ -400,4 +410,56 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
       ),
     ]);
   }
+}
+
+Future<bool?> showAnimatedDialog(BuildContext context) async {
+  return await showDialog<bool>(
+    context: context,
+    builder: (context) => Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircleAvatar(
+              radius: 50.0,
+              backgroundImage: AssetImage('assets/exit_image.png'),
+            ),
+            const SizedBox(height: 16.0),
+            const Text(
+              'Exit App?',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20.0,
+              ),
+            ),
+            const SizedBox(height: 8.0),
+            const Text(
+              'Are you sure you want to exit?',
+              style: TextStyle(
+                fontSize: 16.0,
+              ),
+            ),
+            const SizedBox(height: 16.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('Exit'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
