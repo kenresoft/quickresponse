@@ -111,8 +111,7 @@ class _CallState extends State<Call> {
         return Future(() => false);
       },
       child: Scaffold(
-        backgroundColor: AppColor.overlay,
-        appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.overlay),
+
         body: Center(
           child: Column(children: [
             0.01.dpH(dp).spY,
