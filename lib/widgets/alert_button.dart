@@ -23,7 +23,7 @@ class AlertButton extends StatefulWidget {
   final double iconSize;
   final bool showSecondShadow;
   final IconData? iconData;
-  final Function() onPressed;
+  final Function()? onPressed;
   final Duration? delay;
 
   @override
