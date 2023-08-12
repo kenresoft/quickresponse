@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fontresoft/fontresoft.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quickresponse/camera_screen.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/providers/providers.dart';
 import 'package:quickresponse/routes/call.dart';
@@ -88,6 +89,7 @@ class MyApp extends StatelessWidget {
     routes: <GoRoute>[
       route(Constants.root, const Home()),
       route(Constants.home, const Home()),
+      route(Constants.camera, const CameraScreen()),
       route(Constants.contacts, const Contacts()),
       route(Constants.contactDetails, const ContactDetails()),
       route(Constants.call, const Call()),
