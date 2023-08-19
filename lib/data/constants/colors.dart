@@ -23,4 +23,10 @@ class AppColor {
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
+
+  static LinearGradient radiant = LinearGradient(
+    colors: [alert_1, title],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
 }
