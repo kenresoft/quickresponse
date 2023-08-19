@@ -18,6 +18,7 @@ import '../main.dart';
 import '../providers/location_providers.dart';
 import '../widgets/alert_button.dart';
 import '../widgets/toast.dart';
+import 'dart:ui' as ui;
 
 class Home extends ConsumerStatefulWidget {
   const Home({super.key});
@@ -231,6 +232,9 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
               //ref.watch(positionProvider.select((value) => value));
             }
           }
+
+          /// ADD A BUTTON TO FETCH AND/OR REFRESH LOCATION
+          /// attention:
           return Scaffold(
             backgroundColor: AppColor.background,
             appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.background),
@@ -387,12 +391,15 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
             setState(() {
               showToast = true;
             });
-          } /*else {
+          }
+          /*else {
             setState(() {
               showToast = false;
             });*/
           //launch(context, Constants.locationMap /*, position*/);
           //}
+
+          //restartApp();
         },
         child: Row(children: [
           Column(children: [
@@ -412,7 +419,16 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
   }
 }
 
+/*void restartApp() {
+  // Request a restart of the entire Flutter app
+  ui.window.scheduleFrameCallback((_) {
+    ui.window.onBeginFrame = null;
+    runApp(MyApp());
+  });
+}*/
+
 Future<bool?> showAnimatedDialog(BuildContext context) async {
+  Color? extractedColor = Color.lerp(AppColor.alert.colors.first, AppColor.alert.colors.last, 0.5) ?? AppColor.title;
   return await showDialog<bool>(
     context: context,
     builder: (context) => Dialog(
@@ -424,9 +440,14 @@ Future<bool?> showAnimatedDialog(BuildContext context) async {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 50.0,
-              backgroundImage: AssetImage('assets/exit_image.png'),
+              backgroundColor: extractedColor,
+              child: const Icon(
+                Icons.exit_to_app, // Replace with your IconData
+                size: 40, // Adjust the icon size as needed
+                color: Colors.white, // Adjust the icon color as needed
+              ),
             ),
             const SizedBox(height: 16.0),
             const Text(
