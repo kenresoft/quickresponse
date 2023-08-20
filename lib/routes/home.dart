@@ -9,16 +9,15 @@ import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/constants/density.dart';
 import 'package:quickresponse/data/db/location_db.dart';
-import 'package:quickresponse/providers/permission_provider.dart';
-import 'package:quickresponse/widgets/bottom_navigator.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../main.dart';
 import '../providers/location_providers.dart';
 import '../widgets/alert_button.dart';
+import '../widgets/blinking_text.dart';
+import '../widgets/bottom_navigator.dart';
 import '../widgets/toast.dart';
-import 'dart:ui' as ui;
 
 class Home extends ConsumerStatefulWidget {
   const Home({super.key});
@@ -28,23 +27,18 @@ class Home extends ConsumerStatefulWidget {
 }
 
 class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
-  bool isLocationServiceEnabled = false;
-
-  //LocationPermission? _permission;
-  late Future<LocationPermission> futurePermission;
   late GeolocatorPlatform _geolocator;
   Position? _position;
   List<Map>? _location;
-  bool showToast = false;
+  bool isLocationReady = false;
   List<Placemark>? placemarks;
-
-  bool _restarted = false;
+  Widget page = const SizedBox();
+  bool isAppLaunched = false;
 
   @override
   void initState() {
     super.initState();
     //WidgetsBinding.instance.addObserver(this);
-
     Future(() => ref.watch(locationDbProvider.notifier).initialize());
     _geolocator = GeolocatorPlatform.instance;
     _geolocator.requestPermission().then((value) {
@@ -53,83 +47,6 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
       }
     });
   }
-
-/*
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    log('disposed');
-    super.dispose();
-  }
-*/
-
-/*  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed && _restarted) {
-      //_restarted = true;
-      debugPrint('App resumed');
-      // Restart the app.
-      //WidgetsBinding.instance.reassembleApplication();
-
-    }
-  }*/
-
-/*  Future<void> _requestGPS() async {
-    // Check if the location service is enabled.
-    isLocationServiceEnabled = await _geolocator.isLocationServiceEnabled();
-
-    if (!isLocationServiceEnabled) {
-      _geolocator.getLastKnownPosition().then((location) {
-        if (location != null) {
-          _position = location;
-        } else {
-          // Show a dialog to the user asking them to enable the location service.
-          _showDialog(context);
-        }
-      });
-    }
-  }*/
-
-/*  void _showDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return const LocationDialog();
-      },
-    );
-  }*/
-
-  void _requestPermission() async {
-    Future.value(ref.watch(permissionProvider.notifier).setPermission = await _geolocator.requestPermission());
-  }
-
-  void _showPermissionDeniedDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Permission denied'),
-        content: const Text('You need to grant location permission in order to use this app.'),
-        actions: [
-          TextButton(
-            child: const Text('OK'),
-            onPressed: () {
-              Navigator.of(context).pop();
-              _requestPermission();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-/*  void _startLocationUpdates() {
-    _geolocator.getPositionStream(locationSettings: locationSettings).listen((Position? p) {
-      log(p == null ? 'Unknown' : 'aa ${p.latitude.toString()}, ${p.longitude.toString()}');
-      ref.watch(positionProvider.notifier).setPosition = p;
-      showToast = false;
-    });
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +57,14 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
     log('Loc: $_location');
     log('Pos: $_position');
     getPlacemarks(db);
+    if (!isAppLaunched) {
+      setState(() {
+        isAppLaunched = true;
+        page = buildPage(context, dp);
+      });
+    } else {
+      _geolocator.requestPermission();
+    }
     return WillPopScope(
       onWillPop: () async {
         bool isLastPage = true; // Replace with your logic to check if it's the last page
@@ -149,75 +74,54 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
           return true;
         }
       },
-      child: buildStreamBuilder(dp),
+      child: Scaffold(
+        backgroundColor: AppColor.background,
+        appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.background),
+        body: SingleChildScrollView(
+          child: Stack(children: [
+            Center(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 100),
+                child: page,
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOutBack),
+                  child: child,
+                ),
+              ),
+            ),
+            Toast("The location service on the device is disabled!", show: !isLocationReady),
+          ]),
+        ),
+        bottomNavigationBar: const BottomNavigator(currentIndex: 0),
+      ),
     );
-    /*FutureBuilder(
-        future: _geolocator.requestPermission(),
-        builder: (context, snapshot) {
-          log('a');
-          LocationPermission? locationPermission;
-          if (snapshot.hasData) {
-            locationPermission = snapshot.data;
-            log('b');
-            if (locationPermission != null && locationPermission == LocationPermission.always) {
-              log('c');
-              return buildStreamBuilder(dp);
-            } else {
-              log('d');
-              return FutureBuilder(
-                future: _geolocator.requestPermission(),
-                builder: (context, snapshot) {
-                  log('e');
-                  return buildStreamBuilder(dp);
-                },
-              );
-            }
-          } else if (snapshot.hasError) {
-            log('f');
-            log("FutureError: ${snapshot.error}");
-            return ErrorPage(error: snapshot.error.toString());
-          } else {
-            log('g');
-            return buildStreamBuilder(dp);
-          }
-        });*/
   }
 
   StreamBuilder<Position> buildStreamBuilder(Density dp) {
     return StreamBuilder<Position>(
         stream: _geolocator.getPositionStream(),
         builder: (context, snapshot) {
-          log('h');
           Position? position;
-          var isLoading = true;
+
           if (snapshot.hasData) {
-            log('i');
             position = snapshot.data;
             if (position != null) {
-              log('j');
               Future(() => ref.watch(positionProvider.notifier).setPosition = position);
-              isLoading = false;
-              showToast = false;
+              isLocationReady = true;
             }
           } else if (snapshot.hasError) {
+            isLocationReady = false;
             log("Error: ${snapshot.error}");
             //return ErrorPage(error: snapshot.error.toString());
           } else {
-            log('k');
-            _restarted = true;
-            log('block');
             if (placemarks == null && _position != null) {
-              //restart();
               rebuild();
             }
             log(placemarks.toString());
             log(_position.toString());
 
-            // Toast('Loading position...', show: isLoading);
             if (_location != null) {
               if (_location!.isNotEmpty) {
-                log('l');
-                // Create a map of the current location.
                 Map<String, Object> map = {
                   'latitude': _location?.first['latitude'],
                   'longitude': _location?.first['longitude'],
@@ -235,84 +139,69 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
 
           /// ADD A BUTTON TO FETCH AND/OR REFRESH LOCATION
           /// attention:
-          return Scaffold(
-            backgroundColor: AppColor.background,
-            appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.background),
-            body: SingleChildScrollView(
-              child: Stack(
-                children: [
-                  Center(
-                    child: Column(children: [
-                      // 1
-                      //Util.loadStream(Geolocator.getServiceStatusStream(), (data) {
-                      /*if (data == ServiceStatus.enabled && _position == null) {
-                          setState(() {});
-                        }*/
-                      /* return */ Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: buildRow(context, _position),
-                      ),
-                      //}),
-
-                      0.04.dpH(dp).spY,
-
-                      // 2
-                      0.7.dpW(dp).spaceX(Text(
-                            'Emergency help needed?',
-                            style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: AppColor.title),
-                            textAlign: TextAlign.center,
-                          )),
-                      0.01.dpH(dp).spY,
-
-                      // 3
-                      Text(
-                        'Just hold the button to call',
-                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20, color: AppColor.text),
-                      ),
-                      0.05.dpH(dp).spY,
-
-                      // 4
-                      AlertButton(
-                        height: 190,
-                        width: 185,
-                        borderWidth: 3,
-                        shadowWidth: 15,
-                        iconSize: 45,
-                        onPressed: () => launch(context, Constants.camera),
-                      ),
-                      0.08.dpH(dp).spY,
-
-                      // 5
-                      Text(
-                        'Not sure what to do?',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColor.title),
-                      ),
-
-                      // 6
-                      Text('Pick the subject to chat', style: TextStyle(fontSize: 16, color: AppColor.text)),
-                      0.03.dpH(dp).spY,
-
-                      // 7
-                      .12.dpH(dp).spaceY(ListView.builder(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 6,
-                          itemBuilder: (BuildContext context, int index) {
-                            return const SuggestionCard(text: 'He had an accident');
-                          })),
-
-                      0.03.dpH(dp).spY,
-
-                      // 8
-                    ]),
-                  ),
-                  Toast("Current location not available!", show: showToast),
-                ],
-              ),
-            ),
-            bottomNavigationBar: const BottomNavigator(currentIndex: 0),
-          );
+          return buildPage(context, dp);
         });
+  }
+
+  /// HOME PAGE
+  Widget buildPage(BuildContext context, Density dp) {
+    return Column(children: [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: buildRow(context, _position, dp),
+      ),
+
+      0.04.dpH(dp).spY,
+
+      // 2
+      0.7.dpW(dp).spaceX(Text(
+            'Emergency help needed?',
+            style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: AppColor.title),
+            textAlign: TextAlign.center,
+          )),
+      0.01.dpH(dp).spY,
+
+      // 3
+      Text(
+        'Just hold the button to call',
+        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20, color: AppColor.text),
+      ),
+      0.05.dpH(dp).spY,
+
+      // 4
+      AlertButton(
+        height: 190,
+        width: 185,
+        borderWidth: 3,
+        shadowWidth: 15,
+        iconSize: 45,
+        onPressed: () => launch(context, Constants.camera),
+      ),
+      0.08.dpH(dp).spY,
+
+      // 5
+      Text(
+        'Not sure what to do?',
+        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColor.title),
+      ),
+
+      // 6
+      Text('Pick the subject to chat', style: TextStyle(fontSize: 16, color: AppColor.text)),
+      0.03.dpH(dp).spY,
+
+      // 7
+      .12.dpH(dp).spaceY(ListView.builder(
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+          itemCount: 6,
+          itemBuilder: (BuildContext context, int index) {
+            return const SuggestionCard(text: 'He had an accident');
+          })),
+
+      0.03.dpH(dp).spY,
+
+      // 8
+    ]);
   }
 
   void rebuild({dynamic action}) {
@@ -321,15 +210,6 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
     } else {
       Future(() => action);
     }
-  }
-
-  void restart() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      log('time: $timeStamp');
-      //Future.delayed(const Duration(seconds: 3));
-      setState(() {});
-      //Future.value(() => setState(() {}));
-    });
   }
 
   Future<void> initLocationDb(Database? db) async {
@@ -356,7 +236,8 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
     }
   }
 
-  Row buildRow(BuildContext context, Position? position) {
+  /// TOP ROW
+  Row buildRow(BuildContext context, Position? position, Density dp) {
 /*    void getPlacemark() async {
       for (var placemark in placemarks) {
         log('Name: ${placemark.name!}');
@@ -365,7 +246,6 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
         log('Country: ${placemark.country!}');
       }
     }*/
-
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Row(children: [
         const Image(
@@ -386,26 +266,34 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
       ]),
       GestureDetector(
         onTap: () {
-          // log(position.toString());
-          if (position == null) {
+          isLocationReady
+              ? launch(context, Constants.locationMap)
+              : setState(() {
+                  page = buildPage(context, dp);
+                });
+          Future.delayed(const Duration(milliseconds: 500), () {
             setState(() {
-              showToast = true;
+              page = buildStreamBuilder(dp);
             });
-          }
-          /*else {
-            setState(() {
-              showToast = false;
-            });*/
-          //launch(context, Constants.locationMap /*, position*/);
-          //}
-
-          //restartApp();
+          });
         },
         child: Row(children: [
           Column(children: [
-            Text(
-              '${placemarks == null ? 'Loading' : placemarks?.first.name}...',
-              style: TextStyle(fontSize: 15, color: AppColor.text),
+            BlinkingText(
+              isLocationReady
+                  ? placemarks == null
+                      ? 'Loading...'
+                      : '${placemarks!.first.name!}...'
+                  : 'Tap to load',
+              blink: isLocationReady ? true : false,
+              style: TextStyle(
+                fontSize: 15,
+                color: isLocationReady
+                    ? placemarks == null
+                        ? Colors.yellow
+                        : Colors.green
+                    : AppColor.text,
+              ),
             ),
             Text(
               'See your location',
@@ -419,14 +307,7 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
   }
 }
 
-/*void restartApp() {
-  // Request a restart of the entire Flutter app
-  ui.window.scheduleFrameCallback((_) {
-    ui.window.onBeginFrame = null;
-    runApp(MyApp());
-  });
-}*/
-
+/// EXIT DIALOG
 Future<bool?> showAnimatedDialog(BuildContext context) async {
   Color? extractedColor = Color.lerp(AppColor.alert.colors.first, AppColor.alert.colors.last, 0.5) ?? AppColor.title;
   return await showDialog<bool>(
