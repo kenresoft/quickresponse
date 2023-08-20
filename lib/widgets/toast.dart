@@ -11,7 +11,11 @@ class Toast extends StatelessWidget {
   final String? text;
 
   bool get _show {
-    return text == null ? false : show;
+    if (text == null) {
+      return true;
+    } else {
+      return show;
+    }
   }
 
   @override
