@@ -64,7 +64,7 @@ dependencies:
   phone_state: ^1.0.3
 
   # Firebase
-  firebase_core: ^2.14.0
+  firebase_core: ^2.15.0
   cloud_firestore: ^4.8.1
 
 dev_dependencies:
