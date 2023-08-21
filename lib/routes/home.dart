@@ -227,25 +227,11 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
     if (_position != null) {
       placemarks = await GeocodingPlatform.instance.placemarkFromCoordinates(_position!.latitude, _position!.longitude);
       await LocationDB(db).updateLocation(_position!, placemarks!);
-      /*log(
-        '${placemarks?.first.subThoroughfare}, ${placemarks?.first.thoroughfare}, '
-        '${placemarks?.first.subLocality}, ${placemarks?.first.locality}, '
-        '${placemarks?.first.subAdministrativeArea},${placemarks?.first.administrativeArea}, '
-        '${placemarks?.first.postalCode}, ${placemarks?.first.country}.',
-      );*/
     }
   }
 
   /// TOP ROW
   Row buildRow(BuildContext context, Position? position, Density dp) {
-/*    void getPlacemark() async {
-      for (var placemark in placemarks) {
-        log('Name: ${placemark.name!}');
-        log('Locality: ${placemark.locality!}');
-        log('Postal code: ${placemark.postalCode!}');
-        log('Country: ${placemark.country!}');
-      }
-    }*/
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Row(children: [
         const Image(
