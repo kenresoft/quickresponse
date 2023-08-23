@@ -8,6 +8,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickresponse/data/model/contact.dart';
+import 'package:quickresponse/utils/extensions.dart';
 import 'package:quickresponse/widgets/mini_map.dart';
 
 import '../data/constants/colors.dart';
@@ -49,7 +50,7 @@ class _ContactDetailsState extends ConsumerState<ContactDetails> {
 
   @override
   Widget build(BuildContext context) {
-    final contact = GoRouterState.of(context).extra as Contact;
+    var contact = context.extra;
     final dp = Density.init(context);
 
     final location = ref.watch(positionProvider.select((value) => value!));
@@ -73,8 +74,8 @@ class _ContactDetailsState extends ConsumerState<ContactDetails> {
                   0.02.dpH(dp).spY,
                   const Image(image: ExactAssetImage(Constants.moon), height: 70),
                   0.001.dpH(dp).spY,
-                  Text(contact.name ?? 'Name not defined', style: const TextStyle(fontWeight: FontWeight.w600)),
-                  Text(contact.relationship ?? 'Undefined', style: const TextStyle(fontSize: 13)),
+                  Text(contact?.name ?? 'Name not defined', style: const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(contact?.relationship ?? 'Undefined', style: const TextStyle(fontSize: 13)),
                   0.02.dpH(dp).spY,
 
                   // Horizontal Divider
@@ -141,7 +142,7 @@ class _ContactDetailsState extends ConsumerState<ContactDetails> {
                   const Text('Current Location', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   Text('${placemarks?.last.street}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: AppColor.text)),
                   0.02.dpH(dp).spY,
-                  MiniMap(showButton: _bottomSheetVisible, contact: contact),
+                  MiniMap(showButton: _bottomSheetVisible, contact: contact!),
                   const SizedBox(height: 25),
                 ]),
               ),
