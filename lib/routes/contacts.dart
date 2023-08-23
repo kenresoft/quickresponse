@@ -24,7 +24,9 @@ class Contacts extends ConsumerWidget {
       onWillPop: () async {
         bool isLastPage = page.isEmpty;
         if (isLastPage) {
-          return (await showAnimatedDialog(context))!;
+          launch(context, Constants.home);
+          return false;
+          //return (await showAnimatedDialog(context))!;
         } else {
           launch(context, page.last);
           ref.watch(pageProvider.notifier).setPage = page..remove(page.last);
