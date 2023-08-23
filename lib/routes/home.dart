@@ -14,9 +14,11 @@ import 'package:sqflite/sqflite.dart';
 
 import '../main.dart';
 import '../providers/location_providers.dart';
+import '../providers/page_provider.dart';
 import '../widgets/alert_button.dart';
 import '../widgets/blinking_text.dart';
 import '../widgets/bottom_navigator.dart';
+import '../widgets/exit_dialog.dart';
 import '../widgets/toast.dart';
 
 class Home extends ConsumerStatefulWidget {
@@ -32,7 +34,7 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
   List<Map>? _location;
   bool isLocationReady = false;
   List<Placemark>? placemarks;
-  Widget page = const SizedBox();
+  Widget mPage = const SizedBox();
   bool isAppLaunched = false;
 
   @override
@@ -60,14 +62,15 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
     if (!isAppLaunched) {
       setState(() {
         isAppLaunched = true;
-        page = buildPage(context, dp);
+        mPage = buildPage(context, dp);
       });
     } else {
       _geolocator.requestPermission();
     }
+    final page = ref.watch(pageProvider.select((value) => value));
     return WillPopScope(
       onWillPop: () async {
-        bool isLastPage = true; // Replace with your logic to check if it's the last page
+        bool isLastPage = page.isEmpty;
         if (isLastPage) {
           return (await showAnimatedDialog(context))!;
         } else {
@@ -82,7 +85,7 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
             Center(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 100),
-                child: page,
+                child: mPage,
                 transitionBuilder: (child, animation) => FadeTransition(
                   opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOutBack),
                   child: child,
@@ -255,11 +258,11 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
           isLocationReady
               ? launch(context, Constants.locationMap)
               : setState(() {
-                  page = buildPage(context, dp);
+                  mPage = buildPage(context, dp);
                 });
           Future.delayed(const Duration(milliseconds: 500), () {
             setState(() {
-              page = buildStreamBuilder(dp);
+              mPage = buildStreamBuilder(dp);
             });
           });
         },
@@ -276,7 +279,7 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
                 fontSize: 15,
                 color: isLocationReady
                     ? placemarks == null
-                        ? Colors.yellow
+                        ? Colors.amber
                         : Colors.green
                     : AppColor.text,
               ),
@@ -291,63 +294,4 @@ class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
       ),
     ]);
   }
-}
-
-/// EXIT DIALOG
-Future<bool?> showAnimatedDialog(BuildContext context) async {
-  Color? extractedColor = Color.lerp(AppColor.alert.colors.first, AppColor.alert.colors.last, 0.5) ?? AppColor.title;
-  return await showDialog<bool>(
-    context: context,
-    builder: (context) => Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 50.0,
-              backgroundColor: extractedColor,
-              child: const Icon(
-                Icons.exit_to_app, // Replace with your IconData
-                size: 40, // Adjust the icon size as needed
-                color: Colors.white, // Adjust the icon color as needed
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            const Text(
-              'Exit App?',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20.0,
-              ),
-            ),
-            const SizedBox(height: 8.0),
-            const Text(
-              'Are you sure you want to exit?',
-              style: TextStyle(
-                fontSize: 16.0,
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Exit'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
 }
