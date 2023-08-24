@@ -8,3 +8,10 @@ extension BuildCxt<T> on BuildContext {
 
   T? get extra => GoRouterState.of(this).extra as T;
 }
+
+extension LogExtension<T> on T {
+  T get log {
+    debugPrint(toString());
+    return this;
+  }
+}
