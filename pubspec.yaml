@@ -62,6 +62,7 @@ dependencies:
 #  sms_advanced:
 #    path: 'packages/sms_advanced'
   phone_state: ^1.0.3
+  background_sms: ^0.0.4
 
   # Firebase
   firebase_core: ^2.15.0
