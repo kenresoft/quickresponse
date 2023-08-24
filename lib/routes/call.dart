@@ -77,9 +77,7 @@ class _CallState extends State<Call> {
 
   @override
   Widget build(BuildContext context) {
-    final contact = GoRouterState
-        .of(context)
-        .extra as Contact?;
+    final contact = GoRouterState.of(context).extra as Contact?;
     initSetup(contact);
     final dp = Density.init(context);
     return WillPopScope(
@@ -93,31 +91,29 @@ class _CallState extends State<Call> {
       child: Scaffold(
         body: Center(
           child: Column(children: [
-            0.01
-                .dpH(dp)
-                .spY,
+            0.01.dpH(dp).spY,
             Icon(Icons.visibility, color: AppColor.white, size: 22),
-            0.12
-                .dpH(dp)
-                .spY,
+            0.12.dpH(dp).spY,
             Icon(Icons.ac_unit, color: AppColor.white, size: 40),
             Text(contact?.phone ?? '112', style: TextStyle(fontSize: 65, color: AppColor.white, fontWeight: FontWeight.w500)),
             Text('Calling...', style: TextStyle(fontSize: 18, color: AppColor.white)),
-            0.23
-                .dpH(dp)
-                .spY,
+            0.23.dpH(dp).spY,
             Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor.white, fontWeight: FontWeight.w600)),
-            0.03
-                .dpH(dp)
-                .spY,
+            0.03.dpH(dp).spY,
             SizedBox(
               height: 120,
               width: 310,
-              child: isContactTap ? buildSuggestionAlertMessage(dp) : buildContactsCarousel(),
+              child: isContactTap
+                  ? buildSuggestionAlertMessage(dp)
+                  : buildContactsCarousel(
+                      onTap: () {
+                        setState(() {
+                          isContactTap = true;
+                        });
+                      },
+                      buttonCarouselController: buttonCarouselController),
             ),
-            0.07
-                .dpH(dp)
-                .spY,
+            0.07.dpH(dp).spY,
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
@@ -152,8 +148,7 @@ class _CallState extends State<Call> {
 
   Future<void> initSetup(Contact? contact) async {
     getPermission() async {
-      return await [Permission.sms
-      ].request();
+      return await [Permission.sms].request();
     }
 
     Future<bool> isPermissionGranted() async => await Permission.sms.status.isGranted;
@@ -164,15 +159,13 @@ class _CallState extends State<Call> {
       if ((await supportCustomSim())!) {
         sendMessage(contact?.phone ?? '1', "Hello", simSlot: 1);
         //_sendMessage("09xxxxxxxxx", "Hello", simSlot: 1);
-      }
-      else {
+      } else {
         sendMessage("09xxxxxxxxx", "Hello");
       }
     } else {
       getPermission();
     }
   }
-
 }
 
 ListView buildSuggestionAlertMessage(Density dp) {
@@ -197,16 +190,14 @@ IconButton buildIconButton(IconData iconData, double size, {Function()? onPresse
   );
 }
 
-Widget buildContactsCarousel() {
+Widget buildContactsCarousel({required Function() onTap, required CarouselController buttonCarouselController}) {
   return CarouselSlider.builder(
     itemCount: 3,
     itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
       log("$itemIndex : $pageViewIndex");
       return GestureDetector(
         onTap: () {
-          setState(() {
-            isContactTap = true;
-          });
+          onTap();
         },
         child: Center(
           child: Column(children: [
