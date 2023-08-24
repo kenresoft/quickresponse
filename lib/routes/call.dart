@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:background_sms/background_sms.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +11,10 @@ import 'package:flutter_callkit_incoming/entities/ios_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';*/
 //import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:go_router/go_router.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:quickresponse/camera_preview.dart';
 import 'package:quickresponse/data/constants/constants.dart';
+import 'package:quickresponse/utils/extensions.dart';
 import 'package:quickresponse/widgets/alert_button.dart';
 
 //import 'package:sms_advanced/sms_advanced.dart';
@@ -48,10 +51,10 @@ class _CallState extends State<Call> {
     super.initState();
   }
 
-  _callNumber(String number) async {
-    //await FlutterPhoneDirectCaller.callNumber(number);
+  //_sendMessage(String number) async {
+  //await FlutterPhoneDirectCaller.callNumber(number);
 
-    //this._currentUuid = _uuid.v4();
+  //this._currentUuid = _uuid.v4();
 /*    CallKitParams params = const CallKitParams(
         id: '1a2b3c4d' */ /*this._currentUuid*/ /*,
         nameCaller: 'Hien Nguyen',
@@ -62,45 +65,22 @@ class _CallState extends State<Call> {
     );
     await FlutterCallkitIncoming.startCall(params);*/
 
-    /*StreamBuilder<PhoneState>(
+  /*StreamBuilder<PhoneState>(
       initialData: PhoneState.nothing(),
       stream: PhoneState.stream,
       builder: (context, a) {
         return SizedBox();
       },
     );*/
-/*    void _sendSMS(String message, List<String> recipents) async {
-      String result = await sendSMS(message: message, recipients: recipents)
-          .catchError((onError) {
-        print(onError);
-      });
-      if (kDebugMode) {
-        print(result);
-      }
-    }
 
-    String message = "This is a test message!";
-    List<String> recipents = ["1234567890", "5556787676"];
-
-    _sendSMS(message, recipents);*/
-
-/*    SmsSender sender = SmsSender();
-
-    SmsMessage message = SmsMessage(number, 'Hello flutter world!');
-    message.onStateChanged.listen((state) {
-      if (state == SmsMessageState.Sent) {
-        debugPrint("SMS is sent!");
-      } else if (state == SmsMessageState.Delivered) {
-        debugPrint("SMS is delivered!");
-      }
-    });
-    sender.sendSms(message);*/
-  }
+  //}
 
   @override
   Widget build(BuildContext context) {
-    final contact = GoRouterState.of(context).extra as Contact?;
-    _callNumber(contact?.phone ?? '1');
+    final contact = GoRouterState
+        .of(context)
+        .extra as Contact?;
+    initSetup(contact);
     final dp = Density.init(context);
     return WillPopScope(
       onWillPop: () {
@@ -111,24 +91,33 @@ class _CallState extends State<Call> {
         return Future(() => false);
       },
       child: Scaffold(
-
         body: Center(
           child: Column(children: [
-            0.01.dpH(dp).spY,
+            0.01
+                .dpH(dp)
+                .spY,
             Icon(Icons.visibility, color: AppColor.white, size: 22),
-            0.12.dpH(dp).spY,
+            0.12
+                .dpH(dp)
+                .spY,
             Icon(Icons.ac_unit, color: AppColor.white, size: 40),
             Text(contact?.phone ?? '112', style: TextStyle(fontSize: 65, color: AppColor.white, fontWeight: FontWeight.w500)),
             Text('Calling...', style: TextStyle(fontSize: 18, color: AppColor.white)),
-            0.23.dpH(dp).spY,
+            0.23
+                .dpH(dp)
+                .spY,
             Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor.white, fontWeight: FontWeight.w600)),
-            0.03.dpH(dp).spY,
+            0.03
+                .dpH(dp)
+                .spY,
             SizedBox(
               height: 120,
               width: 310,
               child: isContactTap ? buildSuggestionAlertMessage(dp) : buildContactsCarousel(),
             ),
-            0.07.dpH(dp).spY,
+            0.07
+                .dpH(dp)
+                .spY,
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
@@ -161,79 +150,113 @@ class _CallState extends State<Call> {
     );
   }
 
-  ListView buildSuggestionAlertMessage(Density dp) {
-    return ListView.builder(
-      shrinkWrap: true,
-      scrollDirection: Axis.horizontal,
-      itemCount: 6,
-      itemBuilder: (BuildContext context, int index) {
-        return const SuggestionCard(text: 'He had an accident', verticalMargin: 15, horizontalMargin: 5);
-      },
-    );
+  Future<void> initSetup(Contact? contact) async {
+    getPermission() async {
+      return await [Permission.sms
+      ].request();
+    }
+
+    Future<bool> isPermissionGranted() async => await Permission.sms.status.isGranted;
+
+    Future<bool?> supportCustomSim() async => await BackgroundSms.isSupportCustomSim;
+
+    if (await isPermissionGranted()) {
+      if ((await supportCustomSim())!) {
+        sendMessage(contact?.phone ?? '1', "Hello", simSlot: 1);
+        //_sendMessage("09xxxxxxxxx", "Hello", simSlot: 1);
+      }
+      else {
+        sendMessage("09xxxxxxxxx", "Hello");
+      }
+    } else {
+      getPermission();
+    }
   }
 
-  IconButton buildIconButton(IconData iconData, double size, {Function()? onPressed}) {
-    return IconButton.filled(
-      onPressed: onPressed,
-      icon: Icon(iconData, size: size),
-      style: ButtonStyle(
-        backgroundColor: MaterialStatePropertyAll(AppColor.overlay),
-        fixedSize: const MaterialStatePropertyAll(Size.square(58)),
-      ),
-    );
-  }
+}
 
-  CarouselSlider buildContactsCarousel() {
-    return CarouselSlider.builder(
-      itemCount: 3,
-      itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
-        log("$itemIndex : $pageViewIndex");
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              isContactTap = true;
-            });
-          },
-          child: Center(
-            child: Column(children: [
-              Stack(
-                children: [
-                  AnimatedPositioned(
-                    left: 0,
-                    top: 0,
-                    right: 0,
-                    bottom: 0,
-                    duration: const Duration(),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(100),
-                      ),
+ListView buildSuggestionAlertMessage(Density dp) {
+  return ListView.builder(
+    shrinkWrap: true,
+    scrollDirection: Axis.horizontal,
+    itemCount: 6,
+    itemBuilder: (BuildContext context, int index) {
+      return const SuggestionCard(text: 'He had an accident', verticalMargin: 15, horizontalMargin: 5);
+    },
+  );
+}
+
+IconButton buildIconButton(IconData iconData, double size, {Function()? onPressed}) {
+  return IconButton.filled(
+    onPressed: onPressed,
+    icon: Icon(iconData, size: size),
+    style: ButtonStyle(
+      backgroundColor: MaterialStatePropertyAll(AppColor.overlay),
+      fixedSize: const MaterialStatePropertyAll(Size.square(58)),
+    ),
+  );
+}
+
+Widget buildContactsCarousel() {
+  return CarouselSlider.builder(
+    itemCount: 3,
+    itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
+      log("$itemIndex : $pageViewIndex");
+      return GestureDetector(
+        onTap: () {
+          setState(() {
+            isContactTap = true;
+          });
+        },
+        child: Center(
+          child: Column(children: [
+            Stack(
+              children: [
+                AnimatedPositioned(
+                  left: 0,
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  duration: const Duration(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(100),
                     ),
                   ),
-                  const Padding(
-                    padding: EdgeInsets.all(5.0),
-                    child: CircleAvatar(
-                      radius: 40,
-                      backgroundImage: AssetImage(Constants.profile),
-                    ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: AssetImage(Constants.profile),
                   ),
-                ],
-              ),
-              Text('$itemIndex', style: TextStyle(fontSize: 18, color: AppColor.white)),
-            ]),
-          ),
-        );
-      },
-      carouselController: buttonCarouselController,
-      options: CarouselOptions(
-        enableInfiniteScroll: false,
-        enlargeCenterPage: true,
-        viewportFraction: 0.35,
-        aspectRatio: 1.0,
-        enlargeFactor: 0.5,
-        enlargeStrategy: CenterPageEnlargeStrategy.zoom,
-      ),
-    );
+                ),
+              ],
+            ),
+            Text('$itemIndex', style: TextStyle(fontSize: 18, color: AppColor.white)),
+          ]),
+        ),
+      );
+    },
+    carouselController: buttonCarouselController,
+    options: CarouselOptions(
+      enableInfiniteScroll: false,
+      enlargeCenterPage: true,
+      viewportFraction: 0.35,
+      aspectRatio: 1.0,
+      enlargeFactor: 0.5,
+      enlargeStrategy: CenterPageEnlargeStrategy.zoom,
+    ),
+  );
+}
+
+sendMessage(String phoneNumber, String message, {int? simSlot}) async {
+  var result = await BackgroundSms.sendMessage(phoneNumber: phoneNumber, message: message, simSlot: simSlot);
+  if (result == SmsStatus.sent) {
+    "Sent".log;
+  } else {
+    "Failed".log;
   }
+  sendMessage("131", "Hello");
 }
