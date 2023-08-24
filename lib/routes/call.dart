@@ -78,7 +78,7 @@ class _CallState extends State<Call> {
   @override
   Widget build(BuildContext context) {
     final contact = GoRouterState.of(context).extra as Contact?;
-    initSetup(contact);
+
     final dp = Density.init(context);
     return WillPopScope(
       onWillPop: () {
@@ -108,6 +108,7 @@ class _CallState extends State<Call> {
                   : buildContactsCarousel(
                       onTap: () {
                         setState(() {
+                          initSetup(contact);
                           isContactTap = true;
                         });
                       },
@@ -249,5 +250,4 @@ sendMessage(String phoneNumber, String message, {int? simSlot}) async {
   } else {
     "Failed".log;
   }
-  sendMessage("131", "Hello");
 }
