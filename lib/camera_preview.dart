@@ -111,60 +111,6 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
     );
   }
 
-  /* Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: Icon(_isRecording ? Icons.stop : Icons.fiber_manual_record),
-                          color: _isRecording ? Colors.red : Colors.white,
-                          iconSize: 32.0,
-                          onPressed: _isRecording ? _stopRecording : _startRecording,
-                        ),
-                        const SizedBox(width: 32.0),
-                        IconButton(
-                          icon: const Icon(Icons.camera),
-                          color: Colors.white,
-                          iconSize: 32.0,
-                          onPressed: _takePicture,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16.0),
-                    const Text(
-                      'Tap the buttons to take a photo or record a video',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    const SizedBox(height: 16.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: Icon(_isRecordingAudio ? Icons.stop : Icons.mic),
-                          color: _isRecordingAudio ? Colors.red : Colors.white,
-                          iconSize: 32.0,
-                          onPressed: _isRecordingAudio ? _stopRecordingAudio : _startRecordingAudio,
-                        ),
-                        const SizedBox(width: 16.0),
-                        ElevatedButton(
-                          onPressed: _audioPath != null ? _playLastAudio : null,
-                          child: const Text('Play Last Audio'),
-                        ),
-                      ],
-                    ),
-                    const Text(
-                      'Custom Text Overlay',
-                      style: TextStyle(color: Colors.white, fontSize: 24.0),
-                    ),
-                    ElevatedButton(
-                      onPressed: _pickImageFromGallery,
-                      child: const Text('Custom Button'),
-                    ),
-                  ],
-                )
-
-   */
 
   void _startRecording() async {
     if (!_controller.value.isRecordingVideo) {
