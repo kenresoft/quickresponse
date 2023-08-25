@@ -28,7 +28,7 @@ class Home extends ConsumerStatefulWidget {
   ConsumerState<Home> createState() => _HomeState();
 }
 
-class _HomeState extends ConsumerState<Home> /*with WidgetsBindingObserver*/ {
+class _HomeState extends ConsumerState<Home> {
   late GeolocatorPlatform _geolocator;
   Position? _position;
   List<Map>? _location;
