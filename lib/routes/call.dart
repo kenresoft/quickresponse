@@ -159,7 +159,6 @@ class _CallState extends State<Call> {
     if (await isPermissionGranted()) {
       if ((await supportCustomSim())!) {
         sendMessage(contact?.phone ?? '1', "Hello", simSlot: 1);
-        //_sendMessage("09xxxxxxxxx", "Hello", simSlot: 1);
       } else {
         sendMessage("09xxxxxxxxx", "Hello");
       }
