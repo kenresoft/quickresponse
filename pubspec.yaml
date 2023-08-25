@@ -51,6 +51,7 @@ dependencies:
   permission_handler: ^10.4.3
   record: ^4.4.4
   flutter_sound: ^9.2.13
+  background_sms: ^0.0.4
 
 
   # Networking
@@ -62,7 +63,6 @@ dependencies:
 #  sms_advanced:
 #    path: 'packages/sms_advanced'
   phone_state: ^1.0.3
-  background_sms: ^0.0.4
 
   # Firebase
   firebase_core: ^2.15.0
