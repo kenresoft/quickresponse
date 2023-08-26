@@ -60,8 +60,6 @@ dependencies:
   flutter_callkit_incoming:
     path: 'packages/flutter_callkit_incoming'
 #  flutter_sms: ^2.3.3
-#  sms_advanced:
-#    path: 'packages/sms_advanced'
   phone_state: ^1.0.3
 
   # Firebase
