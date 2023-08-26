@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
@@ -118,7 +119,9 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
         _controller.startVideoRecording();
         setState(() => _isRecordingVideo = true);
       } catch (e) {
-        print(e);
+        if (kDebugMode) {
+          print(e);
+        }
       }
     } else {
       _stopRecording();
