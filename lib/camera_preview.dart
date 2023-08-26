@@ -37,12 +37,9 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
   }
 
   Future<void> _initializeCamera() async {
-    _controller = CameraController(
-      widget.camera,
-      ResolutionPreset.ultraHigh,
-    )
-      ..setFlashMode(FlashMode.always)
-      ..setFocusMode(FocusMode.auto);
+    _controller = CameraController(widget.camera, ResolutionPreset.ultraHigh);
+    _controller.setFlashMode(FlashMode.always);
+    _controller.setFocusMode(FocusMode.auto);
 
     _initializeControllerFuture = _controller.initialize();
 
@@ -111,7 +108,6 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
       ),
     );
   }
-
 
   void _startRecording() async {
     if (!_controller.value.isRecordingVideo) {
