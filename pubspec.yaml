@@ -52,6 +52,7 @@ dependencies:
   record: ^4.4.4
   flutter_sound: ^9.2.13
   background_sms: ^0.0.4
+  screen_protector: ^1.3.0
 
 
   # Networking
@@ -59,7 +60,6 @@ dependencies:
   #flutter_phone_direct_caller: ^2.1.1
   flutter_callkit_incoming:
     path: 'packages/flutter_callkit_incoming'
-#  flutter_sms: ^2.3.3
   phone_state: ^1.0.3
 
   # Firebase
