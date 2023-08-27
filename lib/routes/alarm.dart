@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import 'package:quickresponse/utils/extensions.dart';
 
 class AlarmScreen extends StatefulWidget {
+  const AlarmScreen({super.key});
+
   @override
-  _AlarmScreenState createState() => _AlarmScreenState();
+  State<AlarmScreen> createState() => _AlarmScreenState();
 }
 
 class _AlarmScreenState extends State<AlarmScreen> {
@@ -16,7 +18,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Alarm App'),
+        title: const Text('Alarm App'),
       ),
       body: Center(
         child: Column(
@@ -24,18 +26,18 @@ class _AlarmScreenState extends State<AlarmScreen> {
           children: [
             Text(
               'Alarm Count: $alarmCount',
-              style: TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 20),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 if (!isPaused) {
                   startAlarm();
                 }
               },
-              child: Text('Start Alarm'),
+              child: const Text('Start Alarm'),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
                 setState(() {
@@ -62,7 +64,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
         if (alarmCount < 3) {
           startAlarm();
         } else {
-          'Done'.log;
+          context.toast('Done');
           FlutterRingtonePlayer.stop();
         }
       }
