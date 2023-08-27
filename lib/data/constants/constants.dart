@@ -13,6 +13,7 @@ class Constants {
   static const String call = '/call';
   static const String locationMap = '/locationMap';
   static const String mapScreen = '/mapScreen';
+  static const String alarm = '/alarm';
   static const String error = '/error';
 
   //Images route
