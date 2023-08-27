@@ -29,22 +29,21 @@ dependencies:
   go_router: ^10.0.0
   flutter_riverpod: ^2.3.6
 
-  # Location/Map
+  # --Location/Map
   geolocator: ^9.0.2
   google_maps_flutter: ^2.4.0
   geocoding: ^2.1.0
   flutter_polyline_points: ^1.0.0 # --- uses a higher version of http
   #open_route_service: ^1.2.3 # --- uses a lower version of http
 
-  # Data
+  # --Data/File
   shared_preferences: ^2.2.0
   sqflite: ^2.3.0
-
-  # File
   path_provider: ^2.1.0
   path: ^1.8.3
+  dio: ^5.3.2
 
-  # Media
+  # Media/Phone
   carousel_slider: ^4.2.1
   camera: ^0.10.5+3
   image_picker: ^1.0.2
@@ -52,17 +51,14 @@ dependencies:
   record: ^4.4.4
   flutter_sound: ^9.2.13
   background_sms: ^0.0.4
+  flutter_callkit_incoming:
+    path: 'packages/flutter_callkit_incoming'
+
+  # Utilities
+  phone_state: ^1.0.3
   screen_protector: ^1.3.0
   in_app_update: ^4.2.0
   local_auth: ^2.1.6
-
-
-  # Networking
-  dio: ^5.3.2
-  #flutter_phone_direct_caller: ^2.1.1
-  flutter_callkit_incoming:
-    path: 'packages/flutter_callkit_incoming'
-  phone_state: ^1.0.3
 
   # Firebase
   firebase_core: ^2.15.0
