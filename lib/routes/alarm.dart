@@ -10,70 +10,70 @@ class AlarmScreen extends StatefulWidget {
 }
 
 class _AlarmScreenState extends State<AlarmScreen> {
-  int alarmInterval = 10; // Interval in seconds
   int alarmCount = 0;
-  bool isPaused = false;
+  bool isAlarmActive = false;
+
+  void startAlarm() {
+    if (!isAlarmActive) {
+      isAlarmActive = true;
+      _ringAlarm();
+    }
+  }
+
+  void cancelAlarm() {
+    isAlarmActive = false;
+    FlutterRingtonePlayer.stop();
+  }
+
+  Future<void> _ringAlarm() async {
+    if (isAlarmActive) {
+      alarmCount++;
+      FlutterRingtonePlayer.playAlarm(looping: true);
+      await Future.delayed(
+        const Duration(seconds: 5),
+        () async {
+          FlutterRingtonePlayer.stop();
+
+          context.toast(alarmCount);
+        },
+      );
+      await Future.delayed(const Duration(seconds: 10));
+
+      if (alarmCount < 3) {
+        _ringAlarm();
+      } else {
+        sendDoneMessage();
+      }
+    }
+  }
+
+  void sendDoneMessage() {
+    // Implement your logic to send the "done" message.
+    // This could be sending an SMS, a notification, or any other method.
+    context.toast("DONE");
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alarm App'),
+        title: const Text("Alarm App"),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Alarm Count: $alarmCount',
-              style: const TextStyle(fontSize: 20),
-            ),
-            const SizedBox(height: 20),
+          children: <Widget>[
             ElevatedButton(
-              onPressed: () {
-                if (!isPaused) {
-                  startAlarm();
-                }
-              },
-              child: const Text('Start Alarm'),
+              onPressed: startAlarm,
+              child: const Text("Start Alarm"),
             ),
-            const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  isPaused = !isPaused;
-                });
-              },
-              child: Text(isPaused ? 'Resume' : 'Pause'),
+              onPressed: cancelAlarm,
+              child: const Text("Cancel Alarm"),
             ),
           ],
         ),
       ),
     );
-  }
-
-  void startAlarm() {
-    FlutterRingtonePlayer.playAlarm(looping: true);
-
-    Future.delayed(Duration(seconds: alarmInterval), () {
-      if (!isPaused) {
-        setState(() {
-          alarmCount++;
-        });
-
-        if (alarmCount < 3) {
-          startAlarm();
-        } else {
-          context.toast('Done');
-          FlutterRingtonePlayer.stop();
-        }
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    FlutterRingtonePlayer.stop();
-    super.dispose();
   }
 }
