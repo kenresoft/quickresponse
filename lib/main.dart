@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:quickresponse/camera_screen.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/providers/providers.dart';
+import 'package:quickresponse/routes/alarm.dart';
 import 'package:quickresponse/routes/call.dart';
 import 'package:quickresponse/routes/contact_details.dart';
 import 'package:quickresponse/routes/contacts.dart';
@@ -94,6 +95,7 @@ class MyApp extends StatelessWidget {
       route(Constants.contactDetails, const ContactDetails()),
       route(Constants.call, const Call()),
       route(Constants.locationMap, const LocationMap()),
+      route(Constants.alarm, const AlarmScreen()),
       //route(Constants.mapScreen, const MapScreen()),
       route(Constants.error, const ErrorPage()),
     ],
