@@ -28,7 +28,7 @@ class BottomNavigator extends StatelessWidget {
               replace(context, Constants.home);
               ref.watch(pageProvider.notifier).setPage = page..add(Constants.home);
             } else if (index == 1) {
-              replace(context, Constants.contactDetails);
+              replace(context, Constants.alarm);
             } else if (index == 2) {
               replace(context, Constants.contacts);
             } else if (index == 3) {
