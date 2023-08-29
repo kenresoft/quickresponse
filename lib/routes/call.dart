@@ -108,7 +108,6 @@ class _CallState extends State<Call> {
                   : buildContactsCarousel(
                       onTap: () {
                         setState(() {
-                          initSetup(contact);
                           isContactTap = true;
                         });
                       },
@@ -145,26 +144,6 @@ class _CallState extends State<Call> {
         ),
       ),
     );
-  }
-
-  Future<void> initSetup(Contact? contact) async {
-    getPermission() async {
-      return await [Permission.sms].request();
-    }
-
-    Future<bool> isPermissionGranted() async => await Permission.sms.status.isGranted;
-
-    Future<bool?> supportCustomSim() async => await BackgroundSms.isSupportCustomSim;
-
-    if (await isPermissionGranted()) {
-      if ((await supportCustomSim())!) {
-        sendMessage(contact?.phone ?? '1', "Hello", simSlot: 1);
-      } else {
-        sendMessage("09xxxxxxxxx", "Hello");
-      }
-    } else {
-      getPermission();
-    }
   }
 }
 
