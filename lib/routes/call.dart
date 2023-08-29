@@ -86,7 +86,7 @@ class _CallState extends State<Call> {
         setState(() {
           isContactTap = false;
         });
-        return Future(() => true);
+        return isContactTap ? Future(() => false) : Future(() => true);
       },
       child: Scaffold(
         body: Center(
