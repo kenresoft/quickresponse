@@ -1,3 +1,4 @@
+import 'package:background_sms/background_sms.dart';
 import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +15,13 @@ class SuggestionCard extends StatelessWidget {
     required this.text,
     this.verticalMargin,
     this.horizontalMargin,
+    this.contact,
   });
 
   final String text;
   final double? verticalMargin;
   final double? horizontalMargin;
+  final Contact? contact;
 
   @override
   Widget build(BuildContext context) {
