@@ -11,7 +11,6 @@ import 'package:flutter_callkit_incoming/entities/ios_params.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';*/
 //import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:go_router/go_router.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:quickresponse/camera_preview.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/utils/extensions.dart';
@@ -104,7 +103,7 @@ class _CallState extends State<Call> {
               height: 120,
               width: 310,
               child: isContactTap
-                  ? buildSuggestionAlertMessage(dp)
+                  ? buildSuggestionAlertMessage(dp, contact)
                   : buildContactsCarousel(
                       onTap: () {
                         setState(() {
@@ -147,13 +146,13 @@ class _CallState extends State<Call> {
   }
 }
 
-ListView buildSuggestionAlertMessage(Density dp) {
+ListView buildSuggestionAlertMessage(Density dp, Contact? contact) {
   return ListView.builder(
     shrinkWrap: true,
     scrollDirection: Axis.horizontal,
     itemCount: 6,
     itemBuilder: (BuildContext context, int index) {
-      return const SuggestionCard(text: 'He had an accident', verticalMargin: 15, horizontalMargin: 5);
+      return SuggestionCard(text: 'He had an accident', contact: contact, verticalMargin: 15, horizontalMargin: 5);
     },
   );
 }
