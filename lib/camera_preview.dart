@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -40,6 +41,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
     _controller = CameraController(widget.camera, ResolutionPreset.ultraHigh);
     _controller.setFlashMode(FlashMode.always);
     _controller.setFocusMode(FocusMode.auto);
+    _controller.lockCaptureOrientation(DeviceOrientation.portraitUp);
 
     _initializeControllerFuture = _controller.initialize();
 
@@ -86,6 +88,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
             // Show camera preview
             return SizedBox(
               height: double.infinity,
+              width: double.infinity,
               child: CameraPreview(
                 _controller,
                 child: Call(
