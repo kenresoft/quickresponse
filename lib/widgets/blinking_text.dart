@@ -1,11 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class BlinkingText extends StatefulWidget {
-  const BlinkingText(this.data, {super.key, this.style, this.blink = true});
+  const BlinkingText(
+    this.data, {
+    super.key,
+    this.style,
+    this.blink = true,
+    this.delay = false,
+  });
 
   final String data;
   final TextStyle? style;
   final bool blink;
+  final bool delay;
 
   @override
   State<BlinkingText> createState() => _BlinkingTextState();
@@ -27,8 +36,13 @@ class _BlinkingTextState extends State<BlinkingText> with SingleTickerProviderSt
           _controller.forward();
         }
       });
-
-    _controller.forward();
+    if (widget.delay) {
+      Timer.periodic(const Duration(seconds: 1), (timer) {
+        _controller.forward();
+      });
+    } else {
+      _controller.forward();
+    }
   }
 
   @override
