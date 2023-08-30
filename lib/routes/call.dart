@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:background_sms/background_sms.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:extensionresoft/extensionresoft.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_sms/flutter_sms.dart';
 
@@ -15,6 +16,7 @@ import 'package:quickresponse/camera_preview.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/utils/extensions.dart';
 import 'package:quickresponse/widgets/alert_button.dart';
+import 'package:quickresponse/widgets/blinking_text.dart';
 
 //import 'package:sms_advanced/sms_advanced.dart';
 
@@ -22,6 +24,7 @@ import '../data/constants/colors.dart';
 import '../data/constants/density.dart';
 import '../data/model/contact.dart';
 import '../widgets/suggestion_card.dart';
+import 'emergency_card.dart';
 
 class Call extends StatefulWidget {
   const Call({
@@ -44,6 +47,7 @@ class Call extends StatefulWidget {
 class _CallState extends State<Call> {
   CarouselController buttonCarouselController = CarouselController();
   bool isContactTap = false;
+  bool shouldHide = false;
 
   @override
   void initState() {
@@ -81,22 +85,44 @@ class _CallState extends State<Call> {
     final dp = Density.init(context);
     return WillPopScope(
       onWillPop: () {
-        log('message');
-        setState(() {
-          isContactTap = false;
-        });
-        return isContactTap ? Future(() => false) : Future(() => true);
+        if (isContactTap) {
+          setState(() {
+            isContactTap = false;
+          });
+          return Future(() => false);
+        } else {
+          return Future(() => true);
+        }
       },
       child: Scaffold(
+        backgroundColor: shouldHide ? AppColor.black : AppColor.overlay,
         body: Center(
           child: Column(children: [
-            0.01.dpH(dp).spY,
-            Icon(Icons.visibility, color: AppColor.white, size: 22),
-            0.12.dpH(dp).spY,
-            Icon(Icons.ac_unit, color: AppColor.white, size: 40),
-            Text(contact?.phone ?? '112', style: TextStyle(fontSize: 65, color: AppColor.white, fontWeight: FontWeight.w500)),
-            Text('Calling...', style: TextStyle(fontSize: 18, color: AppColor.white)),
-            0.23.dpH(dp).spY,
+            0.05.dpH(dp).spY,
+            GestureDetector(
+              onTap: () => setState(() {
+                shouldHide = !shouldHide;
+              }),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: Align(alignment: Alignment.topRight, child: Icon(Icons.visibility, color: AppColor.white, size: 22)),
+              ),
+            ),
+            0.10.dpH(dp).spY,
+            Icon(CupertinoIcons.phone_arrow_up_right, color: AppColor.white, size: 40),
+            0.05.dpH(dp).spY,
+            Text('Want to call emergency number?', style: TextStyle(fontSize: 18, color: AppColor.white)),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              EmergencyCard(
+                child: BlinkingText(contact?.phone ?? '112', style: TextStyle(fontSize: 65, color: AppColor.action, fontWeight: FontWeight.w500)),
+              ),
+              contact?.phone == null
+                  ? EmergencyCard(
+                      child: BlinkingText('911', style: TextStyle(fontSize: 65, color: AppColor.action_2, fontWeight: FontWeight.w500), delay: true),
+                    )
+                  : const SizedBox(),
+            ]),
+            0.20.dpH(dp).spY,
             Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor.white, fontWeight: FontWeight.w600)),
             0.03.dpH(dp).spY,
             SizedBox(
