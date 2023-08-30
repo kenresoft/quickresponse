@@ -16,6 +16,7 @@ class AppColor {
   static Color navIcon = const Color(0xffE0E2EB);
   static Color navIconSelected = const Color(0xffF22524);
   static Color action = const Color(0xffF22524);
+  static Color action_2 = const Color(0xff32f224);
   static Color divider = const Color(0xffEDEEF3);
 
   static LinearGradient alert = LinearGradient(
