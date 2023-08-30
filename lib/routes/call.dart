@@ -96,77 +96,80 @@ class _CallState extends State<Call> {
       },
       child: Scaffold(
         backgroundColor: shouldHide ? AppColor.black : AppColor.overlay,
-        body: Center(
-          child: Column(children: [
-            0.05.dpH(dp).spY,
-            GestureDetector(
-              onTap: () => setState(() {
-                shouldHide = !shouldHide;
-              }),
-              child: Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: Align(alignment: Alignment.topRight, child: Icon(Icons.visibility, color: AppColor.white, size: 22)),
+        body: OrientationBuilder(builder: (context, orientation) {
+          return Center(
+            child: Column(children: [
+              0.05.dpH(dp).spY,
+              GestureDetector(
+                onTap: () => setState(() {
+                  shouldHide = !shouldHide;
+                }),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 15),
+                  child: Align(alignment: Alignment.topRight, child: Icon(shouldHide ? CupertinoIcons.eye_slash : CupertinoIcons.eye, color: AppColor.white, size: 22)),
+                ),
               ),
-            ),
-            0.10.dpH(dp).spY,
-            Icon(CupertinoIcons.phone_arrow_up_right, color: AppColor.white, size: 40),
-            0.05.dpH(dp).spY,
-            Text('Want to call emergency number?', style: TextStyle(fontSize: 18, color: AppColor.white)),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              EmergencyCard(
-                child: BlinkingText(contact?.phone ?? '112', style: TextStyle(fontSize: 65, color: AppColor.action, fontWeight: FontWeight.w500)),
-              ),
-              contact?.phone == null
-                  ? EmergencyCard(
-                      child: BlinkingText('911', style: TextStyle(fontSize: 65, color: AppColor.action_2, fontWeight: FontWeight.w500), delay: true),
-                    )
-                  : const SizedBox(),
-            ]),
-            0.20.dpH(dp).spY,
-            Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor.white, fontWeight: FontWeight.w600)),
-            0.03.dpH(dp).spY,
-            SizedBox(
-              height: 120,
-              width: 310,
-              child: isContactTap
-                  ? buildSuggestionAlertMessage(dp, contact)
-                  : buildContactsCarousel(
-                      onTap: () {
-                        setState(() {
-                          isContactTap = true;
-                        });
-                      },
-                      buttonCarouselController: buttonCarouselController),
-            ),
-            0.07.dpH(dp).spY,
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                buildIconButton(
-                  widget.properties!.isRecordingVideo ? Icons.play_arrow_outlined : Icons.video_collection_outlined,
-                  22,
-                  onPressed: widget.onVideoRecord,
+              0.10.dpH(dp).spY,
+              Icon(CupertinoIcons.phone_arrow_up_right, color: AppColor.white, size: 40),
+              0.05.dpH(dp).spY,
+              Text('Want to call emergency number?', style: TextStyle(fontSize: 18, color: AppColor.white)),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                EmergencyCard(
+                  child: BlinkingText(contact?.phone ?? '112', style: TextStyle(fontSize: 65, color: AppColor.action, fontWeight: FontWeight.w500)),
                 ),
-                AlertButton(
-                  height: 70,
-                  width: 70,
-                  borderWidth: 2,
-                  shadowWidth: 10,
-                  iconSize: 25,
-                  showSecondShadow: false,
-                  iconData: Icons.camera_alt,
-                  //iconData: widget.properties!.isCapturingImage ? Icons.play_arrow_outlined : Icons.call_end,
-                  onPressed: widget.onImageCapture /*finish(context)*/,
-                ),
-                buildIconButton(
-                  widget.properties!.isRecordingAudio ? Icons.play_arrow_outlined : Icons.audiotrack_outlined,
-                  22,
-                  onPressed: widget.onAudioRecord,
-                ),
+                0.05.dpW(dp).spX,
+                contact?.phone == null
+                    ? EmergencyCard(
+                        child: BlinkingText('911', style: TextStyle(fontSize: 65, color: AppColor.action_2, fontWeight: FontWeight.w500), delay: true),
+                      )
+                    : const SizedBox(),
               ]),
-            ),
-          ]),
-        ),
+              0.20.dpH(dp).spY,
+              Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor.white, fontWeight: FontWeight.w600)),
+              0.03.dpH(dp).spY,
+              SizedBox(
+                height: 120,
+                width: 310,
+                child: isContactTap
+                    ? buildSuggestionAlertMessage(dp, contact)
+                    : buildContactsCarousel(
+                        onTap: () {
+                          setState(() {
+                            isContactTap = true;
+                          });
+                        },
+                        buttonCarouselController: buttonCarouselController),
+              ),
+              0.07.dpH(dp).spY,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                  buildIconButton(
+                    widget.properties!.isRecordingVideo ? Icons.play_arrow_outlined : Icons.video_collection_outlined,
+                    22,
+                    onPressed: widget.onVideoRecord,
+                  ),
+                  AlertButton(
+                    height: 70,
+                    width: 70,
+                    borderWidth: 2,
+                    shadowWidth: 10,
+                    iconSize: 25,
+                    showSecondShadow: false,
+                    iconData: Icons.camera_alt,
+                    //iconData: widget.properties!.isCapturingImage ? Icons.play_arrow_outlined : Icons.call_end,
+                    onPressed: widget.onImageCapture /*finish(context)*/,
+                  ),
+                  buildIconButton(
+                    widget.properties!.isRecordingAudio ? Icons.play_arrow_outlined : Icons.audiotrack_outlined,
+                    22,
+                    onPressed: widget.onAudioRecord,
+                  ),
+                ]),
+              ),
+            ]),
+          );
+        }),
       ),
     );
   }
