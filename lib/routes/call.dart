@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:math';
 
 import 'package:background_sms/background_sms.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -15,8 +15,10 @@ import 'package:go_router/go_router.dart';
 import 'package:quickresponse/camera_preview.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/utils/extensions.dart';
+import 'package:quickresponse/utils/util.dart';
 import 'package:quickresponse/widgets/alert_button.dart';
 import 'package:quickresponse/widgets/blinking_text.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 
 //import 'package:sms_advanced/sms_advanced.dart';
 
@@ -48,10 +50,39 @@ class _CallState extends State<Call> {
   CarouselController buttonCarouselController = CarouselController();
   bool isContactTap = false;
   bool shouldHide = false;
+  double x = 0, y = 0;
+  double rotationAngle = 0.0;
+
+  void _startListening() {
+    accelerometerEvents.listen((AccelerometerEvent event) {
+      int x = event.x.toInt();
+      int y = event.y.toInt();
+
+      double angle = atan2(x, y);
+      setState(() {
+        rotationAngle = angle;
+      });
+    });
+  }
+
+  void _stopListening() {
+    accelerometerEvents.drain();
+  }
+
+  Widget sensitive(Widget child) => Transform.rotate(angle: rotationAngle, child: child);
 
   @override
   void initState() {
     super.initState();
+    Util.lockOrientation();
+    _startListening();
+  }
+
+  @override
+  void dispose() {
+    Util.unlockOrientation();
+    _stopListening();
+    super.dispose();
   }
 
   //_sendMessage(String number) async {
@@ -96,7 +127,11 @@ class _CallState extends State<Call> {
       },
       child: Scaffold(
         backgroundColor: shouldHide ? AppColor.black : AppColor.overlay,
-        body: OrientationBuilder(builder: (context, orientation) {
+        body: LayoutBuilder(builder: (context, constraint) {
+          constraint.log;
+          if (constraint.maxWidth > constraint.maxHeight) {
+            constraint.maxWidth.log;
+          }
           return Center(
             child: Column(children: [
               0.05.dpH(dp).spY,
@@ -106,21 +141,25 @@ class _CallState extends State<Call> {
                 }),
                 child: Padding(
                   padding: const EdgeInsets.only(right: 15),
-                  child: Align(alignment: Alignment.topRight, child: Icon(shouldHide ? CupertinoIcons.eye_slash : CupertinoIcons.eye, color: AppColor.white, size: 22)),
+                  child: Align(alignment: Alignment.topRight, child: sensitive(Icon(shouldHide ? CupertinoIcons.eye_slash : CupertinoIcons.eye, color: AppColor.white, size: 22))),
                 ),
               ),
               0.10.dpH(dp).spY,
-              Icon(CupertinoIcons.phone_arrow_up_right, color: AppColor.white, size: 40),
+              sensitive(Icon(CupertinoIcons.phone_arrow_up_right, color: AppColor.white, size: 40)),
               0.05.dpH(dp).spY,
               Text('Want to call emergency number?', style: TextStyle(fontSize: 18, color: AppColor.white)),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 EmergencyCard(
-                  child: BlinkingText(contact?.phone ?? '112', style: TextStyle(fontSize: 65, color: AppColor.action, fontWeight: FontWeight.w500)),
+                  child: sensitive(
+                    BlinkingText(contact?.phone ?? '112', style: TextStyle(fontSize: 65, color: AppColor.action, fontWeight: FontWeight.w500)),
+                  ),
                 ),
                 0.05.dpW(dp).spX,
                 contact?.phone == null
                     ? EmergencyCard(
-                        child: BlinkingText('911', style: TextStyle(fontSize: 65, color: AppColor.action_2, fontWeight: FontWeight.w500), delay: true),
+                        child: sensitive(
+                          BlinkingText('911', style: TextStyle(fontSize: 65, color: AppColor.action_2, fontWeight: FontWeight.w500), delay: true),
+                        ),
                       )
                     : const SizedBox(),
               ]),
@@ -144,26 +183,33 @@ class _CallState extends State<Call> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
                 child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                  buildIconButton(
-                    widget.properties!.isRecordingVideo ? Icons.play_arrow_outlined : Icons.video_collection_outlined,
-                    22,
-                    onPressed: widget.onVideoRecord,
+                  sensitive(
+                    buildIconButton(
+                      widget.properties!.isRecordingVideo ? Icons.play_arrow_outlined : Icons.video_collection_outlined,
+                      22,
+                      onPressed: widget.onVideoRecord,
+                    ),
                   ),
-                  AlertButton(
-                    height: 70,
-                    width: 70,
-                    borderWidth: 2,
-                    shadowWidth: 10,
-                    iconSize: 25,
-                    showSecondShadow: false,
-                    iconData: Icons.camera_alt,
-                    //iconData: widget.properties!.isCapturingImage ? Icons.play_arrow_outlined : Icons.call_end,
-                    onPressed: widget.onImageCapture /*finish(context)*/,
+                  Transform.rotate(
+                    angle: rotationAngle,
+                    child: AlertButton(
+                      height: 70,
+                      width: 70,
+                      borderWidth: 2,
+                      shadowWidth: 10,
+                      iconSize: 25,
+                      showSecondShadow: false,
+                      iconData: Icons.camera_alt,
+                      //iconData: widget.properties!.isCapturingImage ? Icons.play_arrow_outlined : Icons.call_end,
+                      onPressed: widget.onImageCapture /*finish(context)*/,
+                    ),
                   ),
-                  buildIconButton(
-                    widget.properties!.isRecordingAudio ? Icons.play_arrow_outlined : Icons.audiotrack_outlined,
-                    22,
-                    onPressed: widget.onAudioRecord,
+                  sensitive(
+                    buildIconButton(
+                      widget.properties!.isRecordingAudio ? Icons.play_arrow_outlined : Icons.audiotrack_outlined,
+                      22,
+                      onPressed: widget.onAudioRecord,
+                    ),
                   ),
                 ]),
               ),
@@ -201,7 +247,7 @@ Widget buildContactsCarousel({required Function() onTap, required CarouselContro
   return CarouselSlider.builder(
     itemCount: 3,
     itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
-      log("$itemIndex : $pageViewIndex");
+      "$itemIndex : $pageViewIndex".log;
       return GestureDetector(
         onTap: () {
           onTap();
