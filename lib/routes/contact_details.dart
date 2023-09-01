@@ -53,9 +53,9 @@ class _ContactDetailsState extends ConsumerState<ContactDetails> {
     var contact = context.extra;
     final dp = Density.init(context);
 
-    final location = ref.watch(positionProvider.select((value) => value!));
-    log('Pos: $location');
-    getPlacemarks(location);
+    // final location = ref.watch(positionProvider.select((value) => value!));
+    // log('Pos: $location');
+    // getPlacemarks(location);
 
     return Scaffold(
       backgroundColor: AppColor.background,
@@ -169,7 +169,7 @@ class _ContactDetailsState extends ConsumerState<ContactDetails> {
                 borderWidth: 2,
                 shadowWidth: 9,
                 iconSize: 30,
-                onPressed: () => launch(context, Constants.call, contact),
+                onPressed: () => launch(context, Constants.camera, contact),
               ),
             ]),
           ),
