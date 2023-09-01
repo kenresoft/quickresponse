@@ -42,7 +42,7 @@ class MiniMap extends StatelessWidget {
                 shadowWidth: 7,
                 iconSize: 24,
                 showSecondShadow: false,
-                onPressed: () => launch(context, Constants.call, contact),
+                onPressed: () => launch(context, Constants.camera, contact),
               ),
             ),
           ),

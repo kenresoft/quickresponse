@@ -93,7 +93,7 @@ class MyApp extends StatelessWidget {
       route(Constants.camera, const CameraScreen()),
       route(Constants.contacts, const Contacts()),
       route(Constants.contactDetails, const ContactDetails()),
-      route(Constants.call, const Call()),
+      //route(Constants.call, const Call()),
       route(Constants.locationMap, const LocationMap()),
       route(Constants.alarm, const AlarmScreen()),
       //route(Constants.mapScreen, const MapScreen()),
