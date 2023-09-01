@@ -74,6 +74,7 @@ class _CallState extends State<Call> {
       int y = event.y.toInt();
 
       double angle = atan2(x, y);
+      await Future.delayed(const Duration(seconds: 5));
       setState(() {
         rotationAngle = angle;
       });
