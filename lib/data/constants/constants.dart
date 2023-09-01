@@ -34,13 +34,4 @@ class Constants {
   static const String drivingPin = "$iconDir/driving_pin.png";
   static const String destinationMapMarker = "$iconDir/destination_map_marker.png";
 
-  static var maps = {
-    1: profile,
-    2: laptop,
-    3: moon,
-    4: tech,
-    5: web,
-    6: spaceship,
-    7: www,
-  };
 }
