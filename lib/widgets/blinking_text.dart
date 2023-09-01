@@ -36,7 +36,7 @@ class _BlinkingTextState extends State<BlinkingText> with SingleTickerProviderSt
           _controller.forward();
         }
       });
-    if (widget.delay) {
+    if (widget.delay && mounted) {
       Timer.periodic(const Duration(seconds: 1), (timer) {
         _controller.forward();
       });

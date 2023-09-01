@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../widgets/toast.dart';
 
@@ -58,4 +59,16 @@ class Util {
       },
     );
   }
+
+  static lockOrientation() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  static unlockOrientation() {
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+  }
+
 }
