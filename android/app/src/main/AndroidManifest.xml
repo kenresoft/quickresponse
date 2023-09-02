@@ -38,15 +38,6 @@
         <!--<meta-data android:name="com.google.android.geo.API_KEY"
                 android:value="AIzaSyDa65bAL30pzz0WId8e5u5vpmFn5VgHs2U"/>-->  <!--// Quick Response old-->
 
-        <!--<service
-            android:name="com.example.quickresponse.MyConnectionService"
-            android:exported="true"
-            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE">
-            <intent-filter>
-                <action android:name="android.telecom.ConnectionService" />
-            </intent-filter>
-        </service>-->
-
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
