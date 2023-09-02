@@ -6,12 +6,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter_sms/flutter_sms.dart';
-
-/*import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
-import 'package:flutter_callkit_incoming/entities/ios_params.dart';
-import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';*/
-//import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickresponse/camera_preview.dart';
 import 'package:quickresponse/data/constants/constants.dart';
@@ -20,9 +14,6 @@ import 'package:quickresponse/utils/util.dart';
 import 'package:quickresponse/widgets/alert_button.dart';
 import 'package:quickresponse/widgets/blinking_text.dart';
 import 'package:sensors_plus/sensors_plus.dart';
-
-//import 'package:sms_advanced/sms_advanced.dart';
-
 import '../data/constants/colors.dart';
 import '../data/constants/density.dart';
 import '../data/model/contact.dart';
@@ -51,7 +42,8 @@ class _CallState extends State<Call> {
   CarouselController buttonCarouselController = CarouselController();
   bool isContactTap = false;
   bool shouldHide = false;
-  double x = 0, y = 0;
+  double x = 0,
+      y = 0;
   double rotationAngle = 0.0;
 
   //StreamController<AccelerometerEvent> _streamController;
@@ -128,7 +120,9 @@ class _CallState extends State<Call> {
 
   @override
   Widget build(BuildContext context) {
-    final contact = GoRouterState.of(context).extra as Contact?;
+    final contact = GoRouterState
+        .of(context)
+        .extra as Contact?;
 
     final dp = Density.init(context);
     return WillPopScope(
@@ -146,53 +140,70 @@ class _CallState extends State<Call> {
         backgroundColor: shouldHide ? AppColor.black : AppColor.overlay,
         body: Center(
           child: Column(children: [
-            0.05.dpH(dp).spY,
+            0.05
+                .dpH(dp)
+                .spY,
             GestureDetector(
-              onTap: () => setState(() {
-                shouldHide = !shouldHide;
-              }),
+              onTap: () =>
+                  setState(() {
+                    shouldHide = !shouldHide;
+                  }),
               child: Padding(
                 padding: const EdgeInsets.only(right: 15),
                 child: Align(alignment: Alignment.topRight, child: sensitive(Icon(shouldHide ? CupertinoIcons.eye_slash : CupertinoIcons.eye, color: AppColor.white, size: 22))),
               ),
             ),
-            0.08.dpH(dp).spY,
+            0.08
+                .dpH(dp)
+                .spY,
             sensitive(Icon(CupertinoIcons.phone_arrow_up_right, color: AppColor.white, size: 40)),
-            0.05.dpH(dp).spY,
+            0.05
+                .dpH(dp)
+                .spY,
             Text('Want to call emergency number?', style: TextStyle(fontSize: 16, color: AppColor.white)),
-            0.05.dpH(dp).spY,
+            0.05
+                .dpH(dp)
+                .spY,
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               sensitive(
                 EmergencyCard(
                   child: BlinkingText(contact?.phone ?? '112', style: TextStyle(fontSize: 55, color: AppColor.action, fontWeight: FontWeight.w500)),
                 ),
               ),
-              0.05.dpW(dp).spX,
+              0.05
+                  .dpW(dp)
+                  .spX,
               contact?.phone == null
                   ? sensitive(
-                      EmergencyCard(
-                        child: BlinkingText('911', style: TextStyle(fontSize: 55, color: AppColor.action_2, fontWeight: FontWeight.w500), delay: true),
-                      ),
-                    )
+                EmergencyCard(
+                  child: BlinkingText('911', style: TextStyle(fontSize: 55, color: AppColor.action_2, fontWeight: FontWeight.w500), delay: true),
+                ),
+              )
                   : const SizedBox(),
             ]),
-            0.10.dpH(dp).spY,
+            0.10
+                .dpH(dp)
+                .spY,
             Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor.white, fontWeight: FontWeight.w600)),
-            0.03.dpH(dp).spY,
+            0.03
+                .dpH(dp)
+                .spY,
             SizedBox(
               height: 120,
               width: 310,
               child: isContactTap
                   ? buildSuggestionAlertMessage(dp, contact)
                   : buildContactsCarousel(
-                      onTap: () {
-                        setState(() {
-                          isContactTap = true;
-                        });
-                      },
-                      buttonCarouselController: buttonCarouselController),
+                  onTap: () {
+                    setState(() {
+                      isContactTap = true;
+                    });
+                  },
+                  buttonCarouselController: buttonCarouselController),
             ),
-            0.07.dpH(dp).spY,
+            0.07
+                .dpH(dp)
+                .spY,
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
