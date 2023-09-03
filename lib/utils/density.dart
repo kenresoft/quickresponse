@@ -11,18 +11,4 @@ class Density {
   final double aspectRatio;
 }
 
-extension Dp on num {
-  double dpH(Density density) {
-    if (density.height > density.width) {
-      return this * density.height;
-    }
-    return this * density.width;
-  }
 
-  double dpW(Density density) {
-    if (density.width < density.height) {
-      return this * density.width;
-    }
-    return this * density.height;
-  }
-}
