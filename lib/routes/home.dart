@@ -7,7 +7,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
-import 'package:quickresponse/data/constants/density.dart';
+import 'package:quickresponse/utils/density.dart';
 import 'package:quickresponse/data/db/location_db.dart';
 import 'package:quickresponse/widgets/suggestion_card.dart';
 import 'package:sqflite/sqflite.dart';
