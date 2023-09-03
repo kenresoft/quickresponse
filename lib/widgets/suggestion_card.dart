@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quickresponse/data/constants/colors.dart';
-import 'package:quickresponse/data/constants/density.dart';
+import 'package:quickresponse/utils/density.dart';
 
 import '../data/model/contact.dart';
 import '../routes/call.dart';
