@@ -13,7 +13,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 
-import '../data/constants/density.dart';
+import '../utils/density.dart';
 import '../data/model/pin_pill_info.dart';
 import '../providers/location_providers.dart';
 import '../widgets/map_pin_pill.dart';
