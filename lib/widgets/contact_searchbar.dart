@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 
-import '../data/constants/density.dart';
+import '../utils/density.dart';
 import '../data/model/contact.dart';
 
 class ContactSearchBar extends StatefulWidget {
