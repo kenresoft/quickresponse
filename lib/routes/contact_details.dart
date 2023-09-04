@@ -13,7 +13,7 @@ import 'package:quickresponse/widgets/mini_map.dart';
 
 import '../data/constants/colors.dart';
 import '../data/constants/constants.dart';
-import '../data/constants/density.dart';
+import '../utils/density.dart';
 import '../main.dart';
 import '../providers/location_providers.dart';
 import '../widgets/alert_button.dart';
