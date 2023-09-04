@@ -7,7 +7,7 @@ import 'package:quickresponse/widgets/appbar.dart';
 import 'package:quickresponse/widgets/contact_searchbar.dart';
 
 import '../data/constants/colors.dart';
-import '../data/constants/density.dart';
+import '../utils/density.dart';
 import '../providers/page_provider.dart';
 import '../widgets/bottom_navigator.dart';
 import '../widgets/exit_dialog.dart';
