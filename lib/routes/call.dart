@@ -15,7 +15,7 @@ import 'package:quickresponse/widgets/alert_button.dart';
 import 'package:quickresponse/widgets/blinking_text.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import '../data/constants/colors.dart';
-import '../data/constants/density.dart';
+import '../utils/density.dart';
 import '../data/model/contact.dart';
 import '../widgets/suggestion_card.dart';
 import 'emergency_card.dart';
