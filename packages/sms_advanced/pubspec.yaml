@@ -14,13 +14,13 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  plugin_platform_interface: ^2.1.5
-  url_launcher: ^6.1.12
+  plugin_platform_interface: ^2.1.6
+  url_launcher: ^6.1.14
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.2
+  flutter_lints: ^2.0.3
 
 flutter:
   # This section identifies this Flutter project as a plugin project.
