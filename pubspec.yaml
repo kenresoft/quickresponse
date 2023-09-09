@@ -37,7 +37,7 @@ dependencies:
   #open_route_service: ^1.2.3 # --- uses a lower version of http
 
   # --Data/File
-  shared_preferences: ^2.2.0
+  shared_preferences: ^2.2.1
   sqflite: ^2.3.0
   path_provider: ^2.1.0
   path: ^1.8.3
