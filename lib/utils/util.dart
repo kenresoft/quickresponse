@@ -71,4 +71,17 @@ class Util {
     SystemChrome.setPreferredOrientations(DeviceOrientation.values);
   }
 
+  static String formatCategory(String category) {
+    // Split the category into words
+    List<String> words = category.split('_');
+
+    // Capitalize the first letter of each word and join them back
+    String formattedCategory = words.map((word) {
+      return word.substring(0, 1).toUpperCase() + word.substring(1);
+    }).join(' ');
+
+    return formattedCategory;
+  }
+
+
 }
