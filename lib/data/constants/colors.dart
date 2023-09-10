@@ -25,9 +25,15 @@ class AppColor {
     end: Alignment.bottomCenter,
   );
 
-  static LinearGradient radiant = LinearGradient(
-    colors: [alert_1, title],
+  static LinearGradient textMix = LinearGradient(
+    colors: [title_2, black],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
+  );
+
+  static LinearGradient radiant = LinearGradient(
+    colors: [alert_2, alert_1],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
   );
 }
