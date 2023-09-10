@@ -7,18 +7,20 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
-import 'package:quickresponse/utils/density.dart';
 import 'package:quickresponse/data/db/location_db.dart';
-import 'package:quickresponse/widgets/suggestion_card.dart';
+import 'package:quickresponse/utils/density.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../data/emergency/emergency.dart';
 import '../main.dart';
 import '../providers/location_providers.dart';
 import '../providers/page_provider.dart';
+import '../utils/extensions.dart';
 import '../widgets/alert_button.dart';
 import '../widgets/blinking_text.dart';
 import '../widgets/bottom_navigator.dart';
 import '../widgets/exit_dialog.dart';
+import '../widgets/tips_carousel.dart';
 import '../widgets/toast.dart';
 
 class Home extends ConsumerStatefulWidget {
@@ -29,6 +31,7 @@ class Home extends ConsumerStatefulWidget {
 }
 
 class _HomeState extends ConsumerState<Home> {
+  late Future<List<EmergencyTip>> _tips;
   late GeolocatorPlatform _geolocator;
   Position? _position;
   List<Map>? _location;
@@ -48,6 +51,7 @@ class _HomeState extends ConsumerState<Home> {
         setState(() {});
       }
     });
+    _tips = loadEmergencyTips();
   }
 
   @override
@@ -193,13 +197,35 @@ class _HomeState extends ConsumerState<Home> {
       0.03.dpH(dp).spY,
 
       // 7
-      .12.dpH(dp).spaceY(ListView.builder(
+      FutureBuilder<List<EmergencyTip>>(
+        future: _tips,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError) {
+              return const Center(
+                child: Text('Error loading tips'),
+              );
+            }
+            final tips = snapshot.data!;
+            return SizedBox(
+              width: double.infinity,
+              height: 140,
+              child: TipSlider(tips: tips),
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
+      /*.12.dpH(dp).spaceY(ListView.builder(
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
           itemCount: 6,
           itemBuilder: (BuildContext context, int index) {
             return const SuggestionCard(text: 'He had an accident');
-          })),
+          })),*/
 
       0.03.dpH(dp).spY,
 
