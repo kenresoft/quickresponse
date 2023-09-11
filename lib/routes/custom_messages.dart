@@ -1,18 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: CustomMessageGeneratorPage(),
-  ));
-}
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:quickresponse/data/constants/colors.dart';
+import 'package:quickresponse/utils/extensions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class CustomMessage {
   final String id;
@@ -43,8 +40,10 @@ class CustomMessage {
 }
 
 class CustomMessageGeneratorPage extends StatefulWidget {
+  const CustomMessageGeneratorPage({super.key});
+
   @override
-  _CustomMessageGeneratorPageState createState() => _CustomMessageGeneratorPageState();
+  State<CustomMessageGeneratorPage> createState() => _CustomMessageGeneratorPageState();
 }
 
 class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage> {
@@ -52,7 +51,7 @@ class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage>
   List<CustomMessage> savedMessages = [];
   String selectedMessage = '';
   late SharedPreferences _prefs;
-  final Uuid _uuid = Uuid();
+  final Uuid _uuid = const Uuid();
 
   @override
   void initState() {
@@ -65,13 +64,31 @@ class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage>
     _prefs = await SharedPreferences.getInstance();
   }
 
-  Future<void> fetchSavedMessages() async {
+/*  Future<void> fetchSavedMessages() async {
     final savedMessagesJson = _prefs.getStringList('savedMessages') ?? [];
     setState(() {
       savedMessages = savedMessagesJson.map((json) {
         return CustomMessage.fromJson(jsonDecode(json));
       }).toList();
     });
+  }*/
+
+  Future<void> fetchSavedMessages() async {
+
+    final directory = await getExternalStorageDirectory();
+    final file = File('${directory?.path}/custom_messages.msg');
+
+    if (await file.exists()) {
+      var content = await file.readAsString();
+      // Remove the escaped double quotes
+      content = content.replaceAll('\\"', '"');
+      final List<dynamic> messagesJson = jsonDecode(content);
+
+      print(content);
+      setState(() {
+        savedMessages = messagesJson.map((json) => CustomMessage.fromJson(json)).toList();
+      });
+    }
   }
 
   Future<void> saveMessage(CustomMessage message) async {
@@ -101,19 +118,68 @@ class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage>
     }).toList();
 
     final directory = await getExternalStorageDirectory();
-    final fileName = 'custom_messages.msg';
+    const fileName = 'custom_messages.msg';
     final file = File('${directory!.path}/$fileName');
 
     await file.writeAsString(jsonEncode(messagesJson));
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Messages exported successfully.'),
+        content: Text('Messages exported successfully to: ${file.path}'),
       ),
     );
   }
 
   Future<void> importMessages() async {
+    final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['msg'],
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      final File file = File(result.files.first.path!);
+
+      try {
+        String content = await file.readAsString();
+
+        // Remove the escaped double quotes
+        content = content.replaceAll('\\"', '"');
+
+        final List<dynamic> messagesJson = jsonDecode(content);
+
+        final List<CustomMessage> importedMessages = messagesJson.map((json) {
+          return CustomMessage.fromJson(json);
+        }).toList();
+
+        final List<String> importedIds = importedMessages.map((message) => message.id).toList();
+        final List<CustomMessage> updatedMessages = savedMessages.where((message) => !importedIds.contains(message.id)).toList();
+
+        updatedMessages.addAll(importedMessages);
+
+        setState(() {
+          savedMessages = updatedMessages;
+          selectedMessage = ''; // Reset selected message
+        });
+
+        await saveMessageListToPrefs(savedMessages);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Messages imported successfully.'),
+          ),
+        );
+      } catch (e) {
+        'Error importing messages: $e'.log;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error importing messages. Please check the file format.'),
+          ),
+        );
+      }
+    }
+  }
+
+/*  Future<void> importMessages() async {
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['msg'],
@@ -141,29 +207,34 @@ class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage>
       await saveMessageListToPrefs(savedMessages);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Messages imported successfully.'),
         ),
       );
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Custom Message Generator'),
+        title: const Text('Custom Message Generator'),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(
+            const Text(
               'Choose from Pre-made Messages:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             DropdownButton<String>(
+              borderRadius: BorderRadius.circular(10),
+              dropdownColor: AppColor.alert_1,
+              //itemHeight: 350,
+              menuMaxHeight: 350,
+
               value: selectedMessage.isNotEmpty ? selectedMessage : null,
               onChanged: (String? newValue) {
                 setState(() {
@@ -178,24 +249,25 @@ class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage>
                 );
               }).toList(),
             ),
-            SizedBox(height: 16.0),
-            Text(
+            const SizedBox(height: 16.0),
+            const Text(
               'Or Create Your Own Message:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             TextField(
               controller: _customMessageController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Custom Message',
                 hintText: 'Type your custom message here',
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 ElevatedButton(
+                  style: const ButtonStyle(maximumSize: MaterialStatePropertyAll(Size.fromWidth(140))),
                   onPressed: () {
                     if (_customMessageController.text.isNotEmpty) {
                       final newMessage = CustomMessage(
@@ -213,7 +285,7 @@ class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage>
                       } else {
                         // Show a notification that the message is already saved.
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('This message is already saved.'),
                           ),
                         );
@@ -222,9 +294,13 @@ class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage>
                       _customMessageController.clear();
                     }
                   },
-                  child: Text('Save Custom Message'),
+                  child: const Text(
+                    'Save Custom Message',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
                 ElevatedButton(
+                  style: const ButtonStyle(maximumSize: MaterialStatePropertyAll(Size.fromWidth(140))),
                   onPressed: () {
                     if (selectedMessage.isNotEmpty) {
                       final newMessage = CustomMessage(
@@ -237,12 +313,13 @@ class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage>
                       if (!isMessageAlreadySaved) {
                         setState(() {
                           savedMessages.add(newMessage);
+                          selectedMessage = ''; // Reset selected message
                         });
                         saveMessage(newMessage);
                       } else {
                         // Show a notification that the message is already saved.
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('This message is already saved.'),
                           ),
                         );
@@ -251,12 +328,15 @@ class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage>
                       _customMessageController.clear();
                     }
                   },
-                  child: Text('Save Selected Message'),
+                  child: const Text(
+                    'Save Selected Message',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ],
             ),
-            SizedBox(height: 16.0),
-            Text(
+            const SizedBox(height: 16.0),
+            const Text(
               'Saved Messages:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
@@ -272,7 +352,7 @@ class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: Icon(Icons.edit),
+                        icon: const Icon(Icons.edit),
                         onPressed: () {
                           _customMessageController.text = message.message;
                           setState(() {
@@ -282,7 +362,7 @@ class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage>
                         },
                       ),
                       IconButton(
-                        icon: Icon(Icons.delete),
+                        icon: const Icon(Icons.delete),
                         onPressed: () {
                           setState(() {
                             savedMessages.removeAt(index);
@@ -298,17 +378,25 @@ class _CustomMessageGeneratorPageState extends State<CustomMessageGeneratorPage>
                 );
               },
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 ElevatedButton(
+                  style: const ButtonStyle(maximumSize: MaterialStatePropertyAll(Size.fromWidth(140))),
                   onPressed: exportMessages,
-                  child: Text('Export Messages (.msg)'),
+                  child: const Text(
+                    'Export Messages (.msg)',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
                 ElevatedButton(
+                  style: const ButtonStyle(maximumSize: MaterialStatePropertyAll(Size.fromWidth(140))),
                   onPressed: importMessages,
-                  child: Text('Import Messages (.msg)'),
+                  child: const Text(
+                    'Import Messages (.msg)',
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ],
             ),
