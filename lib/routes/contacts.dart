@@ -1,22 +1,30 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/model/contact.dart';
 import 'package:quickresponse/main.dart';
+import 'package:quickresponse/utils/top_level.dart';
 import 'package:quickresponse/widgets/appbar.dart';
 import 'package:quickresponse/widgets/contact_searchbar.dart';
 
 import '../data/constants/colors.dart';
-import '../utils/density.dart';
 import '../providers/page_provider.dart';
+import '../utils/density.dart';
 import '../widgets/bottom_navigator.dart';
-import '../widgets/exit_dialog.dart';
 
-class Contacts extends ConsumerWidget {
+class Contacts extends ConsumerStatefulWidget {
   const Contacts({super.key});
 
   @override
-  Widget build(BuildContext context, ref) {
+  ConsumerState<Contacts> createState() => _ContactsState();
+}
+
+class _ContactsState extends ConsumerState<Contacts> {
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  Widget build(BuildContext context) {
     final contacts = Contact.contactList;
     final dp = Density.init(context);
     final page = ref.watch(pageProvider.select((value) => value));
@@ -33,19 +41,28 @@ class Contacts extends ConsumerWidget {
           return true;
         }
       },
-      child: Scaffold(
-        backgroundColor: AppColor.background,
-        appBar: appBar(title: const Text('Contacts'), actionTitle: 'Add', actionIcon: Icons.add),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: ContactSearchBar(
-            contacts: contacts,
-            onSelected: (Contact value) {
-              launch(context, Constants.contactDetails, value);
-            },
+      child: focus(
+        _focusNode,
+        Scaffold(
+          backgroundColor: AppColor.background,
+          appBar: appBar(
+            title: const Text('Contacts', style: TextStyle(fontSize: 20)),
+            leading: const Icon(CupertinoIcons.increase_quotelevel),
+            actionTitle: 'Add',
+            actionIcon: Icons.add,
           ),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: ContactSearchBar(
+              contacts: contacts,
+              focusNode: _focusNode,
+              onSelected: (Contact value) {
+                launch(context, Constants.contactDetails, value);
+              },
+            ),
+          ),
+          bottomNavigationBar: const BottomNavigator(currentIndex: 2),
         ),
-        bottomNavigationBar: const BottomNavigator(currentIndex: 2),
       ),
     );
   }
