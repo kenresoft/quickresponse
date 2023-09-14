@@ -20,8 +20,10 @@ extension Dp on num {
 }
 
 extension BuildCxt<T> on BuildContext {
-  void toast(T msg) {
-    ScaffoldMessenger.of(this).showSnackBar(SnackBar(content: Text(msg.toString())));
+  void toast(T msg, [TextAlign? textAlign, Color? color]) {
+    ScaffoldMessenger.of(this).showSnackBar(
+      SnackBar(content: Text(msg.toString(), textAlign: textAlign), backgroundColor: color),
+    );
   }
 
   T? get extra => GoRouterState.of(this).extra as T;
