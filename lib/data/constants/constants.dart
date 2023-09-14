@@ -10,6 +10,7 @@ class Constants {
   static const String camera = '/camera';
   static const String contacts = '/contacts';
   static const String contactDetails = '/contactDetails';
+  static const String contactsPage = '/contactsPage';
   static const String call = '/call';
   static const String locationMap = '/locationMap';
   static const String mapScreen = '/mapScreen';
