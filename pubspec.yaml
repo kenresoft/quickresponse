@@ -54,6 +54,8 @@ dependencies:
   record: ^4.4.4
   flutter_sound: ^9.2.13
   background_sms: ^0.0.4
+  #flutter_contacts: ^1.1.7+1
+  contacts_service: ^0.6.3
   flutter_ringtone_player: ^3.2.0
   flutter_callkit_incoming:
     path: 'packages/flutter_callkit_incoming'
