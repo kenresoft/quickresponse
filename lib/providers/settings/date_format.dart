@@ -44,3 +44,15 @@ class TimeSeparatorNotifier extends StateNotifier<String> {
 
   set setTimeSeparator(String timeSeparator) => state = timeSeparator;
 }
+
+final expandedStateProvider = StateNotifierProviderFamily<ExpandedStateNotifier, bool, String>((ref, title) {
+  return ExpandedStateNotifier();
+});
+
+class ExpandedStateNotifier extends StateNotifier<bool> {
+  ExpandedStateNotifier() : super(false); // Initial value is false (not expanded)
+
+  void toggle() {
+    state = !state;
+  }
+}
