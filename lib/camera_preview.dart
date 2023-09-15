@@ -10,7 +10,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quickresponse/routes/call.dart';
 import 'package:quickresponse/utils/file_helper.dart';
-import 'package:quickresponse/utils/util.dart';
 import 'package:record/record.dart';
 
 class CameraPreviewWidget extends StatefulWidget {
