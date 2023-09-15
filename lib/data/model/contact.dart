@@ -3,11 +3,43 @@ class ContactModel {
     required this.name,
     this.relationship,
     required this.phone,
+    this.age,
+    this.height,
+    this.weight,
+    this.imageFile,
   });
 
   final String? name;
   final String? relationship;
   final String? phone;
+  final int? age;
+  final int? height;
+  final int? weight;
+  final String? imageFile;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'relationship': relationship,
+      'phone': phone,
+      'age': age,
+      'height': height,
+      'weight': weight,
+      'imageFile': imageFile,
+    };
+  }
+
+  factory ContactModel.fromJson(Map<String, dynamic> json) {
+    return ContactModel(
+      name: json['name'],
+      relationship: json['relationship'],
+      phone: json['phone'],
+      age: json['age'],
+      height: json['height'],
+      weight: json['weight'],
+      imageFile: json['imageFile'],
+    );
+  }
 
   static List<ContactModel> contactList = [
     ContactModel(name: 'Mark Simmons', relationship: 'Husband', phone: '+123456789'),
