@@ -30,10 +30,10 @@ dependencies:
   flutter_riverpod: ^2.3.6
 
   # --Location/Map
-  geolocator: ^9.0.2
-  google_maps_flutter: ^2.4.0
+  geolocator: ^10.0.1
+  google_maps_flutter: ^2.5.0
   geocoding: ^2.1.0
-  flutter_polyline_points: ^1.0.0 # --- uses a higher version of http
+  flutter_polyline_points: ^2.0.0 # --- uses a higher version of http
   #open_route_service: ^1.2.3 # --- uses a lower version of http
 
   # --Data/File
