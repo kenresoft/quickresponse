@@ -64,10 +64,7 @@ class _EditContactPageState extends State<EditContactPage> {
       height: 45,
       child: Row(
         children: [
-          Icon(
-            prefixIcon ?? Icons.edit, // Default icon is the edit icon
-            color: AppColor.navIconSelected,
-          ),
+          Icon(prefixIcon ?? Icons.edit, color: AppColor.navIconSelected),
           const SizedBox(width: 10), // Add spacing between icon and text field
           Expanded(
             child: TextField(
@@ -116,7 +113,7 @@ class _EditContactPageState extends State<EditContactPage> {
       final compressedFile = await FlutterImageCompress.compressAndGetFile(
         file.path!,
         FileHelper.getTempFilePath(uniqueFileName),
-        quality: 15,
+        quality: 20,
       );
 
       final savedFilePath = await FileHelper.saveImageFile(compressedFile!.path, uniqueFileName);
@@ -139,42 +136,6 @@ class _EditContactPageState extends State<EditContactPage> {
       });
     }
   }
-
-/*  Future<void> pickImageFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
-    if (result != null) {
-      PlatformFile file = result.files.single;
-      final uniqueFileName = FileHelper.generateUniqueFileName(phoneController.text);
-      final savedFilePath = await FileHelper.saveImageFile(file.path!, uniqueFileName);
-
-      // Delete the previous image file if it exists
-      if (imageFile != null) {
-        final previousFile = File(imageFile!);
-        if (previousFile.existsSync()) {
-          previousFile.deleteSync();
-        }
-      }
-
-      setState(() {
-        // Store the saved image file path in the imageFile property
-        imageFile = savedFilePath;
-      });
-    }
-  }*/
-
-/*  Future<void> pickImageFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
-    if (result != null) {
-      PlatformFile file = result.files.single;
-      final uniqueFileName = FileHelper.generateUniqueFileName(phoneController.text);
-      final savedFilePath = await FileHelper.saveImageFile(file.path!, uniqueFileName);
-
-      setState(() {
-        // Store the saved image file path in the imageFile property
-        imageFile = savedFilePath;
-      });
-    }
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -200,45 +161,26 @@ class _EditContactPageState extends State<EditContactPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 50),
                   GestureDetector(
                     onTap: pickImageFile,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Profile picture
-                        Container(
-                          width: double.infinity,
-                          height: 200,
-                          color: AppColor.title, // Add a background color for the profile picture
-                          child: imageFile == null
-                              ? profilePicture(widget.contact.imageFile) // Use the initial image if imageFile is null
-                              : profilePicture(imageFile!), // Use the updated imageFile
-                        ),
-                        // Camera overlay icon
-                        Icon(
-                          Icons.camera_alt,
-                          size: 48,
-                          color: AppColor.white,
-                        ),
-                        // Loading indicator
-                        if (isLoading) const CircularProgressIndicator(), // Show loading indicator when isLoading is true
-                      ],
-                    ),
+                    child: imageFile == null
+                        ? profilePicture(widget.contact.imageFile, isLoading: isLoading) // Use the initial image if imageFile is null
+                        : profilePicture(imageFile!, isLoading: isLoading, overlay: true),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 80),
                   _customTextField(nameController, 'Name', TextInputType.text, 'Enter name', CupertinoIcons.person),
-                  const SizedBox(height: 10),
-                  _customTextField(relationshipController, 'Relationship', TextInputType.text, 'Enter relationship', CupertinoIcons.person_2),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
+                  _customTextField(relationshipController, 'Relationship', TextInputType.text, 'Enter relationship', CupertinoIcons.dot_radiowaves_left_right),
+                  const SizedBox(height: 20),
                   _customTextField(phoneController, 'Phone', TextInputType.phone, 'Enter phone', CupertinoIcons.phone),
-                  const SizedBox(height: 10),
-                  _customTextField(ageController, 'Age', TextInputType.number, 'Enter age', CupertinoIcons.calendar),
-                  const SizedBox(height: 10),
-                  _customTextField(heightController, 'Height (cm)', TextInputType.number, 'Enter height', Icons.height),
-                  const SizedBox(height: 10),
-                  _customTextField(weightController, 'Weight (kg)', TextInputType.number, 'Enter weight', Icons.scale),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
+                  _customTextField(ageController, 'Age', TextInputType.number, 'Enter age', CupertinoIcons.time),
+                  const SizedBox(height: 20),
+                  _customTextField(heightController, 'Height (cm)', TextInputType.number, 'Enter height', CupertinoIcons.resize_v),
+                  const SizedBox(height: 20),
+                  _customTextField(weightController, 'Weight (kg)', TextInputType.number, 'Enter weight', CupertinoIcons.lab_flask),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
