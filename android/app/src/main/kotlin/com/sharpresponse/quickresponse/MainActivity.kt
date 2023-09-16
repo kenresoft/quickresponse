@@ -1,4 +1,4 @@
-package com.example.quickresponse
+package com.sharpresponse.quickresponse
 
 import io.flutter.embedding.android.FlutterActivity
 
