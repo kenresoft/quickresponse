@@ -67,9 +67,9 @@ dependencies:
   local_auth: ^2.1.6
   sensors_plus: ^3.0.3
 
-  # Firebase
-  firebase_core: ^2.15.0
-  cloud_firestore: ^4.8.4
+  # Google
+  firebase_core: ^2.15.1
+  cloud_firestore: ^4.9.1
   in_app_purchase: ^3.1.10
 
 dev_dependencies:
