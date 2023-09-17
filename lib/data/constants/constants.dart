@@ -19,6 +19,8 @@ class Constants {
   static const String message = '/message';
   static const String history = '/history';
   static const String settings = '/settings';
+  static const String subscription = '/subscription';
+  static const String authentication = '/authentication';
   static const String error = '/error';
 
   //Images route
