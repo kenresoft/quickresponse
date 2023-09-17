@@ -10,6 +10,7 @@ import 'package:quickresponse/camera_screen.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/providers/providers.dart';
 import 'package:quickresponse/routes/alarm.dart';
+import 'package:quickresponse/routes/authentication.dart';
 import 'package:quickresponse/routes/contact_details.dart';
 import 'package:quickresponse/routes/contact_page.dart';
 import 'package:quickresponse/routes/contacts.dart';
@@ -20,6 +21,7 @@ import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/routes/home.dart';
 import 'package:quickresponse/routes/location_map.dart';
 import 'package:quickresponse/routes/settings.dart';
+import 'package:quickresponse/routes/subscription_page.dart';
 
 import 'data/constants/constants.dart';
 import 'data/db/database_client.dart';
@@ -43,12 +45,16 @@ void main() async {
   ]).then(appCallback);
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
   Widget build(BuildContext context) {
-    //initLocationDb();
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
         var state = ref.watch(themeProvider.select((value) => value));
@@ -90,36 +96,38 @@ class MyApp extends StatelessWidget {
       },
     );
   }
-
-  final GoRouter _router = GoRouter(
-    routes: <GoRoute>[
-      route(Constants.root, const Home()),
-      route(Constants.home, const Home()),
-      route(Constants.camera, const CameraScreen()),
-      route(Constants.contacts, const Contacts()),
-      //route(Constants.contactDetails, const ContactDetails()),
-      //route(Constants.editContactPage, const EditContactPage()),
-      _route(Constants.contactDetails, (context, state) {
-        final contact = state.extra as ContactModel; // Retrieve the contact data from extra
-        return ContactDetails(contact: contact); // Pass the contact data to ContactDetails
-      }),
-      _route(Constants.editContactPage, (context, state) {
-        final contact = state.extra as ContactModel; // Retrieve the contact data from extra
-        return EditContactPage(contact: contact); // Pass the contact data to EditContactPage
-      }),
-      route(Constants.contactsPage, const ContactPage()),
-      //route(Constants.call, const Call()),
-      route(Constants.locationMap, const LocationMap()),
-      route(Constants.alarm, const AlarmScreen()),
-      route(Constants.message, const CustomMessageGeneratorPage()),
-      route(Constants.history, const EmergencyHistoryPage()),
-      route(Constants.settings, const SettingsPage()),
-      //route(Constants.mapScreen, const MapScreen()),
-      route(Constants.error, const ErrorPage()),
-    ],
-    errorBuilder: (context, state) => const ErrorPage(),
-  );
 }
+
+final GoRouter _router = GoRouter(
+  routes: <GoRoute>[
+    route(Constants.root, const Home()),
+    route(Constants.home, const Home()),
+    route(Constants.camera, const CameraScreen()),
+    route(Constants.contacts, const Contacts()),
+    //route(Constants.contactDetails, const ContactDetails()),
+    //route(Constants.editContactPage, const EditContactPage()),
+    _route(Constants.contactDetails, (context, state) {
+      final contact = state.extra as ContactModel; // Retrieve the contact data from extra
+      return ContactDetails(contact: contact); // Pass the contact data to ContactDetails
+    }),
+    _route(Constants.editContactPage, (context, state) {
+      final contact = state.extra as ContactModel; // Retrieve the contact data from extra
+      return EditContactPage(contact: contact); // Pass the contact data to EditContactPage
+    }),
+    route(Constants.contactsPage, const ContactPage()),
+    //route(Constants.call, const Call()),
+    route(Constants.locationMap, const LocationMap()),
+    route(Constants.alarm, const AlarmScreen()),
+    route(Constants.message, const CustomMessageGeneratorPage()),
+    route(Constants.history, const EmergencyHistoryPage()),
+    route(Constants.settings, const SettingsPage()),
+    route(Constants.subscription, const SubscriptionPage()),
+    route(Constants.authentication, const Authentication()),
+    //route(Constants.mapScreen, const MapScreen()),
+    route(Constants.error, const ErrorPage()),
+  ],
+  errorBuilder: (context, state) => const ErrorPage(),
+);
 
 GoRoute route(String path, Widget route) {
   return routeTransition(path, route);
@@ -174,12 +182,11 @@ FutureOr appCallback(void value) async {
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );*/
   runApp(
-    ProviderScope(
+    const ProviderScope(
       child: MyApp(),
     ),
   );
 }
-
 
 /*
 import 'package:firebase_core/firebase_core.dart';
