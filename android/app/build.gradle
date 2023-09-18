@@ -62,8 +62,26 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\user\\AndroidStudioPlugins\\keystore\\sharpresponse.jks') // Path to your keystore file
+            storePassword '_sharp_response_'
+            keyAlias 'quick-response-key' // The alias you used when creating the keystore
+            keyPassword '_quick_response_'
+        }
+
     }
 }
+
+/*
+keytool -genkeypair -v -keystore my-release-key.keystore -keyalg RSA -keysize 2048 -validity 10000 -alias my-key-alias
+\Program Files\Android\Android Studio\jbr\bin
+keytool -list -v -alias quick-response-key -keystore \Users\user\AndroidStudioPlugins\keystore\sharpresponse.jks
+* */
 
 flutter {
     source '../..'
