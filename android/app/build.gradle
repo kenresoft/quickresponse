@@ -67,13 +67,12 @@ android {
         }
     }
     signingConfigs {
-        release {
+        /*release {
             storeFile file('C:\\Users\\user\\AndroidStudioPlugins\\keystore\\sharpresponse.jks') // Path to your keystore file
             storePassword '_sharp_response_'
             keyAlias 'quick-response-key' // The alias you used when creating the keystore
             keyPassword '_quick_response_'
-        }
-
+        }*/
     }
 }
 
