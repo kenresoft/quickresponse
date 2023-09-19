@@ -37,6 +37,13 @@
             {
               "client_id": "659717858737-h6rdqnv8ndo2f9fcpkqffat3m74qsupd.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "659717858737-cgnv6oa0oksvl8jt17c382smc1nj63qn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.quickresponse"
+              }
             }
           ]
         }
