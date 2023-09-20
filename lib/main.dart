@@ -1,13 +1,17 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:extensionresoft/extensionresoft.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fontresoft/fontresoft.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickresponse/camera_screen.dart';
 import 'package:quickresponse/data/constants/colors.dart';
+import 'package:quickresponse/data/emergency/notification_response_model.dart';
 import 'package:quickresponse/providers/providers.dart';
 import 'package:quickresponse/routes/alarm.dart';
 import 'package:quickresponse/routes/authentication.dart';
@@ -15,20 +19,57 @@ import 'package:quickresponse/routes/contact_details.dart';
 import 'package:quickresponse/routes/contact_page.dart';
 import 'package:quickresponse/routes/contacts.dart';
 import 'package:quickresponse/routes/custom_messages.dart';
+import 'package:quickresponse/routes/device_authentication.dart';
 import 'package:quickresponse/routes/edit_contact_page.dart';
 import 'package:quickresponse/routes/emergency_history.dart';
 import 'package:quickresponse/routes/error.dart';
 import 'package:quickresponse/routes/home.dart';
 import 'package:quickresponse/routes/location_map.dart';
+import 'package:quickresponse/routes/reminder_page.dart';
 import 'package:quickresponse/routes/settings.dart';
+import 'package:quickresponse/routes/sign_in.dart';
 import 'package:quickresponse/routes/subscription_page.dart';
+import 'package:quickresponse/routes/travellers_alarm.dart';
+import 'package:quickresponse/services/notification_service.dart';
+import 'package:quickresponse/widgets/notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 import 'data/constants/constants.dart';
 import 'data/db/database_client.dart';
 import 'data/model/contact.dart';
+import 'firebase_options.dart';
+
+final notificationService = NotificationService();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+  );
+
+  tz.initializeTimeZones();
+
+  await flutterLocalNotificationsPlugin.initialize(
+    const InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/notification_icon'),
+    ),
+    onDidReceiveNotificationResponse: (notificationResponse) async {
+      final String? payload = notificationResponse.payload;
+      if (notificationResponse.payload != null) {
+        debugPrint('notification payload: $payload');
+      }
+
+      if (payload == 'alarm') {
+        notificationService.resetCounter(null);
+      }
+      //_router.push(Constants.travellersAlarm, extra: NotificationResponseModel(isMuted: true));
+    },
+  );
+
   DatabaseClient();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
@@ -100,7 +141,7 @@ class _MyAppState extends State<MyApp> {
 
 final GoRouter _router = GoRouter(
   routes: <GoRoute>[
-    route(Constants.root, const Home()),
+    route(Constants.root, const DeviceAuthentication()),
     route(Constants.home, const Home()),
     route(Constants.camera, const CameraScreen()),
     route(Constants.contacts, const Contacts()),
@@ -114,6 +155,10 @@ final GoRouter _router = GoRouter(
       final contact = state.extra as ContactModel; // Retrieve the contact data from extra
       return EditContactPage(contact: contact); // Pass the contact data to EditContactPage
     }),
+    _route(Constants.travellersAlarm, (context, state) {
+      final response = state.extra as NotificationResponseModel; // Retrieve the contact data from extra
+      return TravellersAlarm(notificationResponse: response); // Pass the contact data to EditContactPage
+    }),
     route(Constants.contactsPage, const ContactPage()),
     //route(Constants.call, const Call()),
     route(Constants.locationMap, const LocationMap()),
@@ -122,7 +167,10 @@ final GoRouter _router = GoRouter(
     route(Constants.history, const EmergencyHistoryPage()),
     route(Constants.settings, const SettingsPage()),
     route(Constants.subscription, const SubscriptionPage()),
-    route(Constants.authentication, const Authentication()),
+    route(Constants.authentication, const DeviceAuthentication()),
+    route(Constants.signIn, const SignIn()),
+    route(Constants.reminderPage, const ReminderPage()),
+
     //route(Constants.mapScreen, const MapScreen()),
     route(Constants.error, const ErrorPage()),
   ],
@@ -176,24 +224,9 @@ launchReplace(BuildContext context, String route, [Object? extra]) {
 finish(BuildContext context) => GoRouter.of(context).pop();
 
 FutureOr appCallback(void value) async {
-  //await Firebase.initializeApp();
-  /*FirebaseFirestore.instance.settings = const Settings(
-    persistenceEnabled: true,
-    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-  );*/
   runApp(
     const ProviderScope(
       child: MyApp(),
     ),
   );
 }
-
-/*
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-
-// ...
-
-await Firebase.initializeApp(
-options: DefaultFirebaseOptions.currentPlatform,
-);*/
