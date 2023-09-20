@@ -44,3 +44,11 @@ Future<void> updateEditedContact(ContactModel contactModel) async {
   Wrapper()._updateEditedContactInPrefs(contactModel);
 }
 
+Future<void> signOut() async {
+  FirebaseAuth auth = FirebaseAuth.instance;
+  try {
+    await auth.signOut();
+  } catch (e) {
+    "Error signing out: $e".log;
+  }
+}
