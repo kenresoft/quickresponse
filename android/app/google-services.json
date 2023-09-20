@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "659717858737-kdhd01bndhts9qs8ac6kgmbe0s4t2htr.apps.googleusercontent.com",
+          "client_id": "659717858737-2gka9ec9chqqucj24qqj61rbau7f2bjr.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.sharpresponse.quickresponse",
-            "certificate_hash": "d73281d126a78579727ebbf88ea1f7715fc0d258"
+            "certificate_hash": "56e2522cd2b7bb7678ae17eff14a75afe854f10a"
           }
         },
         {
@@ -39,10 +39,10 @@
               "client_type": 3
             },
             {
-              "client_id": "659717858737-cgnv6oa0oksvl8jt17c382smc1nj63qn.apps.googleusercontent.com",
+              "client_id": "659717858737-3fqd9od97opv0mleu00dtqa1e6hs9k93.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.quickresponse"
+                "bundle_id": "com.sharpresponse.quickresponse"
               }
             }
           ]
