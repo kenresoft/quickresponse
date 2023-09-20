@@ -1,6 +1,6 @@
 # quickresponse
 
-A new Flutter project.
+Quick Response Sharp Response
 
 ## Getting Started
 
