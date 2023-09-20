@@ -1,6 +1,6 @@
 # quickresponse
 
-Quick Response Sharp Response
+QuickResponse is a cutting-edge emergency security Flutter app designed to provide rapid assistance and peace of mind during critical situations. Powered by Flutter, this app ensures swift responses to security concerns, making safety a top priority.
 
 ## Getting Started
 
