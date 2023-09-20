@@ -30,8 +30,8 @@
 
     <application
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
-        android:label="quickresponse">
+        android:icon="@mipmap/launcher_icon"
+        android:label="Quick Response">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
