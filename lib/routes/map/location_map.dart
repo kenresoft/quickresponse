@@ -4,19 +4,21 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+
 ///import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 //import 'package:open_route_service/open_route_service.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
-
-import '../utils/density.dart';
-import '../data/model/pin_pill_info.dart';
-import '../providers/location_providers.dart';
-import '../widgets/map_pin_pill.dart';
+import 'package:quickresponse/data/model/pin_pill_info.dart';
+import 'package:quickresponse/providers/location_providers.dart';
+import 'package:quickresponse/utils/density.dart';
+import 'package:quickresponse/utils/extensions.dart';
+import 'package:quickresponse/widgets/map_pin_pill.dart';
 
 const double CAMERA_ZOOM = 16;
 const double CAMERA_TILT = 80;
@@ -351,13 +353,13 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     );*/
 
     // Print the route coordinates
-    for (var element in []/*routeCoordinates*/) {
+    for (var element in [] /*routeCoordinates*/) {
       log(element.toString());
     }
 
     // Map route coordinates to a list of LatLng (requires google_maps_flutter package)
     // to be used in the Map route Polyline.
-    final List<LatLng> routePoints = []/*routeCoordinates*/.map((coordinate) => LatLng(coordinate.latitude, coordinate.longitude)).toList();
+    final List<LatLng> routePoints = [] /*routeCoordinates*/ .map((coordinate) => LatLng(coordinate.latitude, coordinate.longitude)).toList();
 
     if (routePoints.isNotEmpty && !widget.disableWidgets) {
       for (var point in routePoints) {
