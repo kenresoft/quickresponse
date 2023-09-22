@@ -11,25 +11,23 @@ import 'package:fontresoft/fontresoft.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickresponse/camera_screen.dart';
 import 'package:quickresponse/data/constants/colors.dart';
-import 'package:quickresponse/data/emergency/notification_response_model.dart';
 import 'package:quickresponse/providers/providers.dart';
-import 'package:quickresponse/routes/alarm.dart';
-import 'package:quickresponse/routes/authentication.dart';
-import 'package:quickresponse/routes/contact_details.dart';
-import 'package:quickresponse/routes/contact_page.dart';
-import 'package:quickresponse/routes/contacts.dart';
-import 'package:quickresponse/routes/custom_messages.dart';
-import 'package:quickresponse/routes/device_authentication.dart';
-import 'package:quickresponse/routes/edit_contact_page.dart';
-import 'package:quickresponse/routes/emergency_history.dart';
-import 'package:quickresponse/routes/error.dart';
-import 'package:quickresponse/routes/home.dart';
-import 'package:quickresponse/routes/location_map.dart';
-import 'package:quickresponse/routes/reminder_page.dart';
-import 'package:quickresponse/routes/settings.dart';
-import 'package:quickresponse/routes/sign_in.dart';
-import 'package:quickresponse/routes/subscription_page.dart';
-import 'package:quickresponse/routes/travellers_alarm.dart';
+import 'package:quickresponse/routes/alarm/alarm.dart';
+import 'package:quickresponse/routes/alarm/reminder_page.dart';
+import 'package:quickresponse/routes/alarm/travellers_alarm.dart';
+import 'package:quickresponse/routes/authentication/device_authentication.dart';
+import 'package:quickresponse/routes/authentication/sign_in.dart';
+import 'package:quickresponse/routes/contact/contact_details.dart';
+import 'package:quickresponse/routes/contact/contact_page.dart';
+import 'package:quickresponse/routes/contact/contacts.dart';
+import 'package:quickresponse/routes/contact/edit_contact_page.dart';
+import 'package:quickresponse/routes/main/error.dart';
+import 'package:quickresponse/routes/main/home.dart';
+import 'package:quickresponse/routes/main/settings.dart';
+import 'package:quickresponse/routes/main/subscription_page.dart';
+import 'package:quickresponse/routes/map/location_map.dart';
+import 'package:quickresponse/routes/sos/custom_messages.dart';
+import 'package:quickresponse/routes/sos/emergency_history.dart';
 import 'package:quickresponse/services/notification_service.dart';
 import 'package:quickresponse/widgets/notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -155,10 +153,10 @@ final GoRouter _router = GoRouter(
       final contact = state.extra as ContactModel; // Retrieve the contact data from extra
       return EditContactPage(contact: contact); // Pass the contact data to EditContactPage
     }),
-    _route(Constants.travellersAlarm, (context, state) {
+    /*_route(Constants.travellersAlarm, (context, state) {
       final response = state.extra as NotificationResponseModel; // Retrieve the contact data from extra
       return TravellersAlarm(notificationResponse: response); // Pass the contact data to EditContactPage
-    }),
+    }),*/
     route(Constants.contactsPage, const ContactPage()),
     //route(Constants.call, const Call()),
     route(Constants.locationMap, const LocationMap()),
@@ -170,7 +168,7 @@ final GoRouter _router = GoRouter(
     route(Constants.authentication, const DeviceAuthentication()),
     route(Constants.signIn, const SignIn()),
     route(Constants.reminderPage, const ReminderPage()),
-
+    route(Constants.travellersAlarm, const TravellersAlarm()),
     //route(Constants.mapScreen, const MapScreen()),
     route(Constants.error, const ErrorPage()),
   ],
