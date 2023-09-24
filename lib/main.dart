@@ -17,6 +17,10 @@ import 'package:quickresponse/routes/alarm/reminder_page.dart';
 import 'package:quickresponse/routes/alarm/travellers_alarm.dart';
 import 'package:quickresponse/routes/authentication/device_authentication.dart';
 import 'package:quickresponse/routes/authentication/sign_in.dart';
+import 'package:quickresponse/routes/chat/chat_list_screen.dart';
+import 'package:quickresponse/routes/chat/chat_screen.dart';
+import 'package:quickresponse/routes/chat/new_chat_screen.dart';
+import 'package:quickresponse/routes/chat/user_search_screen.dart';
 import 'package:quickresponse/routes/contact/contact_details.dart';
 import 'package:quickresponse/routes/contact/contact_page.dart';
 import 'package:quickresponse/routes/contact/contacts.dart';
@@ -153,10 +157,27 @@ final GoRouter _router = GoRouter(
       final contact = state.extra as ContactModel; // Retrieve the contact data from extra
       return EditContactPage(contact: contact); // Pass the contact data to EditContactPage
     }),
+
+    _route(Constants.chat, (context, state) {
+      final record = state.extra as (String, String, List<String>); // Retrieve the contact data from extra
+      return ChatScreen(chatId: record.$1, userId: record.$2, selectedContacts: record.$3); // Pass the contact data to EditContactPage
+    }),
+
+    _route(Constants.chatsList, (context, state) {
+      final user = state.extra as String; // Retrieve the contact data from extra
+      return ChatListScreen(userId: user); // Pass the contact data to EditContactPage
+    }),
+
+    _route(Constants.newChatsList, (context, state) {
+      final user = state.extra as String; // Retrieve the contact data from extra
+      return NewChatScreen(userId: user); // Pass the contact data to EditContactPage
+    }),
+
     /*_route(Constants.travellersAlarm, (context, state) {
       final response = state.extra as NotificationResponseModel; // Retrieve the contact data from extra
       return TravellersAlarm(notificationResponse: response); // Pass the contact data to EditContactPage
     }),*/
+    route(Constants.userSearchScreen, const UserSearchScreen()),
     route(Constants.contactsPage, const ContactPage()),
     //route(Constants.call, const Call()),
     route(Constants.locationMap, const LocationMap()),
@@ -169,6 +190,7 @@ final GoRouter _router = GoRouter(
     route(Constants.signIn, const SignIn()),
     route(Constants.reminderPage, const ReminderPage()),
     route(Constants.travellersAlarm, const TravellersAlarm()),
+
     //route(Constants.mapScreen, const MapScreen()),
     route(Constants.error, const ErrorPage()),
   ],
