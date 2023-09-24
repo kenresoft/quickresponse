@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:quickresponse/routes/call.dart';
+import 'package:quickresponse/routes/sos/call.dart';
 import 'package:quickresponse/utils/file_helper.dart';
 import 'package:record/record.dart';
 
