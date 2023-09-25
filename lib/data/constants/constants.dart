@@ -21,6 +21,13 @@ class Constants {
   static const String settings = '/settings';
   static const String subscription = '/subscription';
   static const String authentication = '/authentication';
+  static const String signIn = '/signIn';
+  static const String reminderPage = '/reminderPage';
+  static const String travellersAlarm = '/travellersAlarm';
+  static const String chat = '/chat';
+  static const String chatsList = '/chatsList';
+  static const String newChatsList = '/newChatsList';
+  static const String userSearchScreen = '/userSearchScreen';
   static const String error = '/error';
 
   //Images route
@@ -35,6 +42,8 @@ class Constants {
   static const String web = "$imageDir/web.png";
   static const String spaceship = "$imageDir/spaceship.png";
   static const String www = "$imageDir/www.png";
+  static const String logo = "$imageDir/logo.png";
+  static const String logo2 = "$imageDir/logo2.jpg";
 
   //Icons
   static const String appIcon = "$iconDir/icon.png";
