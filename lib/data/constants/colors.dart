@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class AppColor {
   const AppColor._();
@@ -9,6 +9,7 @@ class AppColor {
   static Color overlay = const Color(0x40A5ACBF);
   static Color text = const Color(0xffA5ACBF);
   static Color white = const Color(0xffFFFFFF);
+  static Color whiteTransparent = const Color(0xfcFFFFFF);
   static Color alertBorder = const Color(0xffB1B6C7);
   static Color alert_1 = const Color(0xffFE6464);
   static Color alertTransparent = const Color(0xccFE6464);
@@ -40,9 +41,44 @@ class AppColor {
     end: Alignment.centerRight,
   );
 
+  // ---- Biometric Mix Start----//
+
+  static LinearGradient authDefault = LinearGradient(
+    colors: [black.withOpacity(0.2), black],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  );
+  static LinearGradient authSuccess = LinearGradient(
+    colors: [Colors.green.shade200, Colors.green],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  );
+  static LinearGradient authError = LinearGradient(
+    colors: [Colors.red.shade200, Colors.red],
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+  );
+
+  // ---- Biometric Mix End----//
+
   static LinearGradient buttonMix = LinearGradient(
     colors: [button, alert_1],
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
   );
+
+  static Widget blend(Widget child, Color color) {
+    return ShaderMask(
+      shaderCallback: (Rect bounds) {
+        return LinearGradient(
+          colors: [color, color],
+          //stops: [0.0, 1.0],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          tileMode: TileMode.clamp,
+        ).createShader(bounds);
+      },
+      child: child,
+    );
+  }
 }
