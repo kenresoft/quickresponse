@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 
-import '../data/constants/constants.dart';
+import '../../data/constants/constants.dart';
 
 class ErrorPage extends StatelessWidget {
   const ErrorPage({Key? key, this.error}) : super(key: key);
@@ -26,7 +26,7 @@ class ErrorPage extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             Text(
-              error!,
+              error?? 'Unknown',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 25,
