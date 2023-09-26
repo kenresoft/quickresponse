@@ -1,27 +1,37 @@
+import 'dart:async';
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:extensionresoft/extensionresoft.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/db/location_db.dart';
+import 'package:quickresponse/data/emergency/emergency.dart';
+import 'package:quickresponse/data/model/profile_info.dart';
+import 'package:quickresponse/main.dart';
+import 'package:quickresponse/providers/location_providers.dart';
+import 'package:quickresponse/providers/page_provider.dart';
+import 'package:quickresponse/services/firebase/firebase_location.dart';
+import 'package:quickresponse/services/firebase/firebase_profile.dart';
 import 'package:quickresponse/utils/density.dart';
+import 'package:quickresponse/utils/extensions.dart';
+import 'package:quickresponse/utils/wrapper.dart';
+import 'package:quickresponse/widgets/alert_button.dart';
+import 'package:quickresponse/widgets/blinking_text.dart';
+import 'package:quickresponse/widgets/bottom_navigator.dart';
+import 'package:quickresponse/widgets/exit_dialog.dart';
+import 'package:quickresponse/widgets/tips_carousel.dart';
+import 'package:quickresponse/widgets/toast.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../data/emergency/emergency.dart';
-import '../main.dart';
-import '../providers/location_providers.dart';
-import '../providers/page_provider.dart';
-import '../utils/extensions.dart';
-import '../widgets/alert_button.dart';
-import '../widgets/blinking_text.dart';
-import '../widgets/bottom_navigator.dart';
-import '../widgets/exit_dialog.dart';
-import '../widgets/tips_carousel.dart';
-import '../widgets/toast.dart';
+import '../../widgets/html_dialog.dart';
 
 class Home extends ConsumerStatefulWidget {
   const Home({super.key});
@@ -39,11 +49,26 @@ class _HomeState extends ConsumerState<Home> {
   List<Placemark>? placemarks;
   Widget mPage = const SizedBox();
   bool isAppLaunched = false;
+  String? url;
+  bool connected = false;
+
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  String _connectionStatus = 'Unknown';
+
+  Stream<ServiceStatus>? _locationStatusStream;
+  String _locationStatus = 'Unknown';
+
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) super.setState(fn);
+  }
 
   @override
   void initState() {
     super.initState();
-    //WidgetsBinding.instance.addObserver(this);
+    // WidgetsBinding.instance.addObserver(this);
+    _tips = loadEmergencyTips();
     Future(() => ref.watch(locationDbProvider.notifier).initialize());
     _geolocator = GeolocatorPlatform.instance;
     _geolocator.requestPermission().then((value) {
@@ -51,7 +76,22 @@ class _HomeState extends ConsumerState<Home> {
         setState(() {});
       }
     });
-    _tips = loadEmergencyTips();
+
+    _initConnectivity();
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+
+    _locationStatusStream = Geolocator.getServiceStatusStream();
+    _locationStatusStream?.listen((status) {
+      setState(() {
+        _locationStatus = _getStatusString(status);
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -63,6 +103,7 @@ class _HomeState extends ConsumerState<Home> {
     log('Loc: $_location');
     log('Pos: $_position');
     getPlacemarks(db);
+
     if (!isAppLaunched) {
       setState(() {
         isAppLaunched = true;
@@ -71,12 +112,21 @@ class _HomeState extends ConsumerState<Home> {
     } else {
       _geolocator.requestPermission();
     }
+
     final page = ref.watch(pageProvider.select((value) => value));
+
+    Future.delayed(Duration.zero, () {
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: AppColor.background));
+    });
+/*    getLocation((value) => context.toast(value))
+      ..onDone(() => setState(() {}))
+      ..onData((data) => context.toast(data));*/
+
     return WillPopScope(
       onWillPop: () async {
         bool isLastPage = page.isEmpty;
         if (isLastPage) {
-          return (await showAnimatedDialog(context))!;
+          return (await showExitDialog(context))!;
         } else {
           return true;
         }
@@ -96,13 +146,80 @@ class _HomeState extends ConsumerState<Home> {
                 ),
               ),
             ),
-            Toast("The location service on the device is disabled!", show: !isLocationReady),
+            Toast(_locationStatus /*_connectionStatus*/, show: !isLocationReady, top: 20),
+            Toast(_connectionStatus, show: !isLocationReady, top: 60),
+            /*SizedBox(
+              width: 36,
+              child: Image.network(url!, loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                if (loadingProgress == null) {
+                  return child;
+                } else {
+                  return CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
+                  );
+                }
+              }),
+            ),*/
           ]),
         ),
         bottomNavigationBar: const BottomNavigator(currentIndex: 0),
       ),
     );
   }
+
+  String _getStatusString(ServiceStatus status) {
+    switch (status) {
+      case ServiceStatus.enabled:
+        return 'Location Services Denied';
+      case ServiceStatus.disabled:
+        return 'Location Services Disabled';
+    }
+  }
+
+  Future<void> _initConnectivity() async {
+    ConnectivityResult result = ConnectivityResult.none;
+    try {
+      result = await _connectivity.checkConnectivity();
+    } catch (e) {
+      print(e.toString());
+    }
+    _updateConnectionStatus(result);
+  }
+
+  void _updateConnectionStatus(ConnectivityResult result) {
+    setState(() {
+      switch (result) {
+        case ConnectivityResult.wifi:
+          _connectionStatus = 'Connected to WiFi';
+          break;
+        case ConnectivityResult.mobile:
+          _connectionStatus = 'Connected to Mobile Network';
+          break;
+        case ConnectivityResult.none:
+          _connectionStatus = 'No Internet Connection';
+          break;
+        default:
+          _connectionStatus = 'Unknown';
+          break;
+      }
+    });
+  }
+
+/*  Future<Widget> showConnectivityMessage() async {
+    final String message = await checkConnectivityAndShowToast();
+    return Toast(_connectionStatus,, show: !isLocationReady, top: 20);
+  }
+
+  Future<String> checkConnectivityAndShowToast() async {
+    final bool isConnected = await connectivityCheck();
+    if (isConnected) {
+      // You are connected to the internet
+      return "The location service on the device is disabled!";
+    } else {
+      // No internet connectivity
+      return "No Internet connectivity";
+    }
+  }*/
 
   StreamBuilder<Position> buildStreamBuilder(Density dp) {
     return StreamBuilder<Position>(
@@ -158,7 +275,7 @@ class _HomeState extends ConsumerState<Home> {
         child: buildRow(context, _position, dp),
       ),
 
-      0.04.dpH(dp).spY,
+      0.08.dpH(dp).spY,
 
       // 2
       0.7.dpW(dp).spaceX(Text(
@@ -176,24 +293,68 @@ class _HomeState extends ConsumerState<Home> {
       0.05.dpH(dp).spY,
 
       // 4
-      AlertButton(
-        height: 190,
-        width: 185,
-        borderWidth: 3,
-        shadowWidth: 15,
-        iconSize: 45,
-        onPressed: () => launch(context, Constants.camera),
+      Stack(
+        children: [
+          Center(
+            child: Tooltip(
+              message: 'Alert for self',
+              child: AlertButton(
+                height: 180,
+                width: 176,
+                borderWidth: 3,
+                shadowWidth: 15,
+                iconSize: 50,
+                onPressed: () => launch(context, Constants.camera),
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 20),
+              child: Tooltip(
+                message: 'Alert for contacts',
+                child: AlertButton(
+                  height: 56,
+                  width: 55,
+                  borderWidth: 0,
+                  shadowWidth: 0,
+                  showSecondShadow: false,
+                  iconSize: 20,
+                  onPressed: () => signOut().then((value) => launch(context, Constants.authentication)) /*launch(context, Constants.subscription)*/,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       0.08.dpH(dp).spY,
 
       // 5
-      Text(
-        'Not sure what to do?',
-        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColor.title),
+      GestureDetector(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => const HTMLDialog(
+              htmlAsset1: 'assets/data/quickresponse_policies.html', // Path to your HTML asset file 1
+              htmlAsset2: 'assets/data/quickresponse_terms.html', // Path to your HTML asset file 2
+            ),
+          );
+        },
+        child: Text(
+          'Not sure what to do?',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColor.title),
+        ),
       ),
-
+      SizedBox(height: 0.03.dpH(dp)),
       // 6
-      Text('Pick the subject to chat', style: TextStyle(fontSize: 16, color: AppColor.text)),
+      GestureDetector(
+          onTap: () {
+            getProfileInfoFromSharedPreferences().then(
+              (profileInfo) => launch(context, Constants.chatsList, profileInfo.uid),
+            );
+          },
+          child: Text('Pick the subject to chat', style: TextStyle(fontSize: 16, color: AppColor.text))),
       0.03.dpH(dp).spY,
 
       // 7
@@ -201,7 +362,7 @@ class _HomeState extends ConsumerState<Home> {
         future: _tips,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError) {
+            if (snapshot.hasError || snapshot.data == null) {
               return const Center(
                 child: Text('Error loading tips'),
               );
@@ -209,7 +370,7 @@ class _HomeState extends ConsumerState<Home> {
             final tips = snapshot.data!;
             return SizedBox(
               width: double.infinity,
-              height: 140,
+              height: 150,
               child: TipSlider(tips: tips),
             );
           } else {
@@ -219,6 +380,7 @@ class _HomeState extends ConsumerState<Home> {
           }
         },
       ),
+
       /*.12.dpH(dp).spaceY(ListView.builder(
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
@@ -255,6 +417,12 @@ class _HomeState extends ConsumerState<Home> {
   Future<void> getPlacemarks(Database? db) async {
     if (_position != null) {
       placemarks = await GeocodingPlatform.instance.placemarkFromCoordinates(_position!.latitude, _position!.longitude);
+      getProfileInfoFromSharedPreferences().then(
+        (profileInfo) => saveUserLocationToFirestore(
+          profileInfo.uid!,
+          _position!,
+        ),
+      );
       await LocationDB(db).updateLocation(_position!, placemarks!);
     }
   }
@@ -263,20 +431,15 @@ class _HomeState extends ConsumerState<Home> {
   Row buildRow(BuildContext context, Position? position, Density dp) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Row(children: [
-        const Image(
-          image: ExactAssetImage(Constants.tech),
-          height: 45,
-          width: 45,
-        ),
-        Column(children: [
-          Text(
-            'Hi Susan!',
-            style: TextStyle(fontSize: 15, color: AppColor.text),
-          ),
-          Text(
-            'Complete profile',
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColor.action),
-          ),
+        buildImage(),
+        const SizedBox(width: 5),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Hi Susan!', style: TextStyle(fontSize: 15, color: AppColor.text)),
+          Row(children: [
+            Text('Complete profile', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColor.action)),
+            const SizedBox(width: 5),
+            Icon(CupertinoIcons.check_mark_circled, size: 12, color: AppColor.action),
+          ]),
         ])
       ]),
       GestureDetector(
@@ -315,9 +478,35 @@ class _HomeState extends ConsumerState<Home> {
               style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColor.action),
             ),
           ]),
-          Icon(Icons.location_on_rounded, color: AppColor.action),
+          Icon(CupertinoIcons.location_solid, color: AppColor.action),
         ]),
       ),
     ]);
   }
+
+  Widget buildImage() {
+    return SizedBox(
+      width: 32,
+      height: 32,
+      child: FutureBuilder<ProfileInfo?>(
+        future: getProfileInfoFromSharedPreferences(),
+        builder: (context, snapshot) {
+          final user = snapshot.data;
+          if (user != null && user.photoURL != null) {
+            return ClipOval(
+              child: CachedNetworkImage(
+                imageUrl: user.photoURL!,
+                placeholder: (context, url) => buildIcon,
+                errorWidget: (context, url, error) => Icon(CupertinoIcons.exclamationmark_triangle, color: AppColor.action),
+              ),
+            );
+          } else {
+            return buildIcon;
+          }
+        },
+      ),
+    );
+  }
+
+  Widget get buildIcon => const SizedBox();
 }
