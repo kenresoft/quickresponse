@@ -8,7 +8,7 @@ import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
 
-import '../utils/consumable_store.dart';
+import '../../utils/consumable_store.dart';
 
 class SubscriptionPage extends StatefulWidget {
   const SubscriptionPage({super.key});
