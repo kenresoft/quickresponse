@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 
-import '../data/constants/constants.dart';
-import '../main.dart';
+import '../../data/constants/constants.dart';
+import '../../main.dart';
 
 class Authentication extends StatefulWidget {
   const Authentication({super.key});
