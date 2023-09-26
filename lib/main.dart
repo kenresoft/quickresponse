@@ -159,8 +159,8 @@ final GoRouter _router = GoRouter(
     }),
 
     _route(Constants.chat, (context, state) {
-      final record = state.extra as (String, String, List<String>); // Retrieve the contact data from extra
-      return ChatScreen(chatId: record.$1, userId: record.$2, selectedContacts: record.$3); // Pass the contact data to EditContactPage
+      final record = state.extra as (String, String, String); // Retrieve the contact data from extra
+      return ChatScreen(chatId: record.$1, userId: record.$2, receiverId: record.$3); // Pass the contact data to EditContactPage
     }),
 
     _route(Constants.chatsList, (context, state) {
