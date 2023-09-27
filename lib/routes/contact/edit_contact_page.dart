@@ -5,13 +5,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
-import '../data/constants/colors.dart';
-import '../data/constants/constants.dart';
-import '../data/model/contact.dart';
-import '../main.dart';
-import '../utils/file_helper.dart';
-import '../utils/wrapper.dart';
-import '../widgets/appbar.dart';
+import '../../data/constants/colors.dart';
+import '../../data/constants/constants.dart';
+import '../../data/model/contact.dart';
+import '../../main.dart';
+import '../../services/firebase/firebase_contact.dart';
+import '../../services/firebase/firebase_profile.dart';
+import '../../utils/file_helper.dart';
+import '../../utils/wrapper.dart';
+import '../../widgets/appbar.dart';
 
 // ... (other imports and constants)
 
@@ -190,7 +192,7 @@ class _EditContactPageState extends State<EditContactPage> {
     );
   }
 
-  Future<void> saveEditedContact() async {
+  void saveEditedContact() {
     final String editedName = nameController.text;
     final String editedRelationship = relationshipController.text;
     final String editedPhone = phoneController.text;
@@ -208,10 +210,16 @@ class _EditContactPageState extends State<EditContactPage> {
       imageFile: imageFile, // Pass the selected image to the ContactModel
     );
 
-    // Update the contact in SharedPreferences
-    // await updateContactInSharedPreferences(updatedContact);
     updateEditedContact(updatedContact);
-
+    getProfileInfoFromSharedPreferences().then(
+      (profileInfo) => updateFirebaseContact(
+        userId: profileInfo.uid!,
+        name: updatedContact.name!,
+        phoneNumber: updatedContact.phone!,
+        relationship: updatedContact.relationship!,
+        age: updatedContact.age.toString(),
+      ),
+    );
     // After saving, you can use Navigator.pop() to return to the previous screen,
     // passing the updated contact as a result.
     //Navigator.pop(context, updatedContact);
