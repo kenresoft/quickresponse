@@ -41,6 +41,7 @@ class Home extends ConsumerStatefulWidget {
 }
 
 class _HomeState extends ConsumerState<Home> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late Future<List<EmergencyTip>> _tips;
   late GeolocatorPlatform _geolocator;
   Position? _position;
@@ -71,11 +72,11 @@ class _HomeState extends ConsumerState<Home> {
     _tips = loadEmergencyTips();
     Future(() => ref.watch(locationDbProvider.notifier).initialize());
     _geolocator = GeolocatorPlatform.instance;
-    _geolocator.requestPermission().then((value) {
+/*    _geolocator.requestPermission().then((value) {
       if (value == LocationPermission.always || value == LocationPermission.whileInUse) {
         setState(() {});
       }
-    });
+    });*/
 
     _initConnectivity();
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
@@ -115,12 +116,10 @@ class _HomeState extends ConsumerState<Home> {
 
     final page = ref.watch(pageProvider.select((value) => value));
 
-    Future.delayed(Duration.zero, () {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: AppColor.background));
-    });
-/*    getLocation((value) => context.toast(value))
-      ..onDone(() => setState(() {}))
-      ..onData((data) => context.toast(data));*/
+    // Show the bottom sheet when location is not ready
+/*    if (!isLocationReady) {
+      _showBottomSheet(context);
+    }*/
 
     return WillPopScope(
       onWillPop: () async {
@@ -132,6 +131,7 @@ class _HomeState extends ConsumerState<Home> {
         }
       },
       child: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: AppColor.background,
         appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.background),
         body: SingleChildScrollView(
@@ -146,20 +146,6 @@ class _HomeState extends ConsumerState<Home> {
                 ),
               ),
             ),
-            Toast(_locationStatus /*_connectionStatus*/, show: !isLocationReady, top: 20),
-            Toast(_connectionStatus, show: !isLocationReady, top: 60),
-            /*SizedBox(
-              width: 36,
-              child: Image.network(url!, loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                if (loadingProgress == null) {
-                  return child;
-                } else {
-                  return CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
-                  );
-                }
-              }),
-            ),*/
           ]),
         ),
         bottomNavigationBar: const BottomNavigator(currentIndex: 0),
@@ -167,10 +153,21 @@ class _HomeState extends ConsumerState<Home> {
     );
   }
 
+/*  void _showBottomSheet(BuildContext context) {
+    _scaffoldKey.currentState?.showBottomSheet(
+      (context) {
+        return BottomSheetContent(
+          locationStatus: _locationStatus,
+          connectionStatus: _connectionStatus,
+        );
+      },
+    );
+  }*/
+
   String _getStatusString(ServiceStatus status) {
     switch (status) {
       case ServiceStatus.enabled:
-        return 'Location Services Denied';
+        return 'Location Services Enabled';
       case ServiceStatus.disabled:
         return 'Location Services Disabled';
     }
@@ -275,7 +272,7 @@ class _HomeState extends ConsumerState<Home> {
         child: buildRow(context, _position, dp),
       ),
 
-      0.08.dpH(dp).spY,
+      0.03.dpH(dp).spY,
 
       // 2
       0.7.dpW(dp).spaceX(Text(
@@ -509,4 +506,31 @@ class _HomeState extends ConsumerState<Home> {
   }
 
   Widget get buildIcon => const SizedBox();
+}
+
+class BottomSheetContent extends StatefulWidget {
+  final String locationStatus;
+  final String connectionStatus;
+
+  const BottomSheetContent({
+    super.key,
+    required this.locationStatus,
+    required this.connectionStatus,
+  });
+
+  @override
+  State<BottomSheetContent> createState() => _BottomSheetContentState();
+}
+
+class _BottomSheetContentState extends State<BottomSheetContent> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Toast(widget.locationStatus, show: true, top: 20),
+        Toast(widget.connectionStatus, show: true, top: 60),
+      ],
+    );
+  }
 }
