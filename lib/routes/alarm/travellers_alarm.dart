@@ -139,7 +139,7 @@ class _TravellersAlarmState extends ConsumerState<TravellersAlarm> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: _showTimePicker,
+                  onPressed: () => launch(context, Constants.media) /*_showTimePicker*/,
                   child: const Text('Select Time'),
                 ),
                 ElevatedButton(
@@ -202,7 +202,8 @@ class _TravellersAlarmState extends ConsumerState<TravellersAlarm> {
                                               padding: const EdgeInsets.all(8.0),
                                               child: ListTile(
                                                 title: Text(notificationSchedule.title ?? ''),
-                                                subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                                                subtitle: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text(notificationSchedule.message ?? ''),
                                                     const SizedBox(height: 3),
