@@ -10,12 +10,14 @@ import 'package:quickresponse/main.dart';
 import 'package:quickresponse/utils/extensions.dart';
 import 'package:quickresponse/widgets/appbar.dart';
 
-import '../data/constants/colors.dart';
-import '../providers/page_provider.dart';
-import '../utils/density.dart';
-import '../utils/file_helper.dart';
-import '../utils/wrapper.dart';
-import '../widgets/bottom_navigator.dart';
+import '../../data/constants/colors.dart';
+import '../../providers/page_provider.dart';
+import '../../services/firebase/firebase_contact.dart';
+import '../../services/firebase/firebase_profile.dart';
+import '../../utils/density.dart';
+import '../../utils/file_helper.dart';
+import '../../utils/wrapper.dart';
+import '../../widgets/bottom_navigator.dart';
 
 class Contacts extends ConsumerStatefulWidget {
   const Contacts({super.key});
@@ -117,6 +119,12 @@ class _ContactsState extends ConsumerState<Contacts> {
       _filteredContacts.removeAt(index);
       _kContacts = _filteredContacts;
       updateContact(contactToDelete);
+      getProfileInfoFromSharedPreferences().then(
+        (profileInfo) => deleteFirebaseContact(
+          userId: profileInfo.uid!,
+          phoneNumber: contactToDelete.phone!,
+        ),
+      );
     });
   }
 
