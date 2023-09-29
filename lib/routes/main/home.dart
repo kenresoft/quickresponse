@@ -6,7 +6,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -18,6 +17,7 @@ import 'package:quickresponse/data/model/profile_info.dart';
 import 'package:quickresponse/main.dart';
 import 'package:quickresponse/providers/location_providers.dart';
 import 'package:quickresponse/providers/page_provider.dart';
+import 'package:quickresponse/routes/authentication/user_profile.dart';
 import 'package:quickresponse/services/firebase/firebase_location.dart';
 import 'package:quickresponse/services/firebase/firebase_profile.dart';
 import 'package:quickresponse/utils/density.dart';
@@ -427,18 +427,23 @@ class _HomeState extends ConsumerState<Home> {
   /// TOP ROW
   Row buildRow(BuildContext context, Position? position, Density dp) {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Row(children: [
-        buildImage(),
-        const SizedBox(width: 5),
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Hi Susan!', style: TextStyle(fontSize: 15, color: AppColor.text)),
-          Row(children: [
-            Text('Complete profile', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColor.action)),
-            const SizedBox(width: 5),
-            Icon(CupertinoIcons.check_mark_circled, size: 12, color: AppColor.action),
-          ]),
-        ])
-      ]),
+      GestureDetector(
+        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+          builder: (BuildContext context) => const UserProfilePage(),
+        )),
+        child: Row(children: [
+          buildImage(),
+          const SizedBox(width: 5),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Hi Susan!', style: TextStyle(fontSize: 15, color: AppColor.text)),
+            Row(children: [
+              Text('Complete profile', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColor.action)),
+              const SizedBox(width: 5),
+              Icon(CupertinoIcons.check_mark_circled, size: 12, color: AppColor.action),
+            ]),
+          ])
+        ]),
+      ),
       GestureDetector(
         onTap: () {
           isLocationReady
