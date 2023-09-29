@@ -30,6 +30,8 @@ class _DeviceAuthenticationState extends State<DeviceAuthentication> {
   double _progressValue = 0.0;
   bool _showProgress = false;
 
+  bool biometricOnly = true;
+
   void _startProgress() {
     setState(() {
       _showProgress = true;
@@ -115,18 +117,14 @@ class _DeviceAuthenticationState extends State<DeviceAuthentication> {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: Text('Error checking biometrics availability: $e'),
-            actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
+          return AlertDialog(title: const Text('Error'), content: Text('Error checking biometrics availability: $e'), actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ]);
         },
       );
     });
@@ -146,14 +144,8 @@ class _DeviceAuthenticationState extends State<DeviceAuthentication> {
     try {
       auth
           .authenticate(
-        localizedReason: ' ', // NOTE: Cannot be null or Empty else will throw an error
-        options: const AuthenticationOptions(
-          useErrorDialogs: false,
-          stickyAuth: true,
-          sensitiveTransaction: true,
-          biometricOnly: true,
-        ),
-      )
+              localizedReason: ' ', // NOTE: Cannot be null or Empty else will throw an error
+              options: AuthenticationOptions(useErrorDialogs: false, stickyAuth: true, sensitiveTransaction: true, biometricOnly: biometricOnly))
           .then((authenticated) {
         if (authenticated) {
           // Authentication successful, navigate to the main app screen
