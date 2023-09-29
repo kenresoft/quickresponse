@@ -510,7 +510,7 @@ class _HomeState extends ConsumerState<Home> {
     );
   }
 
-  Widget get buildIcon => const SizedBox();
+  Widget get buildIcon => const Icon(CupertinoIcons.info);
 }
 
 class BottomSheetContent extends StatefulWidget {
