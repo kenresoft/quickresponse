@@ -28,6 +28,7 @@ class Constants {
   static const String chatsList = '/chatsList';
   static const String newChatsList = '/newChatsList';
   static const String userSearchScreen = '/userSearchScreen';
+  static const String media = '/media';
   static const String error = '/error';
 
   //Images route
