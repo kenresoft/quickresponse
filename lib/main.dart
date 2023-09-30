@@ -10,7 +10,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fontresoft/fontresoft.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickresponse/camera_screen.dart';
-import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/providers/providers.dart';
 import 'package:quickresponse/routes/alarm/alarm.dart';
 import 'package:quickresponse/routes/alarm/reminder_page.dart';
@@ -32,16 +31,19 @@ import 'package:quickresponse/routes/main/subscription_page.dart';
 import 'package:quickresponse/routes/map/location_map.dart';
 import 'package:quickresponse/routes/sos/custom_messages.dart';
 import 'package:quickresponse/routes/sos/emergency_history.dart';
+import 'package:quickresponse/routes/sos/media_screen.dart';
 import 'package:quickresponse/services/notification_service.dart';
 import 'package:quickresponse/widgets/notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'data/constants/constants.dart';
+import 'data/constants/styles.dart';
 import 'data/db/database_client.dart';
 import 'data/model/contact.dart';
 import 'firebase_options.dart';
 
 final notificationService = NotificationService();
+final providerContainer = ProviderContainer();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,9 +77,11 @@ void main() async {
   DatabaseClient();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-      statusBarColor: AppColor.background,
-      systemNavigationBarColor: AppColor.text,
-      systemNavigationBarDividerColor: AppColor.divider,
+      statusBarColor: appColor.background,
+      statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: appColor.text,
+      systemNavigationBarDividerColor: appColor.divider,
     ),
   );
   SystemChrome.setPreferredOrientations([
@@ -97,7 +101,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
+  void setState(VoidCallback fn) {
+    if (mounted) super.setState(fn);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final dp = Density.init(context);
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
         var state = ref.watch(themeProvider.select((value) => value));
@@ -107,26 +117,35 @@ class _MyAppState extends State<MyApp> {
           title: Constants.appName,
           themeMode: condition(state, ThemeMode.light, ThemeMode.dark),
           theme: ThemeData(
-            useMaterial3: true,
-            brightness: Brightness.light,
-            colorSchemeSeed: Colors.redAccent,
-            fontFamily: FontResoft.sourceSansPro,
-            package: FontResoft.package,
-            highlightColor: Colors.transparent,
-            splashColor: Colors.transparent,
-            typography: Typography.material2021(englishLike: Typography.dense2021),
-            textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.black87)),
-          ),
+              useMaterial3: true,
+              brightness: Brightness.light,
+              colorSchemeSeed: Colors.redAccent,
+              fontFamily: FontResoft.sourceSansPro,
+              package: FontResoft.package,
+              highlightColor: Colors.transparent,
+              splashColor: Colors.transparent,
+              typography: Typography.material2021(englishLike: Typography.dense2021),
+              textTheme: TextTheme(bodyMedium: TextStyle(color: appColor.title_2)),
+              cardColor: Colors.white,
+              dialogBackgroundColor: Colors.white,
+              dividerColor: appColor.divider,
+              //scaffoldBackgroundColor: appColor.background,
+              //bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor: appColor.white),
+              appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent)),
           darkTheme: ThemeData(
-            useMaterial3: true,
-            brightness: Brightness.dark,
-            colorSchemeSeed: Colors.redAccent,
-            fontFamily: FontResoft.inter,
-            package: FontResoft.package,
-            highlightColor: Colors.transparent,
-            splashColor: Colors.transparent,
-            textTheme: const TextTheme(bodyMedium: TextStyle()),
-          ),
+              useMaterial3: true,
+              brightness: Brightness.dark,
+              colorSchemeSeed: Colors.redAccent,
+              fontFamily: FontResoft.sourceSansPro,
+              package: FontResoft.package,
+              highlightColor: Colors.transparent,
+              splashColor: Colors.transparent,
+              textTheme: TextTheme(bodyMedium: TextStyle(color: appColor.title_2)),
+              cardColor: appColor.black,
+              dialogBackgroundColor: appColor.black,
+              dividerColor: appColor.divider,
+              //scaffoldBackgroundColor: appColor.backgroundDark,
+              appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent)),
           routeInformationProvider: _router.routeInformationProvider,
           routeInformationParser: _router.routeInformationParser,
           routerDelegate: _router.routerDelegate,
@@ -142,6 +161,13 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
+  /*redirect: (context, state) {
+    bool isAuthenticated = isSignedIn();
+    if (!isAuthenticated) {
+      return Constants.authentication;
+    }
+    return null;
+  },*/
   routes: <GoRoute>[
     route(Constants.root, const DeviceAuthentication()),
     route(Constants.home, const Home()),
@@ -190,6 +216,7 @@ final GoRouter _router = GoRouter(
     route(Constants.signIn, const SignIn()),
     route(Constants.reminderPage, const ReminderPage()),
     route(Constants.travellersAlarm, const TravellersAlarm()),
+    route(Constants.media, const MediaScreen()),
 
     //route(Constants.mapScreen, const MapScreen()),
     route(Constants.error, const ErrorPage()),
@@ -245,8 +272,9 @@ finish(BuildContext context) => GoRouter.of(context).pop();
 
 FutureOr appCallback(void value) async {
   runApp(
-    const ProviderScope(
-      child: MyApp(),
+    ProviderScope(
+      parent: providerContainer,
+      child: const MyApp(),
     ),
   );
 }
