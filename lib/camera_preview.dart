@@ -9,6 +9,8 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quickresponse/routes/sos/call.dart';
+import 'package:quickresponse/services/firebase/firebase_media.dart';
+import 'package:quickresponse/services/firebase/firebase_profile.dart';
 import 'package:quickresponse/utils/file_helper.dart';
 import 'package:record/record.dart';
 
@@ -29,6 +31,11 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
   bool _isRecordingVideo = false;
   bool _isRecordingAudio = false;
   String? _audioPath;
+
+  StreamController<int> _timerStreamController = StreamController<int>();
+  late Timer _recordingTimer;
+  int _elapsedSeconds = 0;
+
 
   @override
   void initState() {
@@ -73,6 +80,11 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
   }
 
   @override
+  void setState(VoidCallback fn) {
+    if (mounted) super.setState(fn);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder<void>(
@@ -97,7 +109,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
                     isCapturingImage: _isCapturingImage,
                     isRecordingVideo: _isRecordingVideo,
                     isRecordingAudio: _isRecordingAudio,
-                  ),
+                  ), videoTimer: _getRemainingTime(),
                 ),
               ),
             );
@@ -110,11 +122,20 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
     );
   }
 
+  Timer? _videoTimer;
+
   void _startRecording() async {
     if (!_controller.value.isRecordingVideo) {
       try {
         _controller.startVideoRecording();
-        setState(() => _isRecordingVideo = true);
+        setState(() {
+          _isRecordingVideo = true;
+        });
+
+        // Start a timer for 10 seconds
+        _videoTimer = Timer(const Duration(seconds: 10), () {
+          _stopRecording();
+        });
       } catch (e) {
         if (kDebugMode) {
           print(e);
@@ -128,22 +149,29 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
   void _stopRecording() async {
     if (_controller.value.isRecordingVideo) {
       try {
+        // Cancel the timer if it's active
+        _videoTimer?.cancel();
+
         // Ensure that the device's camera gallery directory exists
         final Directory? galleryDir = await getExternalStorageDirectory();
         final String? storagePath = await galleryDir?.mkdir("videos");
 
         // Create a unique filename for the image based on the current timestamp
         final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
-        final String imageFileName = 'VID_$timestamp.mp4';
+        final String videoFileName = 'VID_$timestamp.mp4';
 
         // Construct the complete image path
-        final String videoPath = path.join(storagePath!, imageFileName);
+        final String videoPath = path.join(storagePath!, videoFileName);
 
         XFile video = await _controller.stopVideoRecording();
-        setState(() => _isRecordingVideo = false);
+
         // Copy the picture to the desired path
         final File videoFile = File(video.path);
         await videoFile.copy(videoPath);
+
+        setState(() => _isRecordingVideo = false);
+
+        await upload(videoFile, videoFileName, 'videos');
       } catch (e) {
         print(e);
       }
@@ -155,7 +183,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
       try {
         // Ensure that the device's camera gallery directory exists
         final Directory? directory = await getExternalStorageDirectory();
-        final String storagePath = await directory!.mkdir("pictures");
+        final String storagePath = await directory!.mkdir("images");
 
         // Create a unique filename for the image based on the current timestamp
         final String timestamp = DateTime.now().millisecondsSinceEpoch.toString();
@@ -171,8 +199,10 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
         // Copy the picture to the desired path
         final File pictureFile = File(picture.path);
         await pictureFile.copy(imagePath);
-        setState(() => _isRecordingVideo = false);
-        // Do something with the picture (e.g., show preview, save to database, etc.)
+
+        setState(() => _isCapturingImage = false);
+
+        await upload(pictureFile, imageFileName, 'images');
       } catch (e) {
         print('Error taking picture: $e');
       }
@@ -198,6 +228,8 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
           _isRecordingAudio = true;
           _audioPath = audioPath;
         });
+
+        await upload(File(audioPath), audioFileName, 'audios');
       } catch (e) {
         print(e);
       }
@@ -227,6 +259,22 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
     XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
     // Do something with the picked image (e.g., show preview, save, etc.)
   }
+
+  Future<void> upload(File file, String fileName, String folder) async {
+    var profile = await getProfileInfoFromSharedPreferences();
+    String url = await uploadFileToStorage(file, "media/${profile.uid}/$folder/", fileName);
+    await addMediaMetadataToFirestore("${profile.uid}", folder, url, fileName);
+  }
+
+  String _getRemainingTime() {
+    if (_videoTimer != null && _videoTimer!.isActive) {
+      final remainingSeconds = _videoTimer!.tick;
+      return remainingSeconds.toString();
+    } else {
+      return '0';
+    }
+  }
+
 }
 
 class CallProperties {
