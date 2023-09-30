@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quickresponse/utils/extensions.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import '../utils/density.dart';
+import '../data/constants/styles.dart';
+import '../providers/providers.dart';
 
 enum PageTitle { privacyPolicy, termsAndConditions }
 
-class HTMLDialog extends StatefulWidget {
+class HTMLDialog extends ConsumerStatefulWidget {
   final String htmlAsset1;
   final String htmlAsset2;
 
@@ -17,10 +19,10 @@ class HTMLDialog extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _HTMLDialogState createState() => _HTMLDialogState();
+  ConsumerState<HTMLDialog> createState() => _HTMLDialogState();
 }
 
-class _HTMLDialogState extends State<HTMLDialog> {
+class _HTMLDialogState extends ConsumerState<HTMLDialog> {
   late WebViewController _controller;
   bool showHtml1 = true;
   PageTitle dialogTitle = PageTitle.privacyPolicy; // Initialize the title to Privacy Policy
@@ -29,37 +31,17 @@ class _HTMLDialogState extends State<HTMLDialog> {
   void initState() {
     super.initState();
     _controller = WebViewController()
-      ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
-          onProgress: (int progress) {
-            // Update loading bar.
-          },
+          onProgress: (int progress) {},
           onPageStarted: (String url) {},
           onPageFinished: (String url) {},
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: (NavigationRequest request) {
-            /*if (request.url.startsWith('https://')) {
-              return NavigationDecision.prevent;
-            }*/
             return NavigationDecision.prevent;
           },
-          onUrlChange: (a) {
-            _controller.reload();
-          },
         ),
-      )
-      ..clearCache();
-    /*..createHandler(WebViewHandler(
-        allowTextSelection: false, // Prevent text selection
-        customScrollBar: CustomScrollBar( // Customize the scrollbar
-          backgroundColor: Colors.grey[200],
-          width: 6.0,
-          isAlwaysShown: true,
-          radius: Radius.circular(3),
-          color: Colors.blue,
-        ),
-      ));*/
+      );
     loadHtml(widget.htmlAsset1);
   }
 
@@ -89,14 +71,16 @@ class _HTMLDialogState extends State<HTMLDialog> {
   @override
   Widget build(BuildContext context) {
     Density dp = Density.init(context);
+    final theme = ref.watch(themeProvider.select((value) => value));
     return WillPopScope(
       onWillPop: () async {
         // Prevent the dialog from closing on outside click
         return false;
       },
       child: Dialog(
-        // Use Dialog instead of AlertDialog
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24), // Adjust the horizontal padding
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: theme ? appColor.background : appColor.backgroundDark,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: SingleChildScrollView(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -107,7 +91,12 @@ class _HTMLDialogState extends State<HTMLDialog> {
             Container(
               height: 0.7.dpH(dp),
               margin: const EdgeInsets.symmetric(horizontal: 8),
-              child: WebViewWidget(controller: _controller),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: WebViewWidget(
+                  controller: _controller..setBackgroundColor(theme ? appColor.white : appColor.black),
+                ),
+              ),
             ),
             const SizedBox(height: 5),
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
