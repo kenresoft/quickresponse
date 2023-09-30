@@ -3,17 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quickresponse/services/firebase/firebase_sos.dart';
 import 'package:quickresponse/utils/extensions.dart';
-
-import '../../data/constants/colors.dart';
 import '../../data/constants/constants.dart';
+import '../../data/constants/styles.dart';
 import '../../data/model/notification_schedule.dart';
 import '../../main.dart';
 import '../../providers/page_provider.dart';
+import '../../providers/providers.dart';
 import '../../services/firebase/firebase_location.dart';
 import '../../services/firebase/firebase_notification_schedule.dart';
 import '../../services/firebase/firebase_profile.dart';
 import '../../services/notification_service.dart';
-import '../../utils/density.dart';
 import '../../utils/sos_group.dart';
 import '../../widgets/appbar.dart';
 
@@ -105,6 +104,7 @@ class _TravellersAlarmState extends ConsumerState<TravellersAlarm> {
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
+    final theme = ref.watch(themeProvider.select((value) => value));
     final page = ref.watch(pageProvider.select((value) => value));
 
     return WillPopScope(
@@ -121,9 +121,9 @@ class _TravellersAlarmState extends ConsumerState<TravellersAlarm> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColor.background,
+        backgroundColor: theme ? appColor.background : appColor.backgroundDark,
         appBar: appBar(
-          leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor.navIconSelected),
+          leading: Icon(CupertinoIcons.increase_quotelevel, color: appColor.navIconSelected),
           title: const Text('Settings', style: TextStyle(fontSize: 20)),
           actionTitle: '',
         ),
@@ -196,7 +196,7 @@ class _TravellersAlarmState extends ConsumerState<TravellersAlarm> {
                                           // Display individual SOS history items for the date
                                           return Card(
                                             margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
-                                            color: AppColor.white,
+                                            color: appColor.white,
                                             elevation: 0,
                                             child: Padding(
                                               padding: const EdgeInsets.all(8.0),
