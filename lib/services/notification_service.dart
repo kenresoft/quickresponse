@@ -4,7 +4,7 @@ import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:quickresponse/utils/extensions.dart';
 
 import '../data/model/notification_schedule.dart';
-import '../widgets/notifications.dart';
+import '../widgets/display/notifications.dart';
 import 'firebase/firebase_notification_schedule.dart';
 import 'firebase/firebase_profile.dart';
 
@@ -19,11 +19,12 @@ class NotificationService {
   int consecutiveAlarms = 1;
   bool isAlarmActive = false;
 
-  void scheduleNotificationWithTimer({
+  void scheduleNotificationBatch({
     required DateTime selectedDateTime,
     required void Function(NotificationSchedule schedule, int count) onTimerCallback,
     String? title,
     String? body,
+    int batchSize = 10, // Adjust the batch size as needed
   }) {
     int intervalInSeconds = 10;
     int notificationIdPrefix = 100;
@@ -34,69 +35,88 @@ class NotificationService {
     totalAlarms.log;
     cancelExistingSchedules();
 
-    // Schedule the periodic alarms with unique notification IDs
-    for (int i = 1; i <= totalAlarms; i++) {
-      final int notificationId = notificationIdPrefix + i; // Unique notification ID
-      final DateTime scheduledTime = DateTime.now().add(Duration(seconds: i * intervalInSeconds));
+    for (int batchIndex = 0; batchIndex < totalAlarms; batchIndex += batchSize) {
+      final int endIndex = batchIndex + batchSize;
+      final int currentBatchSize = endIndex <= totalAlarms ? batchSize : totalAlarms - batchIndex;
 
-      // Check if it's the last alarm and set it to the exact selected time
-      if (i == totalAlarms) {
-        scheduleNotification(scheduledTime: selectedDateTime.copyWith(second: 00), notificationId: notificationId, title: title, body: body);
-        getProfileInfoFromSharedPreferences().then(
-          (profileInfo) => addFirebaseNotificationSchedule(
-            userId: profileInfo.uid!,
-            time: selectedDateTime.copyWith(second: 00).toString(),
-            recipient: notificationId.toString(),
-            title: title ?? '',
-            message: body ?? '',
-          ),
-        );
-        //onScheduleCallback(NotificationSchedule(time: selectedDateTime.copyWith(second: 00).toString(), recipient: notificationId.toString()));
-      } else {
-        scheduleNotification(scheduledTime: scheduledTime, notificationId: notificationId, title: title, body: body);
-        getProfileInfoFromSharedPreferences().then(
-          (profileInfo) => addFirebaseNotificationSchedule(
-            userId: profileInfo.uid!,
-            time: scheduledTime.toString(),
-            recipient: notificationId.toString(),
-            title: title ?? '',
-            message: body ?? '',
-          ),
-        );
-        //onScheduleCallback(NotificationSchedule(time: scheduledTime.toString(), recipient: notificationId.toString()));
+      final List<int> notificationIds = [];
+      final List<DateTime> scheduledTimes = [];
+
+      for (int i = batchIndex; i < batchIndex + currentBatchSize; i++) {
+        final int notificationId = notificationIdPrefix + i + 1; // Unique notification ID
+        final DateTime scheduledTime = DateTime.now().add(Duration(seconds: (i + 1) * intervalInSeconds));
+
+        notificationIds.add(notificationId);
+        scheduledTimes.add(scheduledTime);
       }
 
-      // Start the alarm for this notification
-      //startAlarm();
+      scheduleNotifications(
+        notificationIds: notificationIds,
+        scheduledTimes: scheduledTimes,
+        title: title,
+        body: body,
+      );
 
-      // Schedule a timer for stopping the alarm and canceling this specific notification after 60 seconds
-      final timer = Timer(Duration(seconds: (i * intervalInSeconds) + intervalInSeconds), () {
-        // Stop the alarm for this notification
+      // Schedule a timer for stopping the alarm and canceling this specific batch after 60 seconds
+      final timer = Timer(Duration(seconds: (batchIndex + currentBatchSize) * intervalInSeconds), () {
+        // Stop the alarm for this batch
         stopAlarm();
 
-        flutterLocalNotificationsPlugin.cancel(notificationId);
-        if (i == totalAlarms) {
-          getProfileInfoFromSharedPreferences().then(
-            (profileInfo) => deleteFirebaseNotificationSchedule(userId: profileInfo.uid!, time: selectedDateTime.copyWith(second: 00).toString()),
-          );
-        } else {
-          getProfileInfoFromSharedPreferences().then(
-            (profileInfo) => deleteFirebaseNotificationSchedule(userId: profileInfo.uid!, time: scheduledTime.toString()),
-          );
-        }
+        // Cancel the notifications for this batch
+        cancelNotifications(notificationIds);
+
+        // Remove the timer from the list
+        _timers.remove(batchIndex);
+
         consecutiveAlarms++;
 
         if (consecutiveAlarms >= 3) {
-          onTimerCallback(NotificationSchedule(recipient: notificationId.toString()), consecutiveAlarms);
+          onTimerCallback(NotificationSchedule(), consecutiveAlarms);
           consecutiveAlarms.log;
         }
-        // Remove the timer from the list
-        _timers.remove(notificationId);
-        consecutiveAlarms.log;
       });
 
       // Store the timer
-      _timers[notificationId] = timer;
+      _timers[batchIndex] = timer;
+    }
+  }
+
+  // Schedule notifications for a batch of notification IDs and scheduled times
+  void scheduleNotifications({
+    required List<int> notificationIds,
+    required List<DateTime> scheduledTimes,
+    String? title,
+    String? body,
+  }) {
+    for (int i = 0; i < notificationIds.length; i++) {
+      final int notificationId = notificationIds[i];
+      final DateTime scheduledTime = scheduledTimes[i];
+
+      scheduleNotification(
+        scheduledTime: scheduledTime,
+        notificationId: notificationId,
+        title: title,
+        body: body,
+      );
+
+      getProfileInfoFromSharedPreferences().then(
+            (profileInfo) => addFirebaseNotificationSchedule(
+          userId: profileInfo.uid!,
+          time: scheduledTime.toString(),
+          recipient: notificationId.toString(),
+          title: title ?? '',
+          message: body ?? '',
+        ),
+      );
+    }
+  }
+
+  void cancelNotifications(List<int> notificationIds) {
+    for (int notificationId in notificationIds) {
+      flutterLocalNotificationsPlugin.cancel(notificationId);
+      getProfileInfoFromSharedPreferences().then(
+            (profileInfo) => deleteFirebaseNotificationSchedule(userId: profileInfo.uid!, time: 'scheduledTime.toString()'),
+      );
     }
   }
 
@@ -134,7 +154,7 @@ class NotificationService {
     flutterLocalNotificationsPlugin.cancelAll();
     cancelAllTimers();
     getProfileInfoFromSharedPreferences().then(
-      (profileInfo) => deleteAllFirebaseNotificationSchedule(userId: profileInfo.uid!),
+          (profileInfo) => deleteAllFirebaseNotificationSchedule(userId: profileInfo.uid!),
     );
   }
 
