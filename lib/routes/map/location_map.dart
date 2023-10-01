@@ -10,15 +10,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 //import 'package:open_route_service/open_route_service.dart';
-import 'package:quickresponse/data/constants/colors.dart';
+
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/model/pin_pill_info.dart';
 import 'package:quickresponse/providers/location_providers.dart';
-import 'package:quickresponse/utils/density.dart';
 import 'package:quickresponse/utils/extensions.dart';
-import 'package:quickresponse/widgets/map_pin_pill.dart';
+import 'package:quickresponse/widgets/map/map_pin_pill.dart';
+
+import '../../data/constants/styles.dart';
 
 const double CAMERA_ZOOM = 16;
 const double CAMERA_TILT = 80;
@@ -155,7 +155,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
                     width: 0.30.dpW(dp),
                     height: 35,
                     child: MaterialButton(
-                      color: AppColor.alert_1.withOpacity(0.7),
+                      color: appColor.alert_1.withOpacity(0.7),
                       padding: const EdgeInsets.all(10),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
                       onPressed: () async {
@@ -163,8 +163,8 @@ class _LocationMapState extends ConsumerState<LocationMap> {
                         controller.animateCamera(CameraUpdate.newCameraPosition(_destination));
                       },
                       child: Row(children: [
-                        Icon(Icons.directions_run, color: AppColor.white),
-                        Text('Destination', style: TextStyle(color: AppColor.white)),
+                        Icon(Icons.directions_run, color: appColor.white),
+                        Text('Destination', style: TextStyle(color: appColor.white)),
                       ]),
                     ),
                   ),
