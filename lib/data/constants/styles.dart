@@ -7,6 +7,6 @@ part '../../utils/app_color.dart';
 
 part '../../utils/density.dart';
 
-final appColor = AppColor._();
+var isDarkTheme = providerContainer.read(themeProvider);
 
-//var isDarkTheme = providerContainer.read(themeProvider);
+var appColor = AppColor._();
