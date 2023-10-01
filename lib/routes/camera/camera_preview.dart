@@ -8,11 +8,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:quickresponse/routes/sos/call.dart';
-import 'package:quickresponse/services/firebase/firebase_media.dart';
-import 'package:quickresponse/services/firebase/firebase_profile.dart';
-import 'package:quickresponse/utils/file_helper.dart';
 import 'package:record/record.dart';
+
+import '../../utils/file_helper.dart';
+import '../emergency/call.dart';
 
 class CameraPreviewWidget extends StatefulWidget {
   final CameraDescription camera;
@@ -35,7 +34,6 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
   StreamController<int> _timerStreamController = StreamController<int>();
   late Timer _recordingTimer;
   int _elapsedSeconds = 0;
-
 
   @override
   void initState() {
@@ -109,7 +107,8 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
                     isCapturingImage: _isCapturingImage,
                     isRecordingVideo: _isRecordingVideo,
                     isRecordingAudio: _isRecordingAudio,
-                  ), videoTimer: _getRemainingTime(),
+                  ),
+                  videoTimer: _getRemainingTime(),
                 ),
               ),
             );
@@ -171,7 +170,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
 
         setState(() => _isRecordingVideo = false);
 
-        await upload(videoFile, videoFileName, 'videos');
+        //await upload(videoFile, videoFileName, 'videos');
       } catch (e) {
         print(e);
       }
@@ -202,7 +201,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
 
         setState(() => _isCapturingImage = false);
 
-        await upload(pictureFile, imageFileName, 'images');
+        //await upload(pictureFile, imageFileName, 'images');
       } catch (e) {
         print('Error taking picture: $e');
       }
@@ -229,7 +228,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
           _audioPath = audioPath;
         });
 
-        await upload(File(audioPath), audioFileName, 'audios');
+        //await upload(File(audioPath), audioFileName, 'audios');
       } catch (e) {
         print(e);
       }
@@ -260,11 +259,11 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
     // Do something with the picked image (e.g., show preview, save, etc.)
   }
 
-  Future<void> upload(File file, String fileName, String folder) async {
+  /*Future<void> upload(File file, String fileName, String folder) async {
     var profile = await getProfileInfoFromSharedPreferences();
     String url = await uploadFileToStorage(file, "media/${profile.uid}/$folder/", fileName);
     await addMediaMetadataToFirestore("${profile.uid}", folder, url, fileName);
-  }
+  }*/
 
   String _getRemainingTime() {
     if (_videoTimer != null && _videoTimer!.isActive) {
@@ -274,7 +273,6 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
       return '0';
     }
   }
-
 }
 
 class CallProperties {

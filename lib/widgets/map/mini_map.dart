@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:quickresponse/data/model/contact.dart';
 import 'package:quickresponse/main.dart';
-import 'package:quickresponse/widgets/alert_button.dart';
+import 'package:quickresponse/widgets/inputs/alert_button.dart';
 
-import '../data/constants/constants.dart';
-import '../routes/location_map.dart';
+import '../../data/constants/constants.dart';
+import '../../routes/map/location_map.dart';
 
 class MiniMap extends StatelessWidget {
   const MiniMap({
@@ -13,7 +13,7 @@ class MiniMap extends StatelessWidget {
     required this.showButton,
   });
 
-  final Contact contact;
+  final ContactModel contact;
   final bool showButton;
 
   @override
