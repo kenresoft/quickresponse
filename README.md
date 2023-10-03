@@ -49,7 +49,7 @@ We welcome contributions from the community! Please check out our [contribution 
 
 ## License:
 
-QuickResponse is licensed under the [MIT License](LICENSE), making it open-source and free for personal and commercial use.
+QuickResponse is licensed under the [BSD 3-Clause License](LICENSE), making it open-source and free for personal and commercial use.
 
 ---
 
