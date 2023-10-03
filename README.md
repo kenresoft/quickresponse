@@ -34,7 +34,7 @@ QuickResponse is a state-of-the-art emergency security app meticulously crafted 
 Clone the repository and install the required dependencies using the following commands:
 
 ```bash
-git clone https://github.com/username/QuickResponse.git
+git clone https://github.com/kenresoft/quickresponse.git
 cd QuickResponse
 flutter pub get
 ```
