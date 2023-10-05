@@ -1,11 +1,9 @@
 // Create an enum for date format options
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum DateFormatOption { format1, format2, format3 }
+import '../../services/preference.dart';
 
-enum TimeFormatOption { format12Hours, format24Hours }
-
-final dateFormatProvider = StateNotifierProvider<DateFormatOptionNotifier, DateFormatOption>((ref) {
+/*final dateFormatProvider = StateNotifierProvider<DateFormatOptionNotifier, DateFormatOption>((ref) {
   return DateFormatOptionNotifier();
 });
 
@@ -13,37 +11,27 @@ class DateFormatOptionNotifier extends StateNotifier<DateFormatOption> {
   DateFormatOptionNotifier() : super(DateFormatOption.format1);
 
   set setDateFormatOption(DateFormatOption dateFormatOption) => state = dateFormatOption;
+}*/
+
+DateFormatOption get dateFormat {
+  DateFormatOption timeFormatOption;
+  final savedTimeFormat = SharedPreferencesService.getString('dateFormat');
+  timeFormatOption = switch (savedTimeFormat) {
+    _? => DateFormatOption.values.firstWhere((option) => option.toString() == savedTimeFormat, orElse: () => DateFormatOption.format1),
+    _ => DateFormatOption.format1
+  };
+  return timeFormatOption;
 }
 
-final timeFormatProvider = StateNotifierProvider<TimeFormatOptionNotifier, TimeFormatOption>((ref) {
-  return TimeFormatOptionNotifier();
-});
-
-class TimeFormatOptionNotifier extends StateNotifier<TimeFormatOption> {
-  TimeFormatOptionNotifier() : super(TimeFormatOption.format24Hours);
-
-  set setTimeFormatOption(TimeFormatOption timeFormatOption) => state = timeFormatOption;
+String get dateSeparator {
+  return SharedPreferencesService.getString('dateSeparator') ?? ':';
 }
 
-final dateSeparatorProvider = StateNotifierProvider<DateSeparatorNotifier, String>((ref) {
-  return DateSeparatorNotifier();
-});
-
-class DateSeparatorNotifier extends StateNotifier<String> {
-  DateSeparatorNotifier() : super('/'); // Set the default separator
-
-  set setDateSeparator(String dateSeparator) => state = dateSeparator;
+set dateSeparator(String value) {
+  SharedPreferencesService.setString('dateSeparator', value);
 }
 
-final timeSeparatorProvider = StateNotifierProvider<TimeSeparatorNotifier, String>((ref) {
-  return TimeSeparatorNotifier();
-});
-
-class TimeSeparatorNotifier extends StateNotifier<String> {
-  TimeSeparatorNotifier() : super(':'); // Set the default separator
-
-  set setTimeSeparator(String timeSeparator) => state = timeSeparator;
-}
+enum DateFormatOption { format1, format2, format3 }
 
 final expandedStateProvider = StateNotifierProviderFamily<ExpandedStateNotifier, bool, String>((ref, title) {
   return ExpandedStateNotifier();
