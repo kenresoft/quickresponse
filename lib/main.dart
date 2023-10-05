@@ -9,6 +9,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fontresoft/fontresoft.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quickresponse/providers/settings/time_format.dart';
+import 'package:quickresponse/providers/settings/time_separator.dart';
+import 'package:quickresponse/services/preference.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'data/constants/constants.dart';
@@ -54,7 +57,7 @@ void main() async {
     persistenceEnabled: true,
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
-
+  await SharedPreferencesService.init();
   tz.initializeTimeZones();
 
   await flutterLocalNotificationsPlugin.initialize(
@@ -111,7 +114,8 @@ class _MyAppState extends State<MyApp> {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
         var state = ref.watch(themeProvider.select((value) => value));
-        //log(state.toString());
+        initAppPreferences(ref);
+
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: Constants.appName,
@@ -157,6 +161,15 @@ class _MyAppState extends State<MyApp> {
         );
       },
     );
+  }
+
+  Future<void> initAppPreferences(WidgetRef ref) async {
+    final bool theme = SharedPreferencesService.getBool('theme') ?? true;
+    await Future(() => ref.watch(themeProvider.notifier).toggleTheme(theme));
+    //ref.watch(timeFormatProvider.notifier).timeFormat;
+    //timeFormat;
+    //ref.watch(timeSeparatorProvider.notifier).timeSeparator;
+
   }
 }
 
