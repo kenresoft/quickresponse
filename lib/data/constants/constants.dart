@@ -29,6 +29,7 @@ class Constants {
   static const String newChatsList = '/newChatsList';
   static const String userSearchScreen = '/userSearchScreen';
   static const String media = '/media';
+  static const String userProfilePage = '/userProfilePage';
   static const String error = '/error';
 
   //Images route
