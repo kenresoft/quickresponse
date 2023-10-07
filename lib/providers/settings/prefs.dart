@@ -45,3 +45,20 @@ String get note {
 set note(String value) {
   SharedPreferencesService.setString('note', value);
 }
+
+//H: Position
+String get longitude {
+  return SharedPreferencesService.getString('longitude') ?? ':';
+}
+
+set longitude(String value) {
+  SharedPreferencesService.setString('longitude', value);
+}
+
+String get latitude {
+  return SharedPreferencesService.getString('latitude') ?? ':';
+}
+
+set latitude(String value) {
+  SharedPreferencesService.setString('latitude', value);
+}
