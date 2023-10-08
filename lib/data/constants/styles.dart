@@ -8,4 +8,4 @@ part '../../utils/density.dart';
 
 //var isDarkTheme = providerContainer.read(themeProvider);
 
-var appColor = AppColor._();
+//var appColor = AppColor(pref.theme);
