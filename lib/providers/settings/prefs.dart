@@ -3,7 +3,7 @@ import 'date_time_format.dart';
 
 // H: Theme
 bool get theme {
-  return SharedPreferencesService.getBool('theme') ?? false;
+  return SharedPreferencesService.getBool('theme') ?? true;
 }
 
 set theme(bool value) {
@@ -21,7 +21,7 @@ set timeFormat(TimeFormatOption timeFormatOption) {
 
 // H: Date Separator
 String get dateSeparator {
-  return SharedPreferencesService.getString('dateSeparator') ?? ':';
+  return SharedPreferencesService.getString('dateSeparator') ?? ', ';
 }
 
 set dateSeparator(String value) {
@@ -39,7 +39,7 @@ set timeSeparator(String value) {
 
 // H: Note
 String get note {
-  return SharedPreferencesService.getString('note') ?? ':';
+  return SharedPreferencesService.getString('note') ?? 'You don\'t have any Note yet!';
 }
 
 set note(String value) {
@@ -48,7 +48,7 @@ set note(String value) {
 
 //H: Position
 String get longitude {
-  return SharedPreferencesService.getString('longitude') ?? ':';
+  return SharedPreferencesService.getString('longitude') ?? '0';
 }
 
 set longitude(String value) {
@@ -56,9 +56,27 @@ set longitude(String value) {
 }
 
 String get latitude {
-  return SharedPreferencesService.getString('latitude') ?? ':';
+  return SharedPreferencesService.getString('latitude') ?? '0';
 }
 
 set latitude(String value) {
   SharedPreferencesService.setString('latitude', value);
+}
+
+//H: Authentication
+bool get authenticate {
+  return SharedPreferencesService.getBool('authenticate') ?? true;
+}
+
+set authenticate(bool value) {
+  SharedPreferencesService.setBool('authenticate', value);
+}
+
+//H: Location Refresh Interval
+int get locationInterval {
+  return SharedPreferencesService.getInt('locationInterval')??0;
+}
+
+set locationInterval(int value) {
+  SharedPreferencesService.setInt('locationInterval', value);
 }
