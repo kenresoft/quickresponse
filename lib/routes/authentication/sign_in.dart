@@ -1,16 +1,8 @@
 import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quickresponse/main.dart';
-import 'package:quickresponse/utils/extensions.dart';
-
-import '../../data/constants/colors.dart';
-import '../../data/constants/constants.dart';
-import '../../services/firebase/firebase_profile.dart';
-import '../../widgets/appbar.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -71,14 +63,14 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(
+      appBar: CustomAppBar(
         title: const Text('Sign In', style: TextStyle(fontSize: 20)),
         leading: Container(
           margin: const EdgeInsets.all(10),
-          child: AppColor.blend(const Image(image: ExactAssetImage(Constants.logo)), AppColor.background),
+          child: AppColor(theme).blend(const Image(image: ExactAssetImage(Constants.logo)), AppColor(theme).background),
         ),
         actionTitle: '',
-        actionIcon: AppColor.blend(const Icon(CupertinoIcons.person_crop_circle_badge_plus), AppColor.black),
+        actionIcon: AppColor(theme).blend(const Icon(CupertinoIcons.person_crop_circle_badge_plus), AppColor(theme).black),
         onActionClick: () {
           context.toast('Authenticate to access the app');
         },
@@ -127,7 +119,7 @@ class _SignInState extends State<SignIn> {
                     margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 4.0),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: _currentPage == index ? AppColor.navIconSelected : AppColor.black,
+                      color: _currentPage == index ? AppColor(theme).navIconSelected : AppColor(theme).black,
                     ),
                   );
                 }),
@@ -154,6 +146,7 @@ class _SignInState extends State<SignIn> {
             user.log;
             launchReplace(context, Constants.home);
           }).error(context);
+          uid = user.uid;
         }
       },
     );
