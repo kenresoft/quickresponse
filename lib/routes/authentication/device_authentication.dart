@@ -3,25 +3,27 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:quickresponse/data/constants/colors.dart';
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/main.dart';
-import 'package:quickresponse/utils/density.dart';
 import 'package:quickresponse/utils/extensions.dart';
 import 'package:quickresponse/utils/wrapper.dart';
-import 'package:quickresponse/widgets/appbar.dart';
-import 'package:quickresponse/widgets/blinking_text.dart';
-import 'package:quickresponse/widgets/color_mix.dart';
+import 'package:quickresponse/widgets/display/blinking_text.dart';
+import 'package:quickresponse/widgets/display/color_mix.dart';
 
-class DeviceAuthentication extends StatefulWidget {
+import '../../data/constants/styles.dart';
+import '../../providers/settings/prefs.dart';
+import '../../widgets/screens/appbar.dart';
+
+class DeviceAuthentication extends ConsumerStatefulWidget {
   const DeviceAuthentication({super.key});
 
   @override
-  State<DeviceAuthentication> createState() => _DeviceAuthenticationState();
+  ConsumerState<DeviceAuthentication> createState() => _DeviceAuthenticationState();
 }
 
-class _DeviceAuthenticationState extends State<DeviceAuthentication> {
+class _DeviceAuthenticationState extends ConsumerState<DeviceAuthentication> {
   final LocalAuthentication auth = LocalAuthentication();
   bool isAuthenticating = false;
   bool isAuthenticated = false;
@@ -189,13 +191,17 @@ class _DeviceAuthenticationState extends State<DeviceAuthentication> {
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
+    //final theme = ref.watch(themeProvider.select((value) => value));
     return Scaffold(
-      backgroundColor: AppColor.background,
-      appBar: appBar(
+      backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+      appBar: CustomAppBar(
         title: const Text('Quick Response', style: TextStyle(fontSize: 20)),
-        leading: Container(margin: const EdgeInsets.all(10), child: AppColor.blend(const Image(image: ExactAssetImage(Constants.logo)), AppColor.background)),
+        leading: Container(
+          margin: const EdgeInsets.all(10),
+          child: AppColor(theme).blend(const Image(image: ExactAssetImage(Constants.logo)), AppColor(theme).background),
+        ),
         actionTitle: '',
-        actionIcon: AppColor.blend(const Icon(CupertinoIcons.padlock_solid), color),
+        actionIcon: AppColor(theme).blend(const Icon(CupertinoIcons.padlock_solid), color(theme)),
         onActionClick: () {
           context.toast('Authenticate to access the app');
         },
@@ -208,12 +214,15 @@ class _DeviceAuthenticationState extends State<DeviceAuthentication> {
               filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
               child: Card(
                 elevation: 0,
-                color: AppColor.overlay,
+                color: AppColor(theme).overlay,
                 margin: EdgeInsets.symmetric(vertical: 0.15.dpH(dp), horizontal: 0.08.dpW(dp)),
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 0.08.dpH(dp), horizontal: 0.08.dpW(dp)),
                   child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    BlinkingText('Security Pass', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, letterSpacing: 2, color: AppColor.black)),
+                    BlinkingText(
+                      'Security Pass',
+                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, letterSpacing: 2, color: !theme ? AppColor(theme).white : AppColor(theme).black),
+                    ),
                     const SizedBox(height: 70),
                     InkWell(
                       onTap: _authenticate,
@@ -232,14 +241,14 @@ class _DeviceAuthenticationState extends State<DeviceAuthentication> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 18,
-                        color: color,
+                        color: color(theme),
                       ),
                     ),
                     if (_showProgress) // Conditionally show the progress indicator
                       const SizedBox(height: 20),
                     if (_showProgress)
                       Container(
-                        decoration: BoxDecoration(color: AppColor.black, borderRadius: BorderRadius.circular(30)),
+                        decoration: BoxDecoration(color: AppColor(theme).black, borderRadius: BorderRadius.circular(30)),
                         width: double.infinity,
                         height: 10,
                         child: ClipRRect(
@@ -262,14 +271,16 @@ class _DeviceAuthenticationState extends State<DeviceAuthentication> {
   }
 
   LinearGradient get gradient => isAuthenticated
-      ? AppColor.authSuccess
+      ? AppColor(theme).authSuccess
       : authError
-          ? AppColor.authError
-          : AppColor.authDefault;
+          ? AppColor(theme).authError
+          : AppColor(theme).authDefault;
 
-  Color get color => isAuthenticated
+  Color color(bool theme) => isAuthenticated
       ? Colors.green
       : authError
           ? Colors.red
-          : AppColor.black;
+          : !theme
+              ? AppColor(theme).white
+              : AppColor(theme).black;
 }
