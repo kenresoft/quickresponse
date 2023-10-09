@@ -1,21 +1,7 @@
-import 'dart:math';
-
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quickresponse/data/constants/constants.dart';
-import 'package:quickresponse/data/model/profile_info.dart';
 import 'package:quickresponse/main.dart';
 import 'package:quickresponse/providers/note_provider.dart';
-import 'package:quickresponse/services/firebase/firebase_profile.dart';
-import 'package:quickresponse/utils/extensions.dart';
-import 'package:quickresponse/utils/wrapper.dart';
 
-import '../../data/constants/styles.dart';
-import '../../providers/settings/prefs.dart';
 import '../../widgets/dialogs/html_dialog.dart';
-import '../../widgets/screens/appbar.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({Key? key}) : super(key: key);
@@ -38,6 +24,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   @override
+  void setState(VoidCallback fn) {
+    if (mounted) super.setState(fn);
+  }
+
+  @override
   void dispose() {
     //internetConnection.dispose();
     super.dispose();
@@ -46,62 +37,64 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   Widget build(BuildContext context) {
     count + 1.log;
-    return focus(
-      _focusNode,
-      Scaffold(
-        backgroundColor: theme ? appColor.background : appColor.backgroundDark,
-        appBar: CustomAppBar(
-          title: const Text('User Account', style: TextStyle(fontSize: 20)),
-          leading: Icon(CupertinoIcons.increase_quotelevel, color: appColor.navIconSelected),
-          actionTitle: '',
-          action2: GestureDetector(
-            onTap: () => _showSignOutConfirmationDialog(context, theme),
-            child: Transform.rotate(angle: pi / 2, child: Icon(CupertinoIcons.share, color: appColor.navIconSelected)),
+    return WillPopScope(
+      onWillPop: () => replace(context, Constants.home),
+      child: focus(
+        _focusNode,
+        Scaffold(
+          backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+          appBar: CustomAppBar(
+            title: const Text('User Account', style: TextStyle(fontSize: 20)),
+            leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor(theme).navIconSelected),
+            actionTitle: '',
+            action2: GestureDetector(
+              onTap: () => _showSignOutConfirmationDialog(context, theme),
+              child: Transform.rotate(angle: pi / 2, child: Icon(CupertinoIcons.share, color: AppColor(theme).navIconSelected)),
+            ),
           ),
-        ),
-        body: Center(
-          child: FutureBuilder<ProfileInfo?>(
-            future: getProfileInfoFromSharedPreferences(), //_loadProfileInfo(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data == null) {
-                return const Center(child: Text('No data available'));
-              }
+          body: Center(
+            child: FutureBuilder<ProfileInfo?>(
+              future: getProfileInfoFromSharedPreferences(), //_loadProfileInfo(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data == null) {
+                  return const Center(child: Text('No data available'));
+                }
 
-              ProfileInfo? profileInfo = snapshot.data;
-              return Container(
-                height: double.infinity,
-                margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                decoration: BoxDecoration(color: theme ? appColor.white : appColor.black, borderRadius: BorderRadius.circular(15)),
-                padding: const EdgeInsets.all(1),
-                child: Container(
-                  decoration: BoxDecoration(color: theme ? appColor.background : appColor.backgroundDark, borderRadius: BorderRadius.circular(15)),
-                  padding: const EdgeInsets.all(8),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: SingleChildScrollView(
-                      child: Container(
-                        decoration: BoxDecoration(color: theme ? appColor.background : appColor.backgroundDark, borderRadius: BorderRadius.circular(15)),
-                        //margin: const EdgeInsets.all(2),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            buildImage(theme),
-                            const SizedBox(height: 16),
-                            buildCard(CupertinoIcons.person, 'Name', profileInfo!.displayName!, theme),
-                            const SizedBox(height: 16),
-                            buildCard(CupertinoIcons.mail, 'Email', profileInfo.email!, theme),
-                            const SizedBox(height: 16),
-                            buildCard(CupertinoIcons.phone, 'Phone', profileInfo.phoneNumber!, theme),
-                            const SizedBox(height: 16),
-                            buildCard(CupertinoIcons.staroflife, 'Profile Status', profileInfo.isComplete.toString(), theme),
-                            const SizedBox(height: 16),
-                            buildNoteCard(),
-                            const SizedBox(height: 16),
-                            /*buildCard(
+                ProfileInfo? profileInfo = snapshot.data;
+                return Container(
+                  height: double.infinity,
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                  decoration: BoxDecoration(color: theme ? AppColor(theme).white : AppColor(theme).black, borderRadius: BorderRadius.circular(15)),
+                  padding: const EdgeInsets.all(1),
+                  child: Container(
+                    decoration: BoxDecoration(color: theme ? AppColor(theme).background : AppColor(theme).backgroundDark, borderRadius: BorderRadius.circular(15)),
+                    padding: const EdgeInsets.all(8),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: SingleChildScrollView(
+                        child: Container(
+                          decoration: BoxDecoration(color: theme ? AppColor(theme).background : AppColor(theme).backgroundDark, borderRadius: BorderRadius.circular(15)),
+                          //margin: const EdgeInsets.all(2),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              buildImage(theme),
+                              const SizedBox(height: 16),
+                              buildCard(CupertinoIcons.person, 'Name', profileInfo!.displayName!, theme),
+                              const SizedBox(height: 16),
+                              buildCard(CupertinoIcons.mail, 'Email', profileInfo.email!, theme),
+                              const SizedBox(height: 16),
+                              buildCard(CupertinoIcons.phone, 'Phone', profileInfo.phoneNumber ?? '', theme),
+                              const SizedBox(height: 16),
+                              buildCard(CupertinoIcons.staroflife, 'Profile Status', profileInfo.isComplete.toString(), theme),
+                              const SizedBox(height: 16),
+                              buildNoteCard(),
+                              const SizedBox(height: 16),
+                              /*buildCard(
                                 CupertinoIcons.time,
                                 'Last Signed In',
                                 '${formatDateTime(
@@ -115,40 +108,41 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 )}',
                                 theme),
                             const SizedBox(height: 16),*/
-                            InkWell(
-                              onTap: () => launch(context, Constants.settings),
-                              child: buildCard(CupertinoIcons.settings, 'Settings', 'View App Settings', theme),
-                            ),
-                            const SizedBox(height: 16),
-                            InkWell(
-                              onTap: () => showDialog(
-                                context: context,
-                                builder: (context) => const HTMLDialog(
-                                  htmlAsset1: 'assets/data/quickresponse_policies.html', // Path to your HTML asset file 1
-                                  htmlAsset2: 'assets/data/quickresponse_terms.html', // Path to your HTML asset file 2
+                              InkWell(
+                                onTap: () => launch(context, Constants.settings),
+                                child: buildCard(CupertinoIcons.settings, 'Settings', 'View App Settings', theme),
+                              ),
+                              const SizedBox(height: 16),
+                              InkWell(
+                                onTap: () => showDialog(
+                                  context: context,
+                                  builder: (context) => const HTMLDialog(
+                                    htmlAsset1: 'assets/data/quickresponse_policies.html', // Path to your HTML asset file 1
+                                    htmlAsset2: 'assets/data/quickresponse_terms.html', // Path to your HTML asset file 2
+                                  ),
+                                ),
+                                child: buildCard(CupertinoIcons.padlock, 'Terms and Policy', 'View App Privacy Policy & Terms', theme),
+                              ),
+                              const SizedBox(height: 16),
+
+                              Center(
+                                child: ElevatedButton(
+                                  style: const ButtonStyle(surfaceTintColor: MaterialStatePropertyAll(Colors.white)),
+                                  onPressed: () => phoneEditDialog(context, profileInfo),
+                                  child: const Text('Change Phone Number'),
                                 ),
                               ),
-                              child: buildCard(CupertinoIcons.padlock, 'Terms and Policy', 'View App Privacy Policy & Terms', theme),
-                            ),
-                            const SizedBox(height: 16),
-
-                            Center(
-                              child: ElevatedButton(
-                                style: const ButtonStyle(surfaceTintColor: MaterialStatePropertyAll(Colors.white)),
-                                onPressed: () => phoneEditDialog(context, profileInfo),
-                                child: const Text('Change Phone Number'),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            // Add current location and app usage summary widgets here
-                          ],
+                              const SizedBox(height: 16),
+                              // Add current location and app usage summary widgets here
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -158,7 +152,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Card buildNoteCard() {
     return Card(
       margin: EdgeInsets.zero,
-      color: theme ? appColor.white : appColor.black,
+      color: AppColor(theme).white,
       elevation: 0,
       child: Center(
         child: Consumer(
@@ -174,10 +168,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
               leading: GestureDetector(
                 onTap: () {
-                  if (isEditing) {
-                    //_aboutMeText = _aboutMeController.text;
-                    note = _aboutMeController.text;
-                  }
+                  if (isEditing) note = _aboutMeController.text;
+
                   ref.watch(profileNoteProvider.notifier).editNote = !isEditing;
                   _focusNode.requestFocus();
                 },
@@ -185,7 +177,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   padding: const EdgeInsets.only(left: 16),
                   child: Icon(
                     isEditing ? CupertinoIcons.check_mark : CupertinoIcons.pencil_ellipsis_rectangle,
-                    color: appColor.navIconSelected,
+                    color: AppColor(theme).navIconSelected,
                     size: 30,
                   ),
                 ),
@@ -210,24 +202,25 @@ class _UserProfilePageState extends State<UserProfilePage> {
   }
 
   void phoneEditDialog(BuildContext context, ProfileInfo profileInfo) {
+    TextEditingController newPhoneNumberController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        String newPhoneNumber = '';
         return AlertDialog(
           surfaceTintColor: Colors.transparent,
-          backgroundColor: theme ? appColor.background : appColor.backgroundDark,
-          title: Text('Update Phone Number', style: TextStyle(color: appColor.title)),
+          backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+          title: Text('Update Phone Number', style: TextStyle(color: AppColor(theme).title)),
           content: SizedBox(
             height: 50,
             child: TextField(
-              onChanged: (value) => newPhoneNumber = value,
+              controller: newPhoneNumberController, // Use TextEditingController here
               decoration: InputDecoration(
                 labelText: 'New Phone Number',
                 labelStyle: TextStyle(color: AppColor(theme).title_2),
                 filled: true,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: appColor.action)),
-                //fillColor: appColor.background,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: AppColor(theme).action)),
+                //fillColor: AppColor(theme).background,
               ),
             ),
           ),
@@ -235,10 +228,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
             TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancel')),
             TextButton(
               onPressed: () {
-                updatePhoneNumberInSharedPreferences(newPhoneNumber);
-                updateUserProfile(profileInfo.uid!, {'phoneNumber': newPhoneNumber});
-                Navigator.of(context).pop();
-                setState(() {});
+                String newPhoneNumber = newPhoneNumberController.text; // Get text from TextEditingController
+                if (newPhoneNumber.trim().isNotEmpty) {
+                  bool isProfileComplete = newPhoneNumber.isNotEmpty; // Update the logic for isProfileComplete as needed
+                  updatePhoneNumberInSharedPreferences(newPhoneNumber, isProfileComplete);
+                  updateUserProfile(profileInfo.uid!, {'phoneNumber': newPhoneNumber, 'isComplete': isProfileComplete});
+                  Navigator.of(context).pop();
+                  setState(() {});
+                } else {
+                  // Handle empty phone number case if necessary
+                  context.toast('Phone can\'t be empty!', TextAlign.center, Colors.red);
+                  Navigator.of(context).pop();
+                }
               },
               child: const Text('Update'),
             ),
@@ -262,12 +263,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 backgroundColor: AppColor(theme).alert_2,
                 child: CircleAvatar(
                   radius: 60,
-                  backgroundColor: appColor.white,
+                  backgroundColor: AppColor(theme).white,
                   child: CachedNetworkImage(
                     fit: BoxFit.fill,
                     imageUrl: user.photoURL!,
                     placeholder: (context, url) => buildIcon,
-                    errorWidget: (context, url, error) => Icon(CupertinoIcons.exclamationmark_triangle, color: appColor.action),
+                    errorWidget: (context, url, error) => Icon(CupertinoIcons.exclamationmark_triangle, color: AppColor(theme).action),
                   ),
                 ),
               );
@@ -280,17 +281,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget get buildIcon => Icon(CupertinoIcons.info, size: 60, color: appColor.navIconSelected);
+  Widget get buildIcon => Icon(CupertinoIcons.info, size: 60, color: AppColor(theme).navIconSelected);
 
   Card buildCard(IconData iconData, String title, String subTitle, bool theme) {
     return Card(
       margin: EdgeInsets.zero,
-      color: theme ? appColor.white : appColor.black,
+      color: AppColor(theme).white,
       elevation: 0,
       child: Center(
         child: ListTile(
           contentPadding: EdgeInsets.zero,
-          leading: Padding(padding: const EdgeInsets.only(left: 16), child: Icon(iconData, color: appColor.navIconSelected, size: 30)),
+          leading: Padding(padding: const EdgeInsets.only(left: 16), child: Icon(iconData, color: AppColor(theme).navIconSelected, size: 30)),
           title: Text(
             title,
             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -310,7 +311,7 @@ Future<void> _showSignOutConfirmationDialog(BuildContext context, bool theme) as
     builder: (BuildContext context) {
       return AlertDialog(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: theme ? appColor.background : appColor.backgroundDark,
+        backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
         title: const Text('Confirm Sign Out'),
         content: const Text('Are you sure you want to sign out?'),
         actions: <Widget>[
@@ -323,7 +324,7 @@ Future<void> _showSignOutConfirmationDialog(BuildContext context, bool theme) as
           TextButton(
             onPressed: () {
               // Sign out the user here
-              signOut();
+              signOut().then((value) => launch(context, Constants.authentication));
               Navigator.of(context).pop(); // Dismiss the dialog
             },
             child: const Text('Sign Out'),
