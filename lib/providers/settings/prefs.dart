@@ -47,20 +47,20 @@ set note(String value) {
 }
 
 //H: Position
-String get longitude {
-  return SharedPreferencesService.getString('longitude') ?? '0';
+double get longitude {
+  return SharedPreferencesService.getDouble('longitude') ?? 0;
 }
 
-set longitude(String value) {
-  SharedPreferencesService.setString('longitude', value);
+set longitude(double value) {
+  SharedPreferencesService.setDouble('longitude', value);
 }
 
-String get latitude {
-  return SharedPreferencesService.getString('latitude') ?? '0';
+double get latitude {
+  return SharedPreferencesService.getDouble('latitude') ?? 0;
 }
 
-set latitude(String value) {
-  SharedPreferencesService.setString('latitude', value);
+set latitude(double value) {
+  SharedPreferencesService.setDouble('latitude', value);
 }
 
 //H: Authentication
@@ -74,9 +74,18 @@ set authenticate(bool value) {
 
 //H: Location Refresh Interval
 int get locationInterval {
-  return SharedPreferencesService.getInt('locationInterval')??0;
+  return SharedPreferencesService.getInt('locationInterval') ?? 0;
 }
 
 set locationInterval(int value) {
   SharedPreferencesService.setInt('locationInterval', value);
+}
+
+//H: User
+String get uid {
+  return SharedPreferencesService.getString('uid') ?? 'No uid';
+}
+
+set uid(String value) {
+  SharedPreferencesService.setString('uid', value);
 }
