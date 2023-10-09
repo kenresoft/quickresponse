@@ -1,23 +1,4 @@
-import 'dart:io';
-
-import 'package:extensionresoft/extensionresoft.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quickresponse/data/constants/constants.dart';
-import 'package:quickresponse/data/model/contact.dart';
 import 'package:quickresponse/main.dart';
-import 'package:quickresponse/utils/extensions.dart';
-import 'package:quickresponse/widgets/appbar.dart';
-
-import '../../data/constants/colors.dart';
-import '../../providers/page_provider.dart';
-import '../../services/firebase/firebase_contact.dart';
-import '../../services/firebase/firebase_profile.dart';
-import '../../utils/density.dart';
-import '../../utils/file_helper.dart';
-import '../../utils/wrapper.dart';
-import '../../widgets/bottom_navigator.dart';
 
 class Contacts extends ConsumerStatefulWidget {
   const Contacts({super.key});
@@ -92,6 +73,8 @@ class _ContactsState extends ConsumerState<Contacts> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
         title: const Text('Confirm Deletion'),
         content: const Text('Are you sure you want to delete this contact?'),
         actions: [
@@ -133,6 +116,7 @@ class _ContactsState extends ConsumerState<Contacts> {
     //final contacts = ContactModel.contactList;
     final dp = Density.init(context);
     final page = ref.watch(pageProvider.select((value) => value));
+    //final theme = ref.watch(themeProvider.select((value) => value));
     _contactCount = _kContacts.length;
 
     return WillPopScope(
@@ -153,8 +137,8 @@ class _ContactsState extends ConsumerState<Contacts> {
       child: focus(
         _focusNode,
         Scaffold(
-          backgroundColor: AppColor.background,
-          appBar: appBar(
+          backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+          appBar: CustomAppBar(
             title: const Text('Contacts', style: TextStyle(fontSize: 20)),
             leading: const Icon(CupertinoIcons.increase_quotelevel),
             actionTitle: 'ADD',
@@ -163,7 +147,7 @@ class _ContactsState extends ConsumerState<Contacts> {
               if (_contactCount < 5) {
                 launch(context, Constants.contactsPage);
               } else {
-                context.toast('Contact Limit Reached.\nYou cannot add more than 5 contacts.', TextAlign.center, AppColor.alert_1);
+                context.toast('Contact Limit Reached.\nYou cannot add more than 5 contacts.', TextAlign.center, AppColor(theme).alert_1);
               }
             },
           ),
@@ -184,13 +168,13 @@ class _ContactsState extends ConsumerState<Contacts> {
                           textAlign: TextAlign.center,
                           autofillHints: _kContacts.map((e) => e.name!),
                           decoration: InputDecoration(
-                            fillColor: AppColor.white,
+                            fillColor: AppColor(theme).white,
                             filled: true,
-                            focusColor: AppColor.white,
-                            prefixIconColor: AppColor.navIconSelected,
-                            suffixIconColor: AppColor.navIconSelected,
+                            focusColor: AppColor(theme).white,
+                            prefixIconColor: AppColor(theme).navIconSelected,
+                            suffixIconColor: AppColor(theme).navIconSelected,
                             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(40), borderSide: BorderSide.none),
-                            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(40), borderSide: BorderSide(color: AppColor.action)),
+                            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(40), borderSide: BorderSide(color: AppColor(theme).border)),
                             hintText: 'Search',
                             prefixIcon: const Icon(CupertinoIcons.search, size: 20),
                             suffixIcon: const Icon(CupertinoIcons.mic, size: 20),
@@ -230,7 +214,7 @@ class _ContactsState extends ConsumerState<Contacts> {
                               },
                               child: Card(
                                 margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
-                                color: AppColor.white,
+                                color: AppColor(theme).white,
                                 elevation: 0,
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -240,17 +224,23 @@ class _ContactsState extends ConsumerState<Contacts> {
                                       //const Image(image: ExactAssetImage(Constants.moon), height: 50),
                                       0.02.dpW(dp).spX,
                                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                        Text(_filteredContacts[index].name ?? 'Name not defined', style: const TextStyle(fontWeight: FontWeight.w600)),
-                                        Text(_filteredContacts[index].phone ?? 'Undefined', style: const TextStyle(fontSize: 13)),
+                                        Text(
+                                          _filteredContacts[index].name ?? 'Name not defined',
+                                          style: TextStyle(fontWeight: FontWeight.w600, color: AppColor(theme).black),
+                                        ),
+                                        Text(
+                                          _filteredContacts[index].phone ?? 'Undefined',
+                                          style: TextStyle(fontSize: 13, color: AppColor(theme).alert_2),
+                                        ),
                                       ]),
                                     ]),
                                     InkWell(
                                       onTap: () => _deleteContact(index),
-                                      splashColor: AppColor.overlay,
+                                      splashColor: AppColor(theme).overlay,
                                       borderRadius: BorderRadius.circular(30),
                                       child: Container(
                                         padding: const EdgeInsets.all(14),
-                                        child: Icon(CupertinoIcons.delete_simple, size: 18, color: AppColor.navIconSelected),
+                                        child: Icon(CupertinoIcons.delete_simple, size: 18, color: AppColor(theme).navIconSelected),
                                       ),
                                     )
                                   ]),
