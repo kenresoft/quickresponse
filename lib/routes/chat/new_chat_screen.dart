@@ -17,9 +17,9 @@ class _NewChatScreenState extends State<NewChatScreen> {
   List<String> selectedContacts = []; // Store selected contact IDs
   List<DocumentSnapshot> searchResults = []; // Store search results
 
-  // Function to search for contacts
-  // /users/userId/emergencyContacts/contact
-  void searchContacts(String query) async {
+// Function to search for contacts
+// /users/userId/emergencyContacts/contact
+/*  void searchContacts(String query) async {
     final CollectionReference userContactsCollection = FirebaseFirestore.instance.collection('users/${widget.userId}/emergencyContacts');
 
     final QuerySnapshot querySnapshot = await userContactsCollection.where('name', isGreaterThanOrEqualTo: query).where('name', isLessThanOrEqualTo: '$query\uf8ff').get();
@@ -38,23 +38,22 @@ class _NewChatScreenState extends State<NewChatScreen> {
         selectedContacts.add(contactId);
       }
     });
-  }
+  }*/
 
   // Function to create a new chat with selected contacts
- void _createChat() async {
-  if (selectedContacts.isNotEmpty) {
+  void _createChat() async {
+    //if (selectedContacts.isNotEmpty) {
     try {
-      String selectedContactUserId = selectedContacts.first; // Assuming you select only one contact
+      //String selectedContactUserId = selectedContacts.first; // Assuming you select only one contact
 
       // Sort user IDs to ensure consistency
-      List<String> sortedUserIds = [widget.userId, selectedContactUserId]..sort();
+      List<String> sortedUserIds = [widget.userId, 'selectedContactUserId']..sort();
 
       // Create a unique chat ID based on sorted user IDs
-      String uniqueChatId = sortedUserIds.join('_');
+      String uniqueChatId = 'abc'; /*sortedUserIds.join('_');*/
 
       // Check if a chat with the selected contact already exists
-      final DocumentSnapshot chatSnapshot =
-          await FirebaseFirestore.instance.collection('chats').doc(uniqueChatId).get();
+      final DocumentSnapshot chatSnapshot = await FirebaseFirestore.instance.collection('chats').doc(uniqueChatId).get();
 
       if (chatSnapshot.exists) {
         // If a chat already exists, navigate to the existing chat
@@ -64,14 +63,13 @@ class _NewChatScreenState extends State<NewChatScreen> {
             builder: (context) => ChatScreen(
               chatId: uniqueChatId,
               userId: widget.userId,
-              receiverId: selectedContactUserId, // Pass the receiver's user ID
+              receiverId: 'selectedContactUserId', // Pass the receiver's user ID
             ),
           ),
         );
       } else {
         // If no chat exists, create a new chat
-        final DocumentReference newChatRef =
-            FirebaseFirestore.instance.collection('chats').doc(uniqueChatId);
+        final DocumentReference newChatRef = FirebaseFirestore.instance.collection('chats').doc(uniqueChatId);
 
         Map<String, dynamic> chatData = {
           'members': sortedUserIds,
@@ -87,7 +85,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
             builder: (context) => ChatScreen(
               chatId: uniqueChatId,
               userId: widget.userId,
-              receiverId: selectedContactUserId, // Pass the receiver's user ID
+              receiverId: 'selectedContactUserId', // Pass the receiver's user ID
             ),
           ),
         );
@@ -96,9 +94,6 @@ class _NewChatScreenState extends State<NewChatScreen> {
       print('Error creating/navigating to chat: $e');
     }
   }
-}
-
-
 
 /*  void _createChat() async {
     if (selectedContacts.isNotEmpty) {
@@ -151,7 +146,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
             child: TextField(
               controller: searchController,
               onChanged: (query) {
-                searchContacts(query);
+                //searchContacts(query);
               },
               decoration: const InputDecoration(
                 hintText: 'Search for contacts...',
@@ -170,7 +165,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
                   title: Text(contactName),
                   trailing: selectedContacts.contains(contactId) ? const Icon(Icons.check_box) : const Icon(Icons.check_box_outline_blank),
                   onTap: () {
-                    toggleContactSelection(contactId);
+                    //toggleContactSelection(contactId);
                   },
                 );
               },
