@@ -1,3 +1,4 @@
+/*
 import 'chat_message.dart';
 
 class Chat {
@@ -9,3 +10,4 @@ class Chat {
     required this.messages,
   });
 }
+*/
