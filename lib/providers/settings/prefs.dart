@@ -4,6 +4,8 @@ import 'date_time_format.dart';
 // H: Theme
 bool get theme {
   return SharedPreferencesService.getBool('theme') ?? true;
+
+  /// Light Theme
 }
 
 set theme(bool value) {
@@ -65,16 +67,29 @@ set latitude(double value) {
 
 //H: Authentication
 bool get authenticate {
-  return SharedPreferencesService.getBool('authenticate') ?? true;
+  return SharedPreferencesService.getBool('authenticate') ?? false;
+
+  /// Launch home directly
 }
 
 set authenticate(bool value) {
   SharedPreferencesService.setBool('authenticate', value);
 }
 
+//H: Location Updates Pause
+bool get stopLocationUpdate {
+  return SharedPreferencesService.getBool('isLocationUpdatesPaused') ?? false;
+
+  /// Launch home directly
+}
+
+set stopLocationUpdate(bool value) {
+  SharedPreferencesService.setBool('isLocationUpdatesPaused', value);
+}
+
 //H: Location Refresh Interval
 int get locationInterval {
-  return SharedPreferencesService.getInt('locationInterval') ?? 0;
+  return SharedPreferencesService.getInt('locationInterval') ?? 30;
 }
 
 set locationInterval(int value) {
@@ -88,4 +103,22 @@ String get uid {
 
 set uid(String value) {
   SharedPreferencesService.setString('uid', value);
+}
+
+//H: Maximum Message Allowed
+int get maxMessageAllowed {
+  return SharedPreferencesService.getInt('maxMessageAllowed') ?? 3;
+}
+
+set maxMessageAllowed(int value) {
+  SharedPreferencesService.setInt('maxMessageAllowed', value);
+}
+
+//H: Items Per Page
+int get itemsPerPage {
+  return SharedPreferencesService.getInt('itemsPerPage') ?? 5;
+}
+
+set itemsPerPage(int value) {
+  SharedPreferencesService.setInt('itemsPerPage', value);
 }
