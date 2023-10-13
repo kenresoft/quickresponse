@@ -37,7 +37,7 @@ dependencies:
   #open_route_service: ^1.2.3 # --- uses a lower version of http
 
   # --Data/File
-  shared_preferences: ^2.2.1
+  shared_preferences: ^2.2.2
   sqflite: ^2.3.0
   path_provider: ^2.1.1
   path: ^1.8.3
@@ -59,8 +59,8 @@ dependencies:
   background_sms: ^0.0.4
   contacts_service: ^0.6.3
   flutter_ringtone_player: ^3.2.0
-  flutter_callkit_incoming:
-    path: 'packages/flutter_callkit_incoming'
+#  flutter_callkit_incoming:
+#    path: 'packages/flutter_callkit_incoming'
 
   # Utilities
   phone_state: ^1.0.3
@@ -68,23 +68,23 @@ dependencies:
   permission_handler: ^10.4.3
   share_plus: ^7.1.0
   #in_app_update: ^4.2.0
-  local_auth: ^2.1.6
+  local_auth: ^2.1.7
   sensors_plus: ^3.0.3
 
   # Google
-  firebase_core: ^2.15.1
-  firebase_auth: ^4.9.0
-  firebase_analytics: ^10.5.0
-  firebase_storage: ^11.2.7
-  cloud_firestore: ^4.9.1
+  firebase_core: ^2.17.0
+  firebase_auth: ^4.10.1
+  firebase_analytics: ^10.5.1
+  firebase_storage: ^11.2.8
+  cloud_firestore: ^4.9.3
   google_sign_in: ^6.1.5
   in_app_purchase: ^3.1.10
 
   # Device
   flutter_local_notifications: ^15.1.1
   timezone: ^0.9.2
-  connectivity_plus: ^4.0.2
-  webview_flutter: ^4.2.4
+  connectivity_plus: ^5.0.0
+  webview_flutter: ^4.4.1
 
 dev_dependencies:
   flutter_test:
