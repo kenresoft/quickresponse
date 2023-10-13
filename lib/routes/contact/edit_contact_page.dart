@@ -1,32 +1,24 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
-import '../../data/constants/colors.dart';
-import '../../data/constants/constants.dart';
-import '../../data/model/contact.dart';
 import '../../main.dart';
 import '../../services/firebase/firebase_contact.dart';
-import '../../services/firebase/firebase_profile.dart';
 import '../../utils/file_helper.dart';
-import '../../utils/wrapper.dart';
-import '../../widgets/appbar.dart';
 
 // ... (other imports and constants)
 
-class EditContactPage extends StatefulWidget {
+class EditContactPage extends ConsumerStatefulWidget {
   final ContactModel contact;
 
   const EditContactPage({super.key, required this.contact});
 
   @override
-  State<EditContactPage> createState() => _EditContactPageState();
+  ConsumerState<EditContactPage> createState() => _EditContactPageState();
 }
 
-class _EditContactPageState extends State<EditContactPage> {
+class _EditContactPageState extends ConsumerState<EditContactPage> {
   late TextEditingController nameController;
   late TextEditingController relationshipController;
   late TextEditingController phoneController;
@@ -66,7 +58,7 @@ class _EditContactPageState extends State<EditContactPage> {
       height: 45,
       child: Row(
         children: [
-          Icon(prefixIcon ?? Icons.edit, color: AppColor.navIconSelected),
+          Icon(prefixIcon ?? Icons.edit, color: AppColor(theme).navIconSelected),
           const SizedBox(width: 10), // Add spacing between icon and text field
           Expanded(
             child: TextField(
@@ -75,22 +67,22 @@ class _EditContactPageState extends State<EditContactPage> {
               decoration: InputDecoration(
                 labelText: labelText,
                 hintText: hintText,
-                fillColor: AppColor.white,
+                fillColor: AppColor(theme).white,
                 filled: true,
-                focusColor: AppColor.white,
+                focusColor: AppColor(theme).white,
                 prefixIcon: null,
                 // Remove the default prefix icon
                 suffixIcon: Icon(
                   CupertinoIcons.check_mark_circled, // You can change this to the desired Cupertino icon
-                  color: AppColor.black,
+                  color: AppColor(theme).black,
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(40),
-                  borderSide: BorderSide(color: AppColor.text),
+                  borderSide: BorderSide(color: AppColor(theme).text),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(40),
-                  borderSide: BorderSide(color: AppColor.text),
+                  borderSide: BorderSide(color: AppColor(theme).text),
                 ),
               ),
             ),
@@ -141,10 +133,11 @@ class _EditContactPageState extends State<EditContactPage> {
 
   @override
   Widget build(BuildContext context) {
+    //final theme = ref.watch(themeProvider.select((value) => value));
     //FileHelper.file(widget.contact.imageFile).then((file) => mImageFile = file);
     return Scaffold(
-      backgroundColor: AppColor.background,
-      appBar: appBar(
+      backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+      appBar: CustomAppBar(
         title: const Text('Edit Contact', style: TextStyle(fontSize: 20)),
         actionTitle: 'SAVE',
         actionIcon: CupertinoIcons.checkmark_seal,
@@ -156,7 +149,7 @@ class _EditContactPageState extends State<EditContactPage> {
         padding: const EdgeInsets.all(16.0),
         child: Card(
           elevation: 0,
-          color: AppColor.white,
+          color: AppColor(theme).white,
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18.0),
