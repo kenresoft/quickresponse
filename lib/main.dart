@@ -1,52 +1,13 @@
-import 'dart:async';
+import 'package:quickresponse/routes/chat/screens/create_group.dart';
+import 'package:quickresponse/routes/chat/screens/group_chat.dart';
+import 'package:quickresponse/routes/chat/screens/groups.dart';
+import 'package:quickresponse/routes/chat/screens/members.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:extensionresoft/extensionresoft.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fontresoft/fontresoft.dart';
-import 'package:go_router/go_router.dart';
-import 'package:quickresponse/providers/settings/time_format.dart';
-import 'package:quickresponse/providers/settings/time_separator.dart';
-import 'package:quickresponse/services/preference.dart';
-import 'package:timezone/data/latest.dart' as tz;
+import 'imports.dart';
 
-import 'data/constants/constants.dart';
-import 'data/constants/styles.dart';
-import 'data/db/database_client.dart';
-import 'data/model/contact.dart';
-import 'firebase_options.dart';
-import 'providers/providers.dart';
-import 'routes/authentication/device_authentication.dart';
-import 'routes/authentication/sign_in.dart';
-import 'routes/camera/camera_screen.dart';
-import 'routes/chat/chat_list_screen.dart';
-import 'routes/chat/chat_screen.dart';
-import 'routes/chat/new_chat_screen.dart';
-import 'routes/chat/user_search_screen.dart';
-import 'routes/contact/contact_details.dart';
-import 'routes/contact/contact_page.dart';
-import 'routes/contact/contacts.dart';
-import 'routes/contact/edit_contact_page.dart';
-import 'routes/emergency/alarm.dart';
-import 'routes/emergency/custom_messages.dart';
-import 'routes/emergency/emergency_history.dart';
-import 'routes/emergency/media_screen.dart';
-import 'routes/emergency/reminder_page.dart';
-import 'routes/emergency/travellers_alarm.dart';
-import 'routes/main/error.dart';
-import 'routes/main/home.dart';
-import 'routes/main/settings.dart';
-import 'routes/main/subscription_page.dart';
-import 'routes/map/location_map.dart';
-import 'services/notification_service.dart';
-import 'widgets/display/notifications.dart';
+export 'imports.dart';
 
 final notificationService = NotificationService();
-final providerContainer = ProviderContainer();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,7 +19,8 @@ void main() async {
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
   await SharedPreferencesService.init();
-  tz.initializeTimeZones();
+  await BackgroundService.init();
+  initializeTimeZones();
 
   await flutterLocalNotificationsPlugin.initialize(
     const InitializationSettings(
@@ -80,11 +42,11 @@ void main() async {
   DatabaseClient();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-      statusBarColor: appColor.background,
+      statusBarColor: AppColor(theme).background,
       statusBarBrightness: Brightness.dark,
       statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: appColor.text,
-      systemNavigationBarDividerColor: appColor.divider,
+      systemNavigationBarColor: AppColor(theme).text,
+      systemNavigationBarDividerColor: AppColor(theme).divider,
     ),
   );
   SystemChrome.setPreferredOrientations([
@@ -110,67 +72,61 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final dp = Density.init(context);
-    return Consumer(
-      builder: (BuildContext context, WidgetRef ref, Widget? child) {
-        var state = ref.watch(themeProvider.select((value) => value));
-        initAppPreferences(ref);
+    Future(() => setState(() => theme = theme));
 
-        return MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          title: Constants.appName,
-          themeMode: condition(state, ThemeMode.light, ThemeMode.dark),
-          theme: ThemeData(
-              useMaterial3: true,
-              brightness: Brightness.light,
-              colorSchemeSeed: Colors.redAccent,
-              fontFamily: FontResoft.sourceSansPro,
-              package: FontResoft.package,
-              highlightColor: Colors.transparent,
-              splashColor: Colors.transparent,
-              typography: Typography.material2021(englishLike: Typography.dense2021),
-              textTheme: TextTheme(bodyMedium: TextStyle(color: appColor.title_2)),
-              cardColor: Colors.white,
-              dialogBackgroundColor: Colors.white,
-              dividerColor: appColor.divider,
-              //scaffoldBackgroundColor: appColor.background,
-              //bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor: appColor.white),
-              appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent)),
-          darkTheme: ThemeData(
-              useMaterial3: true,
-              brightness: Brightness.dark,
-              colorSchemeSeed: Colors.redAccent,
-              fontFamily: FontResoft.sourceSansPro,
-              package: FontResoft.package,
-              highlightColor: Colors.transparent,
-              splashColor: Colors.transparent,
-              textTheme: TextTheme(bodyMedium: TextStyle(color: appColor.title_2)),
-              cardColor: appColor.black,
-              dialogBackgroundColor: appColor.black,
-              dividerColor: appColor.divider,
-              //scaffoldBackgroundColor: appColor.backgroundDark,
-              appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent)),
-          routeInformationProvider: _router.routeInformationProvider,
-          routeInformationParser: _router.routeInformationParser,
-          routerDelegate: _router.routerDelegate,
-          shortcuts: {
-            ...WidgetsApp.defaultShortcuts,
-            const SingleActivator(LogicalKeyboardKey.select): const ActivateIntent(),
-          },
-          localizationsDelegates: const [],
-        );
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: Constants.appName,
+      themeMode: condition(theme, ThemeMode.light, ThemeMode.dark),
+      theme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.light,
+          colorSchemeSeed: Colors.redAccent,
+          fontFamily: FontResoft.sourceSansPro,
+          package: FontResoft.package,
+          highlightColor: Colors.transparent,
+          splashColor: Colors.transparent,
+          typography: Typography.material2021(englishLike: Typography.dense2021),
+          textTheme: TextTheme(bodyMedium: TextStyle(color: AppColor(theme).title_2)),
+          cardColor: Colors.white,
+          dialogBackgroundColor: Colors.white,
+          dividerColor: AppColor(theme).divider,
+          //scaffoldBackgroundColor: AppColor(theme).background,
+          //bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor: AppColor(theme).white),
+          appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent)),
+      darkTheme: ThemeData(
+          useMaterial3: true,
+          brightness: Brightness.dark,
+          colorSchemeSeed: Colors.redAccent,
+          fontFamily: FontResoft.sourceSansPro,
+          package: FontResoft.package,
+          highlightColor: Colors.transparent,
+          splashColor: Colors.transparent,
+          textTheme: TextTheme(bodyMedium: TextStyle(color: AppColor(theme).title_2)),
+          cardColor: AppColor(theme).black,
+          dialogBackgroundColor: AppColor(theme).black,
+          dividerColor: AppColor(theme).divider,
+          //scaffoldBackgroundColor: AppColor(theme).backgroundDark,
+          appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent)),
+      routeInformationProvider: _router.routeInformationProvider,
+      routeInformationParser: _router.routeInformationParser,
+      routerDelegate: _router.routerDelegate,
+      shortcuts: {
+        ...WidgetsApp.defaultShortcuts,
+        const SingleActivator(LogicalKeyboardKey.select): const ActivateIntent(),
       },
+      localizationsDelegates: const [],
     );
   }
 
-  Future<void> initAppPreferences(WidgetRef ref) async {
-    final bool theme = SharedPreferencesService.getBool('theme') ?? true;
-    await Future(() => ref.watch(themeProvider.notifier).toggleTheme(theme));
+/*  Future<void> initAppPreferences() async {
+    theme = theme;
+    //final bool theme = SharedPreferencesService.getBool('theme') ?? true;
+    //await Future(() => ref.watch(themeProvider.notifier).toggleTheme(theme));
     //ref.watch(timeFormatProvider.notifier).timeFormat;
     //timeFormat;
     //ref.watch(timeSeparatorProvider.notifier).timeSeparator;
-
-  }
+  }*/
 }
 
 final GoRouter _router = GoRouter(
@@ -182,39 +138,49 @@ final GoRouter _router = GoRouter(
     return null;
   },*/
   routes: <GoRoute>[
-    route(Constants.root, const DeviceAuthentication()),
+    route(Constants.root, authenticate ? const DeviceAuthentication() : const Home()),
     route(Constants.home, const Home()),
     route(Constants.camera, const CameraScreen()),
     route(Constants.contacts, const Contacts()),
     //route(Constants.contactDetails, const ContactDetails()),
     //route(Constants.editContactPage, const EditContactPage()),
     _route(Constants.contactDetails, (context, state) {
-      final contact = state.extra as ContactModel; // Retrieve the contact data from extra
+      final contact = state.extra as ContactModel;
       return ContactDetails(contact: contact); // Pass the contact data to ContactDetails
     }),
     _route(Constants.editContactPage, (context, state) {
-      final contact = state.extra as ContactModel; // Retrieve the contact data from extra
-      return EditContactPage(contact: contact); // Pass the contact data to EditContactPage
+      final contact = state.extra as ContactModel;
+      return EditContactPage(contact: contact);
     }),
 
     _route(Constants.chat, (context, state) {
-      final record = state.extra as (String, String, String); // Retrieve the contact data from extra
-      return ChatScreen(chatId: record.$1, userId: record.$2, receiverId: record.$3); // Pass the contact data to EditContactPage
+      final record = state.extra as (String, String, String);
+      return ChatScreen(chatId: record.$1, userId: record.$2, receiverId: record.$3);
     }),
 
     _route(Constants.chatsList, (context, state) {
-      final user = state.extra as String; // Retrieve the contact data from extra
-      return ChatListScreen(userId: user); // Pass the contact data to EditContactPage
+      final user = state.extra as String;
+      return ChatListScreen(userId: user);
     }),
 
     _route(Constants.newChatsList, (context, state) {
-      final user = state.extra as String; // Retrieve the contact data from extra
-      return NewChatScreen(userId: user); // Pass the contact data to EditContactPage
+      final user = state.extra as String;
+      return NewChatScreen(userId: user);
+    }),
+
+    _route(Constants.settings, (context, state) {
+      final type = state.extra as SettingType?;
+      return SettingsPage(settingType: type ?? SettingType.none);
+    }),
+
+    _route('/m', (context, state) {
+      final record = state.extra as (String, String);
+      return GroupMembersScreen(groupId: record.$1, currentUserId: record.$2);
     }),
 
     /*_route(Constants.travellersAlarm, (context, state) {
-      final response = state.extra as NotificationResponseModel; // Retrieve the contact data from extra
-      return TravellersAlarm(notificationResponse: response); // Pass the contact data to EditContactPage
+      final response = state.extra as NotificationResponseModel;
+      return TravellersAlarm(notificationResponse: response);
     }),*/
     route(Constants.userSearchScreen, const UserSearchScreen()),
     route(Constants.contactsPage, const ContactPage()),
@@ -223,13 +189,18 @@ final GoRouter _router = GoRouter(
     route(Constants.alarm, const AlarmScreen()),
     route(Constants.message, const CustomMessageGeneratorPage()),
     route(Constants.history, const EmergencyHistoryPage()),
-    route(Constants.settings, const SettingsPage()),
+    //route(Constants.settings, const SettingsPage()),
     route(Constants.subscription, const SubscriptionPage()),
     route(Constants.authentication, const DeviceAuthentication()),
     route(Constants.signIn, const SignIn()),
     route(Constants.reminderPage, const ReminderPage()),
-    route(Constants.travellersAlarm, const TravellersAlarm()),
+    route(Constants.travellersAlarm, const Emergency()),
     route(Constants.media, const MediaScreen()),
+    route(Constants.userProfilePage, const UserProfilePage()),
+
+    route('/cgs', CreateGroupScreen()),
+    route('/cs', const GroupsScreen()),
+    //route('cg', const GroupChatScreen(group: group)),
 
     //route(Constants.mapScreen, const MapScreen()),
     route(Constants.error, const ErrorPage()),
@@ -285,9 +256,8 @@ finish(BuildContext context) => GoRouter.of(context).pop();
 
 FutureOr appCallback(void value) async {
   runApp(
-    ProviderScope(
-      parent: providerContainer,
-      child: const MyApp(),
+    const ProviderScope(
+      child: MyApp(),
     ),
   );
 }
