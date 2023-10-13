@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-
 ///import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
@@ -14,11 +13,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/model/pin_pill_info.dart';
-import 'package:quickresponse/providers/location_providers.dart';
 import 'package:quickresponse/utils/extensions.dart';
 import 'package:quickresponse/widgets/map/map_pin_pill.dart';
 
 import '../../data/constants/styles.dart';
+import '../../providers/settings/prefs.dart';
 
 const double CAMERA_ZOOM = 16;
 const double CAMERA_TILT = 80;
@@ -52,7 +51,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
   BitmapDescriptor destinationIcon = BitmapDescriptor.defaultMarker;
 
   // the user's initial location and current location as it moves
-  Position? currentLocation;
+  //Position? currentLocation;
 
   // a reference to the destination location
   Position? destinationLocation;
@@ -107,14 +106,14 @@ class _LocationMapState extends ConsumerState<LocationMap> {
       tilt: CAMERA_TILT,
       bearing: CAMERA_BEARING,
     );
-    if (currentLocation != null) {
-      initialCameraPosition = CameraPosition(
-        target: LatLng(currentLocation!.latitude, currentLocation!.longitude),
-        zoom: CAMERA_ZOOM,
-        tilt: CAMERA_TILT,
-        bearing: CAMERA_BEARING,
-      );
-    }
+    //if (currentLocation != null) {
+    initialCameraPosition = CameraPosition(
+      target: LatLng(latitude.toDouble(), longitude.toDouble()),
+      zoom: CAMERA_ZOOM,
+      tilt: CAMERA_TILT,
+      bearing: CAMERA_BEARING,
+    );
+    //}
 
     return Scaffold(
       body: Stack(children: <Widget>[
@@ -149,34 +148,34 @@ class _LocationMapState extends ConsumerState<LocationMap> {
           widget.disableWidgets
               ? const SizedBox()
               : Align(
-                  alignment: Alignment.bottomCenter,
-                  widthFactor: 2.2,
-                  child: SizedBox(
-                    width: 0.30.dpW(dp),
-                    height: 35,
-                    child: MaterialButton(
-                      color: appColor.alert_1.withOpacity(0.7),
-                      padding: const EdgeInsets.all(10),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-                      onPressed: () async {
-                        final GoogleMapController controller = await _controller.future;
-                        controller.animateCamera(CameraUpdate.newCameraPosition(_destination));
-                      },
-                      child: Row(children: [
-                        Icon(Icons.directions_run, color: appColor.white),
-                        Text('Destination', style: TextStyle(color: appColor.white)),
-                      ]),
-                    ),
-                  ),
-                )
+            alignment: Alignment.bottomCenter,
+            widthFactor: 2.2,
+            child: SizedBox(
+              width: 0.30.dpW(dp),
+              height: 35,
+              child: MaterialButton(
+                color: AppColor(theme).alert_1.withOpacity(0.7),
+                padding: const EdgeInsets.all(10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                onPressed: () async {
+                  final GoogleMapController controller = await _controller.future;
+                  controller.animateCamera(CameraUpdate.newCameraPosition(_destination));
+                },
+                child: Row(children: [
+                  Icon(Icons.directions_run, color: AppColor(theme).white),
+                  Text('Destination', style: TextStyle(color: AppColor(theme).white)),
+                ]),
+              ),
+            ),
+          )
         ],
         ...[
           widget.disableWidgets
               ? const SizedBox()
               : MapPinPillComponent(
-                  pinPillPosition: pinPillPosition,
-                  currentlySelectedPin: currentlySelectedPin,
-                ),
+            pinPillPosition: pinPillPosition,
+            currentlySelectedPin: currentlySelectedPin,
+          ),
         ]
       ]),
     );
@@ -187,7 +186,6 @@ class _LocationMapState extends ConsumerState<LocationMap> {
   }
 
   void updatePosition() {
-    currentLocation = ref.watch(positionProvider.select((value) => value));
     destinationLocation = Position.fromMap({"latitude": DEST_LOCATION.latitude, "longitude": DEST_LOCATION.longitude});
     updatePinOnMap();
   }
@@ -239,10 +237,10 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     // get a LatLng for the source location
     // from the LocationData currentLocation object
     var pinPosition = LatLng(
-      currentLocation!.latitude,
-      currentLocation!.longitude,
+      latitude.toDouble(),
+      longitude.toDouble(),
     );
-    log('PIN: ${currentLocation!.latitude}');
+    log('PIN: $latitude');
     // get a LatLng out of the LocationData object
     var destPosition = LatLng(
       destinationLocation!.latitude,
@@ -251,7 +249,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
 
     sourcePinInfo = PinInformation(
       locationName: "Start Location",
-      location: LatLng(currentLocation!.latitude, currentLocation!.longitude),
+      location: LatLng(latitude.toDouble(), longitude.toDouble()),
       pinPath: Constants.drivingPin,
       avatarPath: Constants.profile,
       labelColor: Colors.blueAccent,
@@ -318,7 +316,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     // that a widget update is due
     setState(() {
       // updated position
-      var pinPosition = LatLng(currentLocation!.latitude, currentLocation!.longitude);
+      var pinPosition = LatLng(latitude.toDouble(), longitude.toDouble());
 
       sourcePinInfo.location = pinPosition;
 
@@ -359,7 +357,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
 
     // Map route coordinates to a list of LatLng (requires google_maps_flutter package)
     // to be used in the Map route Polyline.
-    final List<LatLng> routePoints = [] /*routeCoordinates*/ .map((coordinate) => LatLng(coordinate.latitude, coordinate.longitude)).toList();
+    final List<LatLng> routePoints = [] /*routeCoordinates*/.map((coordinate) => LatLng(coordinate.latitude, coordinate.longitude)).toList();
 
     if (routePoints.isNotEmpty && !widget.disableWidgets) {
       for (var point in routePoints) {
@@ -391,5 +389,15 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     );*/
 
     // Use Polyline to draw route on map or do anything else with the data :)
+  }
+}
+
+extension ToDouble on String {
+  double toDouble() {
+    try {
+      return double.parse(this);
+    } catch (_) {
+      return 0; // Return null if the conversion fails
+    }
   }
 }
