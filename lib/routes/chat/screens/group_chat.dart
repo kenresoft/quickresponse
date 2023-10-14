@@ -26,54 +26,52 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       appBar: AppBar(
         title: GestureDetector(onTap: () => launch(context, '/m', (widget.groupId, widget.userId)), child: const Text('Group Chat')),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('groups').doc(widget.groupId).collection('chats').orderBy('timestamp', descending: true).snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                }
-                return ListView.builder(
-                  reverse: true,
-                  itemCount: snapshot.data?.docs.length ?? 0,
-                  itemBuilder: (context, index) {
-                    var messageData = snapshot.data!.docs[index].data() as Map<String, dynamic>;
-                    String messageText = messageData['message'];
-                    String senderId = messageData['senderId'];
-                    Timestamp timestamp = messageData['timestamp'] as Timestamp;
-                    bool isOwnMessage = senderId == widget.userId;
+      body: Column(children: [
+        Expanded(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance.collection('groups').doc(widget.groupId).collection('chats').orderBy('timestamp', descending: true).snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              }
+              return ListView.builder(
+                reverse: true,
+                itemCount: snapshot.data?.docs.length ?? 0,
+                itemBuilder: (context, index) {
+                  var messageData = snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                  String messageText = messageData['message'];
+                  String senderId = messageData['senderId'];
+                  Timestamp timestamp = messageData['timestamp'] as Timestamp;
+                  bool isOwnMessage = senderId == widget.userId;
 
-                    return MessageBubble(
-                      message: messageText,
-                      isOwnMessage: isOwnMessage,
-                      time: _formatTimestamp(timestamp),
-                    );
-                  },
-                );
-              },
-            ),
+                  return MessageBubble(
+                    message: messageText,
+                    isOwnMessage: isOwnMessage,
+                    time: _formatTimestamp(timestamp),
+                  );
+                },
+              );
+            },
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: const InputDecoration(labelText: 'Type your message...'),
-                  ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _messageController,
+                  decoration: const InputDecoration(labelText: 'Type your message...'),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: _sendMessage,
-                ),
-              ],
-            ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.send),
+                onPressed: _sendMessage,
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ]),
     );
   }
 

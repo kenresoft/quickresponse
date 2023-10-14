@@ -75,43 +75,35 @@ class _GroupMembersScreenState extends State<GroupMembersScreen> {
               return const ListTile(title: Text('Unknown User.'));
             } else if (!snapshot.hasData || snapshot.data?.uid == null) {
               // Handle the case when the user profile could not be found
-              return const SizedBox(); //const ListTile(title: Text('Unknown User..'));
+              return const SizedBox();
             } else {
               ProfileInfo memberInfo = snapshot.data!;
               bool isMainAdmin = _group.adminId == memberId;
               bool isAdmin = _group.adminIds.contains(memberId);
+              bool isAdminUser = _group.adminIds.contains(widget.currentUserId);
 
               return Card(
                 elevation: 0,
                 color: Colors.white,
-                child: ListTile(
-                  title: Expanded(child: Text(index == 0 ? '${memberInfo.displayName ?? 'Unknown User...'} (You)' : memberInfo.displayName ?? 'Unknown User....')),
-                  subtitle: null,
-                  trailing: SizedBox(
-                    width: 80,
-                    child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                      if (!isMainAdmin)
-                        Row(mainAxisSize: MainAxisSize.min, children: [
-                          if (!isAdmin)
-                            // Admin can add a member as admin
-                            IconButton(
-                              icon: const Icon(CupertinoIcons.person_add),
-                              onPressed: () => _addAdmin(memberId),
-                            ),
-                          // Admin can remove a member from the group
-                          IconButton(icon: const Icon(CupertinoIcons.xmark_octagon_fill, color: Colors.red), onPressed: () => _removeMember(memberId)),
-                        ]),
-                      GestureDetector(
-                        // Admin can remove a member from the group (except for the main admin)
-                        onTap: () => {if (!isMainAdmin && isAdmin) _removeMember(memberId)},
-                        child: isMainAdmin
-                            ? const Text('Admin', style: TextStyle(color: Colors.red))
-                            : isAdmin
-                                ? const Text('Admin', style: TextStyle(color: Colors.blue))
-                                : null,
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  height: 70,
+                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children: [
+                    Row(children: [
+                      buildImage(memberInfo),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 100,
+                        child: Text(maxLines: 3, overflow: TextOverflow.ellipsis, memberInfo.displayName ?? 'Unknown User....', style: const TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ]),
-                  ),
+                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                      if (!isMainAdmin && !isAdmin && !isAdminUser) IconButton(icon: const Icon(CupertinoIcons.person_add, color: Colors.green), onPressed: () => _addAdmin(memberId)),
+                      if (!isMainAdmin && !isAdmin) IconButton(icon: const Icon(CupertinoIcons.xmark_rectangle, color: Colors.red), onPressed: () => _removeMember(memberId)),
+                      if (!isMainAdmin && isAdmin) IconButton(icon: const Icon(CupertinoIcons.xmark_rectangle, color: Colors.red), onPressed: () => _removeMember(memberId)),
+                      Text(isAdmin ? 'Admin   ' : 'Member', style: TextStyle(color: isMainAdmin ? Colors.red : Colors.blue, fontWeight: isMainAdmin ? FontWeight.bold : null)),
+                    ])
+                  ]),
                 ),
               );
             }
@@ -141,10 +133,29 @@ class _GroupMembersScreenState extends State<GroupMembersScreen> {
                   } else {
                     ProfileInfo memberInfo = snapshot.data!;
                     bool isMainAdmin = _group.adminId == memberId;
+                    bool isAdmin = _group.adminIds.contains(memberId);
+                    bool isAdminUser = _group.adminIds.contains(widget.currentUserId);
 
-                    return ListTile(
-                      title: Text(memberInfo.displayName ?? 'Unknown User'), // Use displayName here
-                      trailing: isMainAdmin ? const Text('Admin', style: TextStyle(color: Colors.red)) : null,
+                    return Card(
+                      elevation: 0,
+                      color: Colors.white,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16),
+                        height: 70,
+                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children: [
+                          Row(children: [
+                            buildImage(memberInfo),
+                            const SizedBox(width: 8),
+                            SizedBox(
+                              width: 125,
+                              child: Text(maxLines: 3, overflow: TextOverflow.ellipsis, memberInfo.displayName ?? 'Unknown User....', style: const TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ]),
+                          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                            Text(isAdmin ? 'Admin   ' : 'Member', style: TextStyle(color: isMainAdmin ? Colors.red : Colors.blue, fontWeight: isMainAdmin ? FontWeight.bold : null)),
+                          ])
+                        ]),
+                      ),
                     );
                   }
                 },
@@ -212,3 +223,21 @@ class _GroupMembersScreenState extends State<GroupMembersScreen> {
     );
   }
 }
+
+Widget buildImage(ProfileInfo? user) {
+  return SizedBox(
+    width: 32,
+    height: 32,
+    child: user != null && user.photoURL != null
+        ? ClipOval(
+            child: CachedNetworkImage(
+              imageUrl: user.photoURL!,
+              placeholder: (context, url) => buildIcon,
+              errorWidget: (context, url, error) => Icon(CupertinoIcons.exclamationmark_triangle, color: AppColor(theme).action),
+            ),
+          )
+        : buildIcon,
+  );
+}
+
+Widget get buildIcon => const Icon(CupertinoIcons.info);
