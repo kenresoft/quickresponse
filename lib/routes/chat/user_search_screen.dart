@@ -1,8 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:quickresponse/services/firebase/firebase_profile.dart';
-import 'package:quickresponse/utils/extensions.dart';
-
+import 'package:quickresponse/main.dart';
 class UserSearchScreen extends StatefulWidget {
   const UserSearchScreen({super.key});
 
