@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../widgets/toast.dart';
+import '../widgets/display/toast.dart';
 
 class Util {
   Util._();
@@ -82,6 +82,4 @@ class Util {
 
     return formattedCategory;
   }
-
-
 }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'density.dart';
+import '../data/constants/styles.dart';
+import '../providers/settings/prefs.dart';
 
 extension Dp on num {
   double dpH(Density density) {
@@ -22,7 +23,7 @@ extension Dp on num {
 extension BuildCxt<T> on BuildContext {
   void toast(T msg, [TextAlign? textAlign, Color? color]) {
     ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(content: Text(msg.toString(), textAlign: textAlign), backgroundColor: color),
+      SnackBar(content: Text(msg.toString(), textAlign: textAlign), backgroundColor: color ?? AppColor(theme).black),
     );
   }
 

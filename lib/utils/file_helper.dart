@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:quickresponse/utils/extensions.dart';
 
-import '../data/constants/colors.dart';
+import '../data/constants/styles.dart';
+import '../providers/settings/prefs.dart';
 
 class FileHelper {
   static String getTempFilePath(String fileName) {
@@ -60,7 +61,7 @@ Widget profilePicture(String? targetFile, {double? size, bool isLoading = false,
         Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: borderColor ?? AppColor.text, width: 2.0),
+            border: Border.all(color: borderColor ?? AppColor(theme).text, width: 2.0),
           ),
           child: targetFile == null
               ? Padding(
@@ -68,13 +69,13 @@ Widget profilePicture(String? targetFile, {double? size, bool isLoading = false,
                   child: Icon(
                     CupertinoIcons.person_alt, // Display a default icon if no image is selected
                     size: size != null ? size + size - 5 : 90,
-                    color: AppColor.navIconSelected,
+                    color: AppColor(theme).navIconSelected,
                   ),
                 )
               : CircleAvatar(radius: size ?? 50, backgroundImage: FileImage(File(targetFile))),
         ),
-        overlay ? Icon(CupertinoIcons.camera, size: 48, color: AppColor.white) : const SizedBox(),
-        if (isLoading) const CircularProgressIndicator(), // Show loading indicator when isLoading is true
+        overlay ? Icon(CupertinoIcons.camera, size: 48, color: AppColor(theme).white) : const SizedBox(),
+        if (isLoading) const Center(child: CircularProgressIndicator()),
       ],
     ),
   );
