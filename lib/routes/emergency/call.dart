@@ -6,18 +6,18 @@ import 'package:extensionresoft/extensionresoft.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:quickresponse/camera_preview.dart';
-import 'package:quickresponse/data/constants/colors.dart';
-import 'package:quickresponse/data/model/contact.dart';
-import 'package:quickresponse/utils/density.dart';
-import 'package:quickresponse/utils/extensions.dart';
-import 'package:quickresponse/utils/util.dart';
-import 'package:quickresponse/widgets/alert_button.dart';
-import 'package:quickresponse/widgets/blinking_text.dart';
-import 'package:quickresponse/widgets/emergency_card.dart';
-import 'package:quickresponse/widgets/suggestion_card.dart';
 
+import '../../providers/settings/prefs.dart';
+import '../camera/camera_preview.dart';
 import '../../data/constants/constants.dart';
+import '../../data/constants/styles.dart';
+import '../../data/model/contact.dart';
+import '../../utils/extensions.dart';
+import '../../utils/util.dart';
+import '../../widgets/display/blinking_text.dart';
+import '../../widgets/inputs/alert_button.dart';
+import '../../widgets/screens/emergency_card.dart';
+import '../../widgets/screens/suggestion_card.dart';
 
 class Call extends StatefulWidget {
   const Call({
@@ -103,7 +103,7 @@ class _CallState extends State<Call> {
         }
       },
       child: Scaffold(
-        backgroundColor: shouldHide ? AppColor.black : AppColor.overlay,
+        backgroundColor: shouldHide ? AppColor(theme).black : AppColor(theme).overlay,
         body: Center(
           child: Column(children: [
             0.05.dpH(dp).spY,
@@ -118,7 +118,8 @@ class _CallState extends State<Call> {
                   child: Text(widget.videoTimer!),
                 ),
               ),
-            ),GestureDetector(
+            ),
+            GestureDetector(
               onTap: () => setState(() {
                 shouldHide = !shouldHide;
               }),
@@ -126,28 +127,28 @@ class _CallState extends State<Call> {
                 padding: const EdgeInsets.only(right: 15),
                 child: Align(
                   alignment: Alignment.topRight,
-                  child: Icon(shouldHide ? CupertinoIcons.eye_slash : CupertinoIcons.eye, color: AppColor.white, size: 22),
+                  child: Icon(shouldHide ? CupertinoIcons.eye_slash : CupertinoIcons.eye, color: AppColor(theme).white, size: 22),
                 ),
               ),
             ),
             0.08.dpH(dp).spY,
-            Icon(CupertinoIcons.phone_arrow_up_right, color: AppColor.white, size: 40),
+            Icon(CupertinoIcons.phone_arrow_up_right, color: AppColor(theme).white, size: 40),
             0.05.dpH(dp).spY,
-            Text('Want to call emergency number?', style: TextStyle(fontSize: 16, color: AppColor.white)),
+            Text('Want to call emergency number?', style: TextStyle(fontSize: 16, color: AppColor(theme).white)),
             0.05.dpH(dp).spY,
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               EmergencyCard(
-                child: BlinkingText(contact?.phone ?? '112', style: TextStyle(fontSize: 55, color: AppColor.action, fontWeight: FontWeight.w500)),
+                child: BlinkingText(contact?.phone ?? '112', style: TextStyle(fontSize: 55, color: AppColor(theme).action, fontWeight: FontWeight.w500)),
               ),
               0.05.dpW(dp).spX,
               contact?.phone == null
                   ? EmergencyCard(
-                      child: BlinkingText('911', style: TextStyle(fontSize: 55, color: AppColor.action_2, fontWeight: FontWeight.w500), delay: true),
+                      child: BlinkingText('911', style: TextStyle(fontSize: 55, color: AppColor(theme).action_2, fontWeight: FontWeight.w500), delay: true),
                     )
                   : const SizedBox(),
             ]),
             0.10.dpH(dp).spY,
-            Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor.white, fontWeight: FontWeight.w600)),
+            Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor(theme).white, fontWeight: FontWeight.w600)),
             0.03.dpH(dp).spY,
             SizedBox(
               height: 120,
@@ -210,7 +211,7 @@ IconButton buildIconButton(IconData iconData, double size, {Function()? onPresse
     onPressed: onPressed,
     icon: Icon(iconData, size: size),
     style: ButtonStyle(
-      backgroundColor: MaterialStatePropertyAll(AppColor.overlay),
+      backgroundColor: MaterialStatePropertyAll(AppColor(theme).overlay),
       fixedSize: const MaterialStatePropertyAll(Size.square(58)),
     ),
   );
@@ -251,7 +252,7 @@ Widget buildContactsCarousel(String userId, {required Function() onTap, required
                 ),
               ],
             ),
-            Text('$itemIndex', style: TextStyle(fontSize: 18, color: AppColor.white)),
+            Text('$itemIndex', style: TextStyle(fontSize: 18, color: AppColor(theme).white)),
           ]),
         ),
       );

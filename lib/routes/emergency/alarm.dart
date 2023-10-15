@@ -4,9 +4,8 @@ import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/emergency/notification_response_model.dart';
 import 'package:quickresponse/main.dart';
 import 'package:quickresponse/utils/extensions.dart';
-import 'package:timezone/timezone.dart' as tz;
 
-import '../../widgets/notifications.dart';
+import '../../widgets/display/notifications.dart';
 
 class AlarmScreen extends StatefulWidget {
   const AlarmScreen({super.key});
