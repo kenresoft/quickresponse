@@ -1,8 +1,3 @@
-import 'package:quickresponse/routes/chat/screens/create_group.dart';
-import 'package:quickresponse/routes/chat/screens/group_chat.dart';
-import 'package:quickresponse/routes/chat/screens/groups.dart';
-import 'package:quickresponse/routes/chat/screens/members.dart';
-
 import 'imports.dart';
 
 export 'imports.dart';

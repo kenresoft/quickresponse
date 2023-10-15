@@ -15,11 +15,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
   late TextEditingController _aboutMeController;
   final FocusNode _focusNode = FocusNode();
   int count = 0;
+  late ProfileInfo profileInfo;
 
   @override
   void initState() {
     super.initState();
     _aboutMeController = TextEditingController(text: note);
+    profileInfo = getProfileInfoFromSharedPreferences();
     //internetConnection = InternetConnection();
   }
 
@@ -53,48 +55,34 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
           ),
           body: Center(
-            child: FutureBuilder<ProfileInfo?>(
-              future: getProfileInfoFromSharedPreferences(), //_loadProfileInfo(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data == null) {
-                  return const Center(child: Text('No data available'));
-                }
-
-                ProfileInfo? profileInfo = snapshot.data;
-                return Container(
-                  height: double.infinity,
-                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  decoration: BoxDecoration(color: theme ? AppColor(theme).white : AppColor(theme).black, borderRadius: BorderRadius.circular(15)),
-                  padding: const EdgeInsets.all(1),
-                  child: Container(
-                    decoration: BoxDecoration(color: theme ? AppColor(theme).background : AppColor(theme).backgroundDark, borderRadius: BorderRadius.circular(15)),
-                    padding: const EdgeInsets.all(8),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: SingleChildScrollView(
-                        child: Container(
-                          decoration: BoxDecoration(color: theme ? AppColor(theme).background : AppColor(theme).backgroundDark, borderRadius: BorderRadius.circular(15)),
-                          //margin: const EdgeInsets.all(2),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              buildImage(theme),
-                              const SizedBox(height: 16),
-                              buildCard(CupertinoIcons.person, 'Name', profileInfo!.displayName!, theme),
-                              const SizedBox(height: 16),
-                              buildCard(CupertinoIcons.mail, 'Email', profileInfo.email!, theme),
-                              const SizedBox(height: 16),
-                              buildCard(CupertinoIcons.phone, 'Phone', profileInfo.phoneNumber ?? '', theme),
-                              const SizedBox(height: 16),
-                              buildCard(CupertinoIcons.staroflife, 'Profile Status', profileInfo.isComplete.toString(), theme),
-                              const SizedBox(height: 16),
-                              buildNoteCard(),
-                              const SizedBox(height: 16),
-                              /*buildCard(
+            child: Container(
+              height: double.infinity,
+              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              decoration: BoxDecoration(color: theme ? AppColor(theme).white : AppColor(theme).black, borderRadius: BorderRadius.circular(15)),
+              padding: const EdgeInsets.all(1),
+              child: Container(
+                decoration: BoxDecoration(color: theme ? AppColor(theme).background : AppColor(theme).backgroundDark, borderRadius: BorderRadius.circular(15)),
+                padding: const EdgeInsets.all(8),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: SingleChildScrollView(
+                    child: Container(
+                      decoration: BoxDecoration(color: theme ? AppColor(theme).background : AppColor(theme).backgroundDark, borderRadius: BorderRadius.circular(15)),
+                      //margin: const EdgeInsets.all(2),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        buildImage(profileInfo, theme),
+                        const SizedBox(height: 16),
+                        buildCard(CupertinoIcons.person, 'Name', profileInfo.displayName!, theme),
+                        const SizedBox(height: 16),
+                        buildCard(CupertinoIcons.mail, 'Email', profileInfo.email!, theme),
+                        const SizedBox(height: 16),
+                        buildCard(CupertinoIcons.phone, 'Phone', profileInfo.phoneNumber ?? '', theme),
+                        const SizedBox(height: 16),
+                        buildCard(CupertinoIcons.staroflife, 'Profile Status', profileInfo.isComplete.toString(), theme),
+                        const SizedBox(height: 16),
+                        buildNoteCard(),
+                        const SizedBox(height: 16),
+                        /*buildCard(
                                 CupertinoIcons.time,
                                 'Last Signed In',
                                 '${formatDateTime(
@@ -108,40 +96,37 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 )}',
                                 theme),
                             const SizedBox(height: 16),*/
-                              InkWell(
-                                onTap: () => launch(context, Constants.settings),
-                                child: buildCard(CupertinoIcons.settings, 'Settings', 'View App Settings', theme),
-                              ),
-                              const SizedBox(height: 16),
-                              InkWell(
-                                onTap: () => showDialog(
-                                  context: context,
-                                  builder: (context) => const HTMLDialog(
-                                    htmlAsset1: 'assets/data/quickresponse_policies.html', // Path to your HTML asset file 1
-                                    htmlAsset2: 'assets/data/quickresponse_terms.html', // Path to your HTML asset file 2
-                                  ),
-                                ),
-                                child: buildCard(CupertinoIcons.padlock, 'Terms and Policy', 'View App Privacy Policy & Terms', theme),
-                              ),
-                              const SizedBox(height: 16),
+                        InkWell(
+                          onTap: () => launch(context, Constants.settings),
+                          child: buildCard(CupertinoIcons.settings, 'Settings', 'View App Settings', theme),
+                        ),
+                        const SizedBox(height: 16),
+                        InkWell(
+                          onTap: () => showDialog(
+                            context: context,
+                            builder: (context) => const HTMLDialog(
+                              htmlAsset1: 'assets/data/quickresponse_policies.html', // Path to your HTML asset file 1
+                              htmlAsset2: 'assets/data/quickresponse_terms.html', // Path to your HTML asset file 2
+                            ),
+                          ),
+                          child: buildCard(CupertinoIcons.padlock, 'Terms and Policy', 'View App Privacy Policy & Terms', theme),
+                        ),
+                        const SizedBox(height: 16),
 
-                              Center(
-                                child: ElevatedButton(
-                                  style: const ButtonStyle(surfaceTintColor: MaterialStatePropertyAll(Colors.white)),
-                                  onPressed: () => phoneEditDialog(context, profileInfo),
-                                  child: const Text('Change Phone Number'),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              // Add current location and app usage summary widgets here
-                            ],
+                        Center(
+                          child: ElevatedButton(
+                            style: const ButtonStyle(surfaceTintColor: MaterialStatePropertyAll(Colors.white)),
+                            onPressed: () => phoneEditDialog(context, profileInfo),
+                            child: const Text('Change Phone Number'),
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 16),
+                        // Add current location and app usage summary widgets here
+                      ]),
                     ),
                   ),
-                );
-              },
+                ),
+              ),
             ),
           ),
         ),
@@ -249,33 +234,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  Widget buildImage(bool theme) {
+  Widget buildImage(ProfileInfo profileInfo, bool theme) {
     return Center(
       child: Container(
         margin: const EdgeInsets.all(16),
-        child: FutureBuilder<ProfileInfo?>(
-          future: getProfileInfoFromSharedPreferences(),
-          builder: (context, snapshot) {
-            final user = snapshot.data;
-            if (user != null && user.photoURL != null) {
-              return CircleAvatar(
-                radius: 60.6,
-                backgroundColor: AppColor(theme).alert_2,
-                child: CircleAvatar(
-                  radius: 60,
-                  backgroundColor: AppColor(theme).white,
-                  child: CachedNetworkImage(
-                    fit: BoxFit.fill,
-                    imageUrl: user.photoURL!,
-                    placeholder: (context, url) => buildIcon,
-                    errorWidget: (context, url, error) => Icon(CupertinoIcons.exclamationmark_triangle, color: AppColor(theme).action),
-                  ),
-                ),
-              );
-            } else {
-              return buildIcon;
-            }
-          },
+        child: CircleAvatar(
+          radius: 60.6,
+          backgroundColor: AppColor(theme).alert_2,
+          child: CircleAvatar(
+            radius: 60,
+            backgroundColor: AppColor(theme).white,
+            child: CachedNetworkImage(
+              fit: BoxFit.fill,
+              imageUrl: profileInfo.photoURL!,
+              placeholder: (context, url) => buildIcon,
+              errorWidget: (context, url, error) => Icon(CupertinoIcons.exclamationmark_triangle, color: AppColor(theme).action),
+            ),
+          ),
         ),
       ),
     );
