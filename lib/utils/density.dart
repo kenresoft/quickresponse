@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+part of '../data/constants/styles.dart';
 
 class Density {
   Density.init(BuildContext context)
@@ -10,5 +10,3 @@ class Density {
   final double width;
   final double aspectRatio;
 }
-
-
