@@ -5,10 +5,12 @@ class Toast extends StatelessWidget {
     this.text, {
     super.key,
     required this.show,
+    this.top,
   });
 
   final bool show;
   final String? text;
+  final double? top;
 
   bool get _show {
     if (text == null) {
@@ -22,7 +24,7 @@ class Toast extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedPositioned(
       key: ValueKey(text),
-      top: _show ? 35 : -300,
+      top: _show ? top ?? 35 : -300,
       right: 0,
       left: 0,
       duration: const Duration(milliseconds: 300),
@@ -45,7 +47,7 @@ class Toast extends StatelessWidget {
             ],
           ),
           child: Center(
-            child: Text(text!, textAlign: TextAlign.center),
+            child: Text(text?? '...', textAlign: TextAlign.center),
           ),
         ),
       ),

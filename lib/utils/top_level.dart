@@ -57,14 +57,15 @@ Future<void> signOut() async {
 }
 
 Future<void> clearSharedPreferences() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.clear();
+  var themeCache = theme;
+  await SharedPreferencesService.clear();
+  theme = themeCache;
 }
 
 bool isSignedIn() {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final user = auth.currentUser;
-  if (user != null) return true;
+  if (user != null && uid != 'No uid') return true;
   return false;
 }
 
@@ -102,7 +103,7 @@ String dateFromTimestamp(Timestamp timestamp) {
 }
 
 // Helper method to format the time based on the selected time separator
-String formatTime(WidgetRef ref, DateTime dateTime, TimeFormatOption formatOption) {
+String formatTime(DateTime dateTime, TimeFormatOption formatOption) {
   return switch (formatOption) {
     TimeFormatOption.format12Hours => DateFormat('hh${timeSeparator}mm a').format(dateTime),
     TimeFormatOption.format24Hours => DateFormat('HH${timeSeparator}mm').format(dateTime),
@@ -110,7 +111,7 @@ String formatTime(WidgetRef ref, DateTime dateTime, TimeFormatOption formatOptio
   };
 }
 
-String formatDate(WidgetRef ref, DateTime dateTime, DateFormatOption formatOption) {
+String formatDate(DateTime dateTime, DateFormatOption formatOption) {
   return switch (formatOption) {
     DateFormatOption.format1 => DateFormat('MM${dateSeparator}dd${dateSeparator}yyyy').format(dateTime),
     DateFormatOption.format2 => DateFormat('dd${dateSeparator}MMM${dateSeparator}yyyy').format(dateTime),

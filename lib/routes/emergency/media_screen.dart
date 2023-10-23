@@ -15,9 +15,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
   @override
   void initState() {
     super.initState();
-    getProfileInfoFromSharedPreferences().then((value) {
-      setState(() => profileInfo = value);
-    });
+    profileInfo = getProfileInfoFromSharedPreferences();
   }
 
   @override

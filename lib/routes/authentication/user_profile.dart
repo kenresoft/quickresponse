@@ -4,7 +4,7 @@ import 'package:quickresponse/providers/note_provider.dart';
 import '../../widgets/dialogs/html_dialog.dart';
 
 class UserProfilePage extends StatefulWidget {
-  const UserProfilePage({Key? key}) : super(key: key);
+  const UserProfilePage({super.key});
 
   @override
   State<UserProfilePage> createState() => _UserProfilePageState();
@@ -14,7 +14,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   //late InternetConnection internetConnection;
   late TextEditingController _aboutMeController;
   final FocusNode _focusNode = FocusNode();
-  int count = 0;
   late ProfileInfo profileInfo;
 
   @override
@@ -38,7 +37,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    count + 1.log;
     return WillPopScope(
       onWillPop: () => replace(context, Constants.home),
       child: focus(
@@ -50,7 +48,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor(theme).navIconSelected),
             actionTitle: '',
             action2: GestureDetector(
-              onTap: () => _showSignOutConfirmationDialog(context, theme),
+              onTap: () => isSignedIn() ? _showSignOutConfirmationDialog(context, theme) : launchReplace(context, Constants.authentication),
               child: Transform.rotate(angle: pi / 2, child: Icon(CupertinoIcons.share, color: AppColor(theme).navIconSelected)),
             ),
           ),
@@ -244,11 +242,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
           child: CircleAvatar(
             radius: 60,
             backgroundColor: AppColor(theme).white,
-            child: CachedNetworkImage(
-              fit: BoxFit.fill,
-              imageUrl: profileInfo.photoURL!,
-              placeholder: (context, url) => buildIcon,
-              errorWidget: (context, url, error) => Icon(CupertinoIcons.exclamationmark_triangle, color: AppColor(theme).action),
+            child: ClipRRect(borderRadius: BorderRadius.circular(30),
+              child: CachedNetworkImage(
+                fit: BoxFit.fill,
+                imageUrl: profileInfo.photoURL!,
+                placeholder: (context, url) => buildIcon,
+                errorWidget: (context, url, error) => Icon(CupertinoIcons.exclamationmark_triangle, color: AppColor(theme).action),
+              ),
             ),
           ),
         ),
@@ -278,34 +278,35 @@ class _UserProfilePageState extends State<UserProfilePage> {
       ),
     );
   }
-}
 
-Future<void> _showSignOutConfirmationDialog(BuildContext context, bool theme) async {
-  return showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        surfaceTintColor: Colors.transparent,
-        backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
-        title: const Text('Confirm Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Sign out the user here
-              signOut().then((value) => launch(context, Constants.authentication));
-              Navigator.of(context).pop(); // Dismiss the dialog
-            },
-            child: const Text('Sign Out'),
-          ),
-        ],
-      );
-    },
-  );
+  Future<void> _showSignOutConfirmationDialog(BuildContext context, bool theme) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+          title: const Text('Confirm Sign Out'),
+          content: const Text('Are you sure you want to sign out?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                BuildContext currentContext = context; // Capture the current context
+                Navigator.of(currentContext).pop(); // Use the captured context
+                signOut().then((_) {});
+                Future(() => launchReplace(currentContext, Constants.authentication));
+              },
+              child: const Text('Sign Out'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

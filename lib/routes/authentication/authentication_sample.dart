@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 
-import '../../data/constants/constants.dart';
 import '../../main.dart';
 
 class Authentication extends StatefulWidget {
@@ -152,16 +149,10 @@ class _AuthenticationState extends State<Authentication> {
             const Text('This device is not supported'),
           const Divider(height: 100),
           Text('Can check biometrics: $_canCheckBiometrics\n'),
-          ElevatedButton(
-            onPressed: _checkBiometrics,
-            child: const Text('Check biometrics'),
-          ),
+          ElevatedButton(onPressed: _checkBiometrics, child: const Text('Check biometrics')),
           const Divider(height: 100),
           Text('Available biometrics: $_availableBiometrics\n'),
-          ElevatedButton(
-            onPressed: _getAvailableBiometrics,
-            child: const Text('Get available biometrics'),
-          ),
+          ElevatedButton(onPressed: _getAvailableBiometrics, child: const Text('Get available biometrics')),
           const Divider(height: 100),
           Text('Current State: $_authorized\n'),
           if (_isAuthenticating)
@@ -176,13 +167,10 @@ class _AuthenticationState extends State<Authentication> {
             Column(children: [
               ElevatedButton(
                 onPressed: _authenticate,
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Authenticate'),
-                    Icon(Icons.perm_device_information),
-                  ],
-                ),
+                child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text('Authenticate'),
+                  Icon(Icons.perm_device_information),
+                ]),
               ),
               ElevatedButton(
                 onPressed: _authenticateWithBiometrics,

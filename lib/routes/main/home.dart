@@ -1,390 +1,246 @@
-import 'dart:async';
-import 'dart:developer';
+import '../../main.dart';
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:extensionresoft/extensionresoft.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:quickresponse/data/constants/colors.dart';
-import 'package:quickresponse/data/constants/constants.dart';
-import 'package:quickresponse/data/db/location_db.dart';
-import 'package:quickresponse/data/emergency/emergency.dart';
-import 'package:quickresponse/data/model/profile_info.dart';
-import 'package:quickresponse/main.dart';
-import 'package:quickresponse/providers/location_providers.dart';
-import 'package:quickresponse/providers/page_provider.dart';
-import 'package:quickresponse/routes/authentication/user_profile.dart';
-import 'package:quickresponse/services/firebase/firebase_location.dart';
-import 'package:quickresponse/services/firebase/firebase_profile.dart';
-import 'package:quickresponse/utils/density.dart';
-import 'package:quickresponse/utils/extensions.dart';
-import 'package:quickresponse/utils/wrapper.dart';
-import 'package:quickresponse/widgets/alert_button.dart';
-import 'package:quickresponse/widgets/blinking_text.dart';
-import 'package:quickresponse/widgets/bottom_navigator.dart';
-import 'package:quickresponse/widgets/exit_dialog.dart';
-import 'package:quickresponse/widgets/tips_carousel.dart';
-import 'package:quickresponse/widgets/toast.dart';
-import 'package:sqflite/sqflite.dart';
-
-import '../../widgets/html_dialog.dart';
-
-class Home extends ConsumerStatefulWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
 
   @override
-  ConsumerState<Home> createState() => _HomeState();
+  State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends ConsumerState<Home> {
+class _HomeState extends State<Home> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late Future<List<EmergencyTip>> _tips;
-  late GeolocatorPlatform _geolocator;
-  Position? _position;
-  List<Map>? _location;
-  bool isLocationReady = false;
-  List<Placemark>? placemarks;
-  Widget mPage = const SizedBox();
-  bool isAppLaunched = false;
-  String? url;
-  bool connected = false;
 
-  final Connectivity _connectivity = Connectivity();
-  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  String _connectionStatus = 'Unknown';
+  //final LocationService _locationService = LocationService();
+  late String _locationData;
+  late String _streetAddress;
+  bool _isPermissionDenied = false;
 
-  Stream<ServiceStatus>? _locationStatusStream;
-  String _locationStatus = 'Unknown';
+  //bool _isLocationUpdatesPaused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _tips = loadEmergencyTips();
+    _locationData = 'Fetching location...';
+    _streetAddress = 'Fetching address...';
+    WidgetsBinding.instance.addObserver(this);
+    _checkLocationPermission();
+  }
 
   @override
   void setState(VoidCallback fn) {
     if (mounted) super.setState(fn);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // WidgetsBinding.instance.addObserver(this);
-    _tips = loadEmergencyTips();
-    Future(() => ref.watch(locationDbProvider.notifier).initialize());
-    _geolocator = GeolocatorPlatform.instance;
-/*    _geolocator.requestPermission().then((value) {
-      if (value == LocationPermission.always || value == LocationPermission.whileInUse) {
-        setState(() {});
+  void _checkLocationPermission() async {
+    bool isPermissionDenied = false;
+    await LocationService.startLocationUpdates(
+      (position) async {
+        setState(() {
+          if (stopLocationUpdate) {
+            _locationData = 'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
+            _getAddressFromCoordinates(position.latitude, position.longitude);
+            latitude = position.latitude;
+            longitude = position.longitude;
+          }
+        });
+      },
+      (isDenied) {
+        setState(() => isPermissionDenied = isDenied);
+      },
+    );
+
+    setState(() => _isPermissionDenied = isPermissionDenied);
+  }
+
+  Future<void> _getAddressFromCoordinates(double latitude, double longitude) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+      if (placemarks.isNotEmpty) {
+        Placemark placemark = placemarks[0];
+        setState(() => _streetAddress = placemark.thoroughfare ?? 'Address not found');
       }
-    });*/
+    } catch (e) {
+      setState(() => _streetAddress = 'Address not found');
+      'Error fetching address: $e'.log;
+    }
+  }
 
-    _initConnectivity();
-    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  // void _toggleLocationUpdates() {
+  //   setState(() => isLocationUpdatesPaused = !isLocationUpdatesPaused);
+  //
+  //   if (isLocationUpdatesPaused) {
+  //     _locationService.stopLocationUpdates();
+  //   } else {
+  //     _checkLocationPermission();
+  //   }
+  // }
 
-    _locationStatusStream = Geolocator.getServiceStatusStream();
-    _locationStatusStream?.listen((status) {
-      setState(() {
-        _locationStatus = _getStatusString(status);
-      });
-    });
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      'resumed'.log;
+      if (stopLocationUpdate) {
+        _checkLocationPermission();
+      }
+    } else if (state == AppLifecycleState.paused) {
+      'paused'.log;
+      // H: uncommenting this will automatically turn off the location updates when the page is paused
+      //LocationService.stopLocationUpdates();
+    }
   }
 
   @override
   void dispose() {
-    _connectivitySubscription.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    // H: uncommenting this will automatically turn off the location updates when the page is exited
+    //LocationService.stopLocationUpdates();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
-    Database? db = ref.watch(locationDbProvider.select((value) => value));
-    _position = ref.watch(positionProvider.select((value) => value));
-    getLocationFromStorage(db);
-    log('Loc: $_location');
-    log('Pos: $_position');
-    getPlacemarks(db);
-
-    if (!isAppLaunched) {
-      setState(() {
-        isAppLaunched = true;
-        mPage = buildPage(context, dp);
-      });
-    } else {
-      _geolocator.requestPermission();
-    }
-
-    final page = ref.watch(pageProvider.select((value) => value));
-
-    // Show the bottom sheet when location is not ready
-/*    if (!isLocationReady) {
-      _showBottomSheet(context);
-    }*/
-
     return WillPopScope(
-      onWillPop: () async {
-        bool isLastPage = page.isEmpty;
-        if (isLastPage) {
-          return (await showExitDialog(context))!;
-        } else {
-          return true;
-        }
-      },
+      onWillPop: () async => (await showExitDialog(context, theme))!,
       child: Scaffold(
         key: _scaffoldKey,
-        backgroundColor: AppColor.background,
-        appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColor.background),
-        body: SingleChildScrollView(
-          child: Stack(children: [
-            Center(
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 100),
-                child: mPage,
-                transitionBuilder: (child, animation) => FadeTransition(
-                  opacity: CurvedAnimation(parent: animation, curve: Curves.easeInOutBack),
-                  child: child,
-                ),
-              ),
-            ),
-          ]),
-        ),
+        backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+        appBar: AppBar(toolbarHeight: 0),
+        body: SingleChildScrollView(child: Center(child: buildPage(context, dp))),
         bottomNavigationBar: const BottomNavigator(currentIndex: 0),
       ),
     );
   }
 
-/*  void _showBottomSheet(BuildContext context) {
-    _scaffoldKey.currentState?.showBottomSheet(
-      (context) {
-        return BottomSheetContent(
-          locationStatus: _locationStatus,
-          connectionStatus: _connectionStatus,
-        );
-      },
-    );
-  }*/
-
-  String _getStatusString(ServiceStatus status) {
-    switch (status) {
-      case ServiceStatus.enabled:
-        return 'Location Services Enabled';
-      case ServiceStatus.disabled:
-        return 'Location Services Disabled';
-    }
-  }
-
-  Future<void> _initConnectivity() async {
-    ConnectivityResult result = ConnectivityResult.none;
-    try {
-      result = await _connectivity.checkConnectivity();
-    } catch (e) {
-      print(e.toString());
-    }
-    _updateConnectionStatus(result);
-  }
-
-  void _updateConnectionStatus(ConnectivityResult result) {
-    setState(() {
-      switch (result) {
-        case ConnectivityResult.wifi:
-          _connectionStatus = 'Connected to WiFi';
-          break;
-        case ConnectivityResult.mobile:
-          _connectionStatus = 'Connected to Mobile Network';
-          break;
-        case ConnectivityResult.none:
-          _connectionStatus = 'No Internet Connection';
-          break;
-        default:
-          _connectionStatus = 'Unknown';
-          break;
-      }
-    });
-  }
-
-/*  Future<Widget> showConnectivityMessage() async {
-    final String message = await checkConnectivityAndShowToast();
-    return Toast(_connectionStatus,, show: !isLocationReady, top: 20);
-  }
-
-  Future<String> checkConnectivityAndShowToast() async {
-    final bool isConnected = await connectivityCheck();
-    if (isConnected) {
-      // You are connected to the internet
-      return "The location service on the device is disabled!";
-    } else {
-      // No internet connectivity
-      return "No Internet connectivity";
-    }
-  }*/
-
-  StreamBuilder<Position> buildStreamBuilder(Density dp) {
-    return StreamBuilder<Position>(
-        stream: _geolocator.getPositionStream(),
-        builder: (context, snapshot) {
-          Position? position;
-
-          if (snapshot.hasData) {
-            position = snapshot.data;
-            if (position != null) {
-              Future(() => ref.watch(positionProvider.notifier).setPosition = position);
-              isLocationReady = true;
-            }
-          } else if (snapshot.hasError) {
-            isLocationReady = false;
-            log("Error: ${snapshot.error}");
-            //return ErrorPage(error: snapshot.error.toString());
-          } else {
-            if (placemarks == null && _position != null) {
-              rebuild();
-            }
-            log(placemarks.toString());
-            log(_position.toString());
-
-            if (_location != null) {
-              if (_location!.isNotEmpty) {
-                Map<String, Object> map = {
-                  'latitude': _location?.first['latitude'],
-                  'longitude': _location?.first['longitude'],
-                };
-                log('if');
-                Future(() => ref.watch(positionProvider.notifier).setPosition = Position.fromMap(map));
-              }
-            } else {
-              log('else');
-              //initLocationDb(db);
-              rebuild();
-              //ref.watch(positionProvider.select((value) => value));
-            }
-          }
-
-          /// ADD A BUTTON TO FETCH AND/OR REFRESH LOCATION
-          /// attention:
-          return buildPage(context, dp);
-        });
-  }
-
-  /// HOME PAGE
   Widget buildPage(BuildContext context, Density dp) {
     return Column(children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        child: buildRow(context, _position, dp),
+      Padding(padding: const EdgeInsets.symmetric(horizontal: 15), child: buildRow(context, dp)),
+
+      0.015.dpH(dp).spY,
+
+      condition(
+        _isPermissionDenied,
+        const Text('Location permission denied.', textAlign: TextAlign.center, style: TextStyle(color: Colors.red)),
+        GestureDetector(
+          onTap: () => launch(context, Constants.settings, SettingType.locationUpdate),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            condition(
+              !stopLocationUpdate,
+              const Text('Location Updates Paused:', style: TextStyle(color: Colors.red)),
+              const Text('Location Updates Active:', style: TextStyle(color: Colors.green)),
+            ),
+            0.01.dpW(dp).spX,
+            condition(
+              !stopLocationUpdate,
+              Text('Resume?', style: TextStyle(fontWeight: FontWeight.w900, color: AppColor(theme).title)),
+              Text('Pause?', style: TextStyle(fontWeight: FontWeight.w900, color: AppColor(theme).title)),
+            )
+          ]),
+        ),
       ),
 
-      0.03.dpH(dp).spY,
+      0.001.dpH(dp).spY,
 
       // 2
-      0.7.dpW(dp).spaceX(Text(
-            'Emergency help needed?',
-            style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: AppColor.title),
-            textAlign: TextAlign.center,
-          )),
+      0.7.dpW(dp).spaceX(Text('Emergency help needed?', style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: AppColor(theme).title), textAlign: TextAlign.center)),
       0.01.dpH(dp).spY,
 
       // 3
-      Text(
-        'Just hold the button to call',
-        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20, color: AppColor.text),
-      ),
+      Text('Just hold the button to call', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20, color: AppColor(theme).text)),
       0.05.dpH(dp).spY,
 
       // 4
-      Stack(
-        children: [
-          Center(
-            child: Tooltip(
-              message: 'Alert for self',
-              child: AlertButton(
-                height: 180,
-                width: 176,
-                borderWidth: 3,
-                shadowWidth: 15,
-                iconSize: 50,
-                onPressed: () => launch(context, Constants.camera),
+      Stack(children: [
+        Center(
+          child: Tooltip(
+            message: 'Alert for self',
+            child: AlertButton(
+              height: 180,
+              width: 175,
+              borderWidth: 3,
+              shadowWidth: 15,
+              iconSize: 75,
+              onPressed: () => conditionFunction(
+                !isSignedIn(),
+                () => _showSignInDialog,
+                () {
+                  conditionFunction(
+                    customMessagesList.isNotEmpty,
+                    () {
+                      conditionFunction(sosMessage.isNotEmpty, () {
+                        final newEmergencyAlert = EmergencyAlert.autoIncrement(
+                          type: EmergencyAlert.getAlertTypeFromCustomMessage(sosMessage),
+                          dateTime: DateTime.now(),
+                          location: 'Latitude: $latitude, Longitude: $longitude',
+                          details: 'From ${getProfileInfoFromSharedPreferences().displayName}',
+                          customMessage: sosMessage,
+                          hasLocationData: latitude != 0 && longitude != 0,
+                        );
+
+                        // H: SEND SOS FROM HERE
+
+                        var alerts = emergencyAlerts;
+                        alerts.add(newEmergencyAlert);
+                        emergencyAlerts = alerts;
+
+                        context.toast('Alert Delivered successfully!\nMESSAGE: "$sosMessage"', TextAlign.center, Colors.green.shade300);
+                      }, () => context.toast('Default Message Not Selected!', TextAlign.center, Colors.orange.shade300));
+                    },
+                    () => context.toast('No Defined SOS Message!', TextAlign.center, Colors.red.shade300),
+                  );
+                },
               ),
             ),
           ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: Tooltip(
-                message: 'Alert for contacts',
-                child: AlertButton(
-                  height: 56,
-                  width: 55,
-                  borderWidth: 0,
-                  shadowWidth: 0,
-                  showSecondShadow: false,
-                  iconSize: 20,
-                  onPressed: () => signOut().then((value) => launch(context, Constants.authentication)) /*launch(context, Constants.subscription)*/,
-                ),
-              ),
+        ),
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: FloatingActionButton(
+              elevation: 0,
+              shape: const CircleBorder(),
+              backgroundColor: AppColor(theme).miniAlert,
+              tooltip: 'Alert for contacts',
+              onPressed: conditionFunction(!isSignedIn(), () => _showSignInDialog, () => _showSOSDialog),
+              child: const Icon(CupertinoIcons.mail),
             ),
           ),
-        ],
-      ),
+        ),
+      ]),
       0.08.dpH(dp).spY,
 
       // 5
       GestureDetector(
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) => const HTMLDialog(
-              htmlAsset1: 'assets/data/quickresponse_policies.html', // Path to your HTML asset file 1
-              htmlAsset2: 'assets/data/quickresponse_terms.html', // Path to your HTML asset file 2
-            ),
-          );
-        },
-        child: Text(
-          'Not sure what to do?',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColor.title),
-        ),
-      ),
+          //onTap: () => setState(() => authenticate = !authenticate),
+          child: Text('Not sure what to do?', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColor(theme).title))),
       SizedBox(height: 0.03.dpH(dp)),
       // 6
       GestureDetector(
-          onTap: () {
-            getProfileInfoFromSharedPreferences().then(
-              (profileInfo) => launch(context, Constants.chatsList, profileInfo.uid),
-            );
-          },
-          child: Text('Pick the subject to chat', style: TextStyle(fontSize: 16, color: AppColor.text))),
+        onTap: () => launch(context, '/cgs'),
+        //onTap: () => replace(context, authenticate ? Constants.authentication : Constants.home), // H: important for restart or so...
+        child: Text('Pick the subject to chat', style: TextStyle(fontSize: 16, color: AppColor(theme).text)),
+      ),
       0.03.dpH(dp).spY,
 
       // 7
       FutureBuilder<List<EmergencyTip>>(
-        future: _tips,
+        //future: _tips,
+        future: loadEmergencyTips(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError || snapshot.data == null) {
-              return const Center(
-                child: Text('Error loading tips'),
-              );
-            }
-            final tips = snapshot.data!;
-            return SizedBox(
-              width: double.infinity,
-              height: 150,
-              child: TipSlider(tips: tips),
-            );
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+          //if (snapshot.connectionState == ConnectionState.done) {}
+          if (snapshot.hasError || snapshot.data == null) {
+            return Center(child: Text('Error loading tips: ${snapshot.error}'));
           }
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final tips = snapshot.data!;
+          return SizedBox(width: double.infinity, height: 155, child: TipSlider(tips: tips, action: () => setState(() {})));
         },
       ),
-
-      /*.12.dpH(dp).spaceY(ListView.builder(
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          itemCount: 6,
-          itemBuilder: (BuildContext context, int index) {
-            return const SuggestionCard(text: 'He had an accident');
-          })),*/
 
       0.03.dpH(dp).spY,
 
@@ -392,150 +248,84 @@ class _HomeState extends ConsumerState<Home> {
     ]);
   }
 
-  void rebuild({dynamic action}) {
-    if (action == null) {
-      Future(() => setState(() {}));
-    } else {
-      Future(() => action);
-    }
+  void _showSOSDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SOSDialog(
+          sosMessages: customMessagesList,
+          onMessageSelected: (message) {
+            setState(() => sosMessage = message);
+            // Here you can send the SOS message
+          },
+        );
+      },
+    );
   }
 
-  Future<void> initLocationDb(Database? db) async {
-    await LocationDB(db).initialize();
+  void _showSignInDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) => SignInDialog(action: () => setState(() {})),
+    );
   }
 
-  Future<void> getLocationFromStorage(Database? db) async {
-    _location = await LocationDB(db).getLocation().then((value) {
-      log("Location: $value");
-      return value;
-    });
-  }
-
-  Future<void> getPlacemarks(Database? db) async {
-    if (_position != null) {
-      placemarks = await GeocodingPlatform.instance.placemarkFromCoordinates(_position!.latitude, _position!.longitude);
-      getProfileInfoFromSharedPreferences().then(
-        (profileInfo) => saveUserLocationToFirestore(
-          profileInfo.uid!,
-          _position!,
-        ),
-      );
-      await LocationDB(db).updateLocation(_position!, placemarks!);
-    }
-  }
-
-  /// TOP ROW
-  Row buildRow(BuildContext context, Position? position, Density dp) {
+  Row buildRow(BuildContext context, Density dp) {
+    var user = getProfileInfoFromSharedPreferences();
     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       GestureDetector(
-        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-          builder: (BuildContext context) => const UserProfilePage(),
-        )),
+        onTap: () => conditionFunction(
+          isButtonDisabled,
+          () {},
+          () => isSignedIn() ? replace(context, Constants.userProfilePage) : _showSignInDialog(),
+        ),
         child: Row(children: [
-          buildImage(),
+          buildImage(user),
           const SizedBox(width: 5),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Hi Susan!', style: TextStyle(fontSize: 15, color: AppColor.text)),
+            Text(
+              '${isSignedIn() ? 'Hi ${getFirstName(user.displayName)}' : 'Welcome'} !',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColor(theme).text),
+            ),
             Row(children: [
-              Text('Complete profile', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColor.action)),
+              condition(
+                isSignedIn(),
+                condition(
+                  user.isComplete,
+                  const Text('Profile is completed!', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.green)),
+                  Text('Complete your profile!', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppColor(theme).action)),
+                ),
+                const Text('Sign In to continue', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              ),
               const SizedBox(width: 5),
-              Icon(CupertinoIcons.check_mark_circled, size: 12, color: AppColor.action),
+              condition(
+                isSignedIn(),
+                condition(
+                  user.isComplete,
+                  Icon(CupertinoIcons.check_mark_circled, size: 12, color: AppColor(theme).action_2),
+                  Icon(CupertinoIcons.xmark_circle, size: 12, color: AppColor(theme).action),
+                ),
+                Icon(CupertinoIcons.nosign, size: 12, color: AppColor(theme).action),
+              )
             ]),
           ])
         ]),
       ),
-      GestureDetector(
-        onTap: () {
-          isLocationReady
-              ? launch(context, Constants.locationMap)
-              : setState(() {
-                  mPage = buildPage(context, dp);
-                });
-          Future.delayed(const Duration(milliseconds: 500), () {
-            setState(() {
-              mPage = buildStreamBuilder(dp);
-            });
-          });
-        },
-        child: Row(children: [
-          Column(children: [
-            BlinkingText(
-              isLocationReady
-                  ? placemarks == null
-                      ? 'Loading...'
-                      : '${placemarks!.first.name!}...'
-                  : 'Tap to load',
-              blink: isLocationReady ? true : false,
-              style: TextStyle(
-                fontSize: 15,
-                color: isLocationReady
-                    ? placemarks == null
-                        ? Colors.amber
-                        : Colors.green
-                    : AppColor.text,
-              ),
-            ),
-            Text(
-              'See your location',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15, color: AppColor.action),
-            ),
+      Builder(builder: (context) {
+        return GestureDetector(
+          onTap: () {
+            if (_streetAddress != 'Fetching address...' && _streetAddress.isNotEmpty) launch(context, Constants.locationMap);
+          },
+          child: Row(children: [
+            Column(children: [
+              BlinkingText(trim(_streetAddress), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: AppColor(theme).text)),
+              const Text('See your location', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.green)),
+            ]),
+            const Icon(CupertinoIcons.location_solid, color: Colors.green, size: 13),
           ]),
-          Icon(CupertinoIcons.location_solid, color: AppColor.action),
-        ]),
-      ),
+        );
+      }),
     ]);
-  }
-
-  Widget buildImage() {
-    return SizedBox(
-      width: 32,
-      height: 32,
-      child: FutureBuilder<ProfileInfo?>(
-        future: getProfileInfoFromSharedPreferences(),
-        builder: (context, snapshot) {
-          final user = snapshot.data;
-          if (user != null && user.photoURL != null) {
-            return ClipOval(
-              child: CachedNetworkImage(
-                imageUrl: user.photoURL!,
-                placeholder: (context, url) => buildIcon,
-                errorWidget: (context, url, error) => Icon(CupertinoIcons.exclamationmark_triangle, color: AppColor.action),
-              ),
-            );
-          } else {
-            return buildIcon;
-          }
-        },
-      ),
-    );
-  }
-
-  Widget get buildIcon => const Icon(CupertinoIcons.info);
-}
-
-class BottomSheetContent extends StatefulWidget {
-  final String locationStatus;
-  final String connectionStatus;
-
-  const BottomSheetContent({
-    super.key,
-    required this.locationStatus,
-    required this.connectionStatus,
-  });
-
-  @override
-  State<BottomSheetContent> createState() => _BottomSheetContentState();
-}
-
-class _BottomSheetContentState extends State<BottomSheetContent> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Toast(widget.locationStatus, show: true, top: 20),
-        Toast(widget.connectionStatus, show: true, top: 60),
-      ],
-    );
   }
 }

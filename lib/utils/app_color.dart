@@ -15,6 +15,11 @@ class AppColor {
   Color background = const Color(0xffEFF2F9);
   Color backgroundDark = const Color(0xff292A30);
 
+  Color btn_1 = const Color(0xffD80000);
+  Color btn_2 = const Color(0xffF22524);
+
+  Color get bg => theme ? const Color(0xffEFF2F9) : const Color(0xff292A30);
+
   Color get title => theme ? const Color(0xff3D4459) : Colors.white;
 
   Color get title_2 => theme ? const Color(0xff4D5366) : Colors.white70;
@@ -23,10 +28,17 @@ class AppColor {
   Color overlay = const Color(0x40A5ACBF);
   Color text = const Color(0xffA5ACBF);
 
+  Color get dropdown => theme ? const Color(0xffdee4f1) : backgroundDark;
+  Color get miniAlert => theme ? const Color(0xffdee4f1) : const Color(0xff2D344B);
+
   Color get white => theme ? const Color(0xffFFFFFF) : const Color(0xff2D344B);
   Color whiteTransparent = const Color(0xfcFFFFFF);
   Color alertBorder = const Color(0xffB1B6C7);
   Color alert_1 = const Color(0xffFE6464);
+
+  Color get bubble_1 => theme ? const Color(0xffFE6464) : const Color(0xff4B1A13);
+
+  Color get bubble_2 => theme ? const Color(0xffB1B6C7) : const Color(0xff3A3B40);
   Color alertTransparent = const Color(0xccFE6464);
 
   Color get alert_2 => theme ? const Color(0xffD80000) : AppColor(theme).alertBorder;
@@ -46,6 +58,12 @@ class AppColor {
   Color get fab => theme ? const Color(0xbbffffff) : AppColor(theme).black;
 
   LinearGradient get alertMix => LinearGradient(
+        colors: [AppColor(theme).alert_1, AppColor(theme).alert_2_],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      );
+
+  LinearGradient get alertMixPressed => LinearGradient(
         colors: [AppColor(theme).alert_1, AppColor(theme).alert_2_],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,

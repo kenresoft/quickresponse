@@ -1,8 +1,8 @@
+
 import 'dart:ui';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:quickresponse/main.dart';
+
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -191,10 +191,3 @@ class _SignInState extends State<SignIn> {
   }
 }
 
-extension Er on Future {
-  Future error(BuildContext context) {
-    return catchError((error) {
-      context.toast(error);
-    });
-  }
-}

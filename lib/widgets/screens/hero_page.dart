@@ -1,27 +1,37 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quickresponse/utils/extensions.dart';
-import 'package:quickresponse/widgets/blinking_text.dart';
+import 'package:quickresponse/widgets/display/blinking_text.dart';
 
-import '../data/constants/colors.dart';
-import '../data/emergency/emergency.dart';
-import '../utils/density.dart';
-import '../utils/util.dart';
+import '../../data/constants/styles.dart';
+import '../../data/emergency/emergency.dart';
+import '../../providers/settings/prefs.dart';
+import '../../utils/util.dart';
+import '../display/color_mix.dart';
 import 'appbar.dart';
-import 'color_mix.dart';
 
-class HeroPage extends StatelessWidget {
+class HeroPage extends ConsumerStatefulWidget {
   final EmergencyTip tip;
 
   const HeroPage({super.key, required this.tip});
 
   @override
+  ConsumerState<HeroPage> createState() => _HeroPageState();
+}
+
+class _HeroPageState extends ConsumerState<HeroPage> {
+  @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
     return Scaffold(
-      appBar: appBar(
+      backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+      appBar: CustomAppBar(
         leading: const Icon(CupertinoIcons.increase_quotelevel),
-        title: Text(tip.shortDescription),
+        title: Text(
+          widget.tip.shortDescription,
+          style: const TextStyle(fontSize: 21),
+        ),
         actionTitle: '',
         actionIcon: null,
       ),
@@ -32,13 +42,13 @@ class HeroPage extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border.all(
               width: 1,
-              color: AppColor.overlay,
+              color: AppColor(theme).overlay,
             ),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Hero(
-              tag: tip.iconData, // Use the image URL as the hero tag
+              tag: widget.tip.iconData, // Use the image URL as the hero tag
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -46,21 +56,21 @@ class HeroPage extends StatelessWidget {
                     null,
                     isNotText: true,
                     child: ColorMix(
-                      gradient: AppColor.alert,
+                      gradient: AppColor(theme).alertMix,
                       child: Icon(
-                        tip.iconData,
+                        widget.tip.iconData,
                         size: 72.0,
-                        color: AppColor.action, // Customize the icon color
+                        color: AppColor(theme).action, // Customize the icon color
                       ),
                     ),
                   ),
                   SizedBox(
                     width: 0.6.dpW(dp),
                     child: ColorMix(
-                      gradient: AppColor.radiant,
+                      gradient: AppColor(theme).textMix,
                       child: Text(
                         softWrap: true,
-                        Util.formatCategory(tip.category),
+                        Util.formatCategory(widget.tip.category),
                         style: const TextStyle(fontSize: 24),
                       ),
                     ),
@@ -75,9 +85,9 @@ class HeroPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             ColorMix(
-              gradient: AppColor.textMix,
+              gradient: AppColor(theme).iconMix,
               child: Text(
-                tip.longDescription,
+                widget.tip.longDescription,
                 style: const TextStyle(fontSize: 30),
               ),
             ),

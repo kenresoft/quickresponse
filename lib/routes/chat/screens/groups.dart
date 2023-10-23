@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:quickresponse/routes/chat/screens/helper.dart';
-
+import 'package:quickresponse/main.dart';
 import '../model.dart';
 import '../service.dart';
 import 'group_chat.dart';
@@ -18,8 +17,11 @@ class _GroupsScreenState extends State<GroupsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Groups'),
+      backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+      appBar: CustomAppBar(
+        leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor(theme).navIconSelected),
+        title: const Text('Groups', style: TextStyle(fontSize: 20)),
+        actionTitle: '',
       ),
       body: StreamBuilder<List<Group>>(
         stream: getGroups(), // Stream of groups from Firestore
@@ -39,33 +41,41 @@ class _GroupsScreenState extends State<GroupsScreen> {
                 bool isAdmin = group.adminId == getCurrentUserId();
                 bool isGroupMember = group.members.contains(getCurrentUserId());
 
-                return ListTile(
-                  title: Text(group.groupName),
-                  subtitle: Text(group.groupDescription),
-                  trailing: isAdmin
-                      ? GestureDetector(
-                          onTap: () {
-                            // Handle admin logic to accept join requests
-                            _handleJoinRequests(group);
-                          },
-                          child: Text('${group.joinRequests?.length ?? 0} Requests'))
-                      : null,
-                  onTap: () {
-                    if (isGroupMember) {
-                      // If user is a group member, navigate to the GroupChatScreen directly
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => GroupChatScreen(groupId: group.groupId, userId: getCurrentUserId())),
-                      );
-                    } else {
-                      if (isAdmin) {
-                        // TODO:
-                      } else {
-                        // Non-admin user needs to enter group ID to join
-                        _showJoinGroupDialog(group);
-                      }
-                    }
-                  },
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    margin: EdgeInsets.zero,
+                    color: AppColor(theme).white,
+                    elevation: 0,
+                    child: ListTile(
+                      title: Text(group.groupName),
+                      subtitle: Text(group.groupDescription),
+                      trailing: isAdmin
+                          ? GestureDetector(
+                              onTap: () {
+                                // Handle admin logic to accept join requests
+                                _handleJoinRequests(group);
+                              },
+                              child: Text('${group.joinRequests?.length ?? 0} Requests'))
+                          : null,
+                      onTap: () {
+                        if (isGroupMember) {
+                          // If user is a group member, navigate to the GroupChatScreen directly
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => GroupChatScreen(groupId: group.groupId, userId: getCurrentUserId())),
+                          );
+                        } else {
+                          if (isAdmin) {
+                            // TODO:
+                          } else {
+                            // Non-admin user needs to enter group ID to join
+                            _showJoinGroupDialog(group);
+                          }
+                        }
+                      },
+                    ),
+                  ),
                 );
               },
             );

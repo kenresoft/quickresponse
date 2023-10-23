@@ -2,7 +2,7 @@ import 'package:quickresponse/main.dart';
 
 class AlertButton extends StatefulWidget {
   const AlertButton({
-    Key? key,
+    super.key,
     required this.height,
     required this.width,
     required this.borderWidth,
@@ -12,7 +12,7 @@ class AlertButton extends StatefulWidget {
     this.iconData,
     required this.onPressed,
     this.delay,
-  }) : super(key: key);
+  });
 
   final double height;
   final double width;
@@ -55,13 +55,18 @@ class _AlertButtonState extends State<AlertButton> with TickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTapDown: (_) {
+      onLongPress: () {
         _isPressedNotifier.value = !_isPressedNotifier.value;
         if (widget.onPressed != null) {
-          Future.delayed(widget.delay ?? const Duration(seconds: 3), () {
+          if (widget.delay == const Duration(seconds: 0)) {
             widget.onPressed!();
             _isPressedNotifier.value = !_isPressedNotifier.value;
-          });
+          } else {
+            Future.delayed(const Duration(seconds: 3), () {
+              widget.onPressed!();
+              _isPressedNotifier.value = !_isPressedNotifier.value;
+            });
+          }
         }
       },
       child: ValueListenableBuilder<bool>(
@@ -73,28 +78,36 @@ class _AlertButtonState extends State<AlertButton> with TickerProviderStateMixin
                 duration: const Duration(milliseconds: 300),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.elliptical(widget.width, widget.height)),
-                  color: ColorTween(begin: AppColor(theme).alert_2, end: AppColor(theme).action).evaluate(_gradientAnimationController),
+                  color: ColorTween(begin: AppColor(theme).btn_1, end: AppColor(theme).btn_2).evaluate(_gradientAnimationController),
                   border: Border.all(width: widget.borderWidth, color: isPressed ? Colors.transparent : Colors.grey),
                   boxShadow: isPressed
                       ? [
                           BoxShadow(color: Colors.white.withOpacity(0.6), spreadRadius: 3),
                           BoxShadow(
-                            color: theme ? Colors.white.withOpacity(0.5) : AppColor(theme).white.withOpacity(0.8),
+                            color: theme ? Colors.white.withOpacity(0.5) : AppColor(theme).white.withOpacity(0.1),
                             offset: Tween<Offset>(begin: const Offset(0, -20), end: const Offset(0, -30)).animate(_shadowAnimationController).value,
                             blurRadius: 5,
                           ),
                           BoxShadow(
-                            color: theme ? Colors.grey.withOpacity(0.3) : AppColor(theme).white.withOpacity(0.5),
+                            color: theme ? Colors.grey.withOpacity(0.3) : AppColor(theme).white.withOpacity(0.1),
                             offset: Tween<Offset>(begin: const Offset(10, 20), end: const Offset(10, 30)).animate(_shadowAnimationController).value,
                             blurRadius: 5,
                           ),
-                          BoxShadow(color: Colors.grey.withOpacity(0.3), offset: Tween<Offset>(begin: const Offset(10, 0), end: const Offset(10, 10)).animate(_shadowAnimationController).value, blurRadius: 5),
                           BoxShadow(
-                            color: theme ? Colors.grey.withOpacity(0.3) : AppColor(theme).white.withOpacity(0.5),
+                            color: Colors.grey.withOpacity(0.3),
+                            offset: Tween<Offset>(begin: const Offset(10, 0), end: const Offset(10, 10)).animate(_shadowAnimationController).value,
+                            blurRadius: 5,
+                          ),
+                          BoxShadow(
+                            color: theme ? Colors.grey.withOpacity(0.3) : AppColor(theme).white.withOpacity(0.1),
                             offset: Tween<Offset>(begin: const Offset(-10, 10), end: const Offset(-10, 20)).animate(_shadowAnimationController).value,
                             blurRadius: 5,
                           ),
-                          BoxShadow(color: Colors.grey.withOpacity(0.3), offset: Tween<Offset>(begin: const Offset(-10, 0), end: const Offset(-10, 10)).animate(_shadowAnimationController).value, blurRadius: 5),
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            offset: Tween<Offset>(begin: const Offset(-10, 0), end: const Offset(-10, 10)).animate(_shadowAnimationController).value,
+                            blurRadius: 5,
+                          ),
                           BoxShadow(color: Colors.black.withOpacity(0.05), spreadRadius: widget.shadowWidth),
                         ]
                       : [const BoxShadow(color: Colors.white, spreadRadius: 3)],
@@ -105,9 +118,9 @@ class _AlertButtonState extends State<AlertButton> with TickerProviderStateMixin
                   animation: _iconAnimationController,
                   builder: (context, child) {
                     return Icon(
-                      widget.iconData ?? CupertinoIcons.location_solid,
+                      widget.iconData ?? CupertinoIcons.hand_raised,
                       size: widget.iconSize,
-                      color: !isPressed ? Colors.red.shade900.withOpacity(1 - _iconAnimationController.value) : CupertinoColors.white,
+                      color: isPressed ? Colors.red.shade900.withOpacity(1 - _iconAnimationController.value) : CupertinoColors.white,
                     );
                   },
                 ),

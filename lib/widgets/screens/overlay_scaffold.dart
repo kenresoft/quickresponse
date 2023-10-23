@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../utils/wrapper.dart';
-import 'custom_fab.dart';
+import '../../data/constants/styles.dart';
+import '../../providers/settings/prefs.dart';
+import '../../utils/wrapper.dart';
+import '../inputs/custom_fab.dart';
 
-class ScaffoldX extends StatefulWidget {
+class ScaffoldX extends ConsumerStatefulWidget {
   ScaffoldX({
     super.key,
     this.backgroundColor,
@@ -25,18 +28,22 @@ class ScaffoldX extends StatefulWidget {
   final Function()? onPressed1;
   final Function()? onPressed2;
 
-  void toast(String message) {
+/*  void toast(String message) {
     sKey.currentState?.showSnackBar(SnackBar(content: Text(message)));
+  }*/
+
+  void toast(Object msg, [TextAlign? textAlign, Color? color]) {
+    sKey.currentState?.showSnackBar(SnackBar(content: Text(msg.toString(), textAlign: textAlign), backgroundColor: color ?? AppColor(theme).black));
   }
 
   @override
-  State<ScaffoldX> createState() => _ScaffoldXState();
+  ConsumerState<ScaffoldX> createState() => _ScaffoldXState();
 }
 
-class _ScaffoldXState extends State<ScaffoldX> {
+class _ScaffoldXState extends ConsumerState<ScaffoldX> {
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<ScaffoldMessengerState> sKey = widget.sKey ?? GlobalKey<ScaffoldMessengerState>();
+    final GlobalKey<ScaffoldMessengerState> sKey = widget.sKey;
 
     return Stack(
       children: [
@@ -54,6 +61,7 @@ class _ScaffoldXState extends State<ScaffoldX> {
           ),
         ),
         CustomFAB(
+          theme,
           onPressed1: () => widget.onPressed1!(),
           onPressed2: () => widget.onPressed2!(),
         ),

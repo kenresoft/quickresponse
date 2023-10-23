@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import '../providers/settings/date_format.dart';
+import '../../providers/settings/date_time_format.dart';
 
 class RealTimeTimeWidget extends StatefulWidget {
   final TimeFormatOption selectedTimeFormat;
