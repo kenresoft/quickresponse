@@ -1,9 +1,10 @@
+import 'package:quickresponse/data/emergency/emergency_alert.dart';
 import 'package:quickresponse/main.dart';
 
 final notificationService = NotificationService();
 const String sosType = 'Travel';
 const String sosRecipients = '08012345678';
-const String sosMessage = 'Please Help! I have lost my way!';
+/*const String sosMessage = 'Please Help! I have lost my way!';*/
 
 class Emergency extends ConsumerStatefulWidget {
   const Emergency({super.key});
@@ -27,18 +28,14 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
   }
 
   void sendSecuritySMS(BuildContext context, NotificationSchedule notificationSchedule, int count) {
-    getLocationLogFromSharedPreferences().then(
-      (location) => getProfileInfoFromSharedPreferences().then(
-        (profileInfo) => addFirebaseSOSHistory(
-          userId: profileInfo.uid!,
-          type: sosType,
-          recipient: sosRecipients,
-          message: '${notificationSchedule.recipient} - $sosMessage',
-          latitude: location.latitude.toString(),
-          longitude: location.longitude.toString(),
-        ).whenComplete(() => context.toast('SEND SMS - $count')),
-      ),
-    );
+    addFirebaseSOSHistory(
+      userId: uid,
+      type: EmergencyAlert.getAlertTypeFromCustomMessage(sosMessage),
+      recipient: sosRecipients,
+      message: '${notificationSchedule.recipient} - $sosMessage',
+      latitude: location().latitude.toString(),
+      longitude: location().longitude.toString(),
+    ).whenComplete(() => context.toast('SEND SMS - $count'));
   }
 
   void _resetCounter() {
@@ -176,13 +173,7 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
             elevation: 0,
             child: ListTile(
               title: const Text('Setup Travelling Alarm'),
-              subtitle: Text(selectedDateTime == null
-                      ? 'Select Expected Travel Time'
-                      : 'Selected Time: ${formatTime(
-                          ref,
-                          selectedDateTime!,
-                          selectedTimeFormat,
-                        )}'
+              subtitle: Text(selectedDateTime == null ? 'Select Expected Travel Time' : 'Selected Time: ${formatTime(selectedDateTime!, selectedTimeFormat)}'
                   //'${selectedDateTime?.hour}:${selectedDateTime?.minute}',
                   ),
               trailing: const Icon(CupertinoIcons.bus),
@@ -263,7 +254,7 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
               title: const Text('View Chat'),
               subtitle: const Text('View chats'),
               trailing: const Icon(CupertinoIcons.photo_fill_on_rectangle_fill),
-              onTap: () => launch(context, Constants.newChatsList, uid/* ('abc', uid, 'receiver')*/),
+              onTap: () => launch(context, Constants.newChatsList, uid /* ('abc', uid, 'receiver')*/),
             ),
           ),
           const SizedBox(height: 30),
@@ -275,94 +266,71 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
   Widget _buildSecondPage(DateFormatOption selectedDateFormat, TimeFormatOption selectedTimeFormat) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: FutureBuilder<ProfileInfo>(
-        future: getProfileInfoFromSharedPreferences(),
+      child: StreamBuilder<List<NotificationSchedule>>(
+        stream: getFirebaseNotificationSchedule(userId: uid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox(); // Loading indicator while data is loading
+            return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is loading
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            final profile = snapshot.data!;
-            profile.displayName.log;
-            return StreamBuilder<List<NotificationSchedule>>(
-              stream: getFirebaseNotificationSchedule(userId: profile.uid!),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is loading
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  final notificationScheduleList = snapshot.data!;
+            return Text('Error: ${snapshot.error}');
+          } else {
+            final notificationScheduleList = snapshot.data!;
 
-                  if (notificationScheduleList.isEmpty) {
-                    return const Center(
-                      child: Text('No travelling alarm scheduled!', style: TextStyle(fontSize: 21)),
-                    );
-                  }
+            if (notificationScheduleList.isEmpty) {
+              return const Center(
+                child: Text('No travelling alarm scheduled!', style: TextStyle(fontSize: 21)),
+              );
+            }
 
-                  // Group SOS history items by time
-                  final groupedNotificationSchedule = groupNotificationScheduleByTime(notificationScheduleList);
+            // Group SOS history items by time
+            final groupedNotificationSchedule = groupNotificationScheduleByTime(notificationScheduleList);
 
-                  return ListView.builder(
-                    itemCount: groupedNotificationSchedule.length,
-                    itemBuilder: (context, index) {
-                      final group = groupedNotificationSchedule[index];
+            return ListView.builder(
+              itemCount: groupedNotificationSchedule.length,
+              itemBuilder: (context, index) {
+                final group = groupedNotificationSchedule[index];
 
-                      // Display the time as a separator
-                      return Column(
-                        children: [
-                          ListTile(
-                            title: Text('Time: ${formatTime(
-                              ref,
-                              DateFormat.Hm().parseStrict(group.time),
-                              selectedTimeFormat,
-                            )}'),
-                            // You can customize the separator appearance here
-                            // For example, you can use a Divider or a different widget.
-                            // Here, I'm using a Container with a line separator.
-                            subtitle: Container(
-                              height: 1,
-                              color: Colors.blue,
+                // Display the time as a separator
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Text('Time: ${formatTime(DateFormat.Hm().parseStrict(group.time), selectedTimeFormat)}'),
+                      // You can customize the separator appearance here
+                      // For example, you can use a Divider or a different widget.
+                      // Here, I'm using a Container with a line separator.
+                      subtitle: Container(
+                        height: 1,
+                        color: Colors.blue,
+                      ),
+                    ),
+                    ...group.items.map((notificationSchedule) {
+                      // Display individual SOS history items for the time
+                      return Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
+                        color: AppColor(theme).white,
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ListTile(
+                            title: Text(notificationSchedule.title ?? ''),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(notificationSchedule.message ?? ''),
+                                const SizedBox(height: 3),
+                                Text('Date & Time: ${formatDate(DateTime.parse(notificationSchedule.time!), selectedDateFormat)} ${formatTime(DateTime.parse(notificationSchedule.time!), selectedTimeFormat)}'),
+                              ],
                             ),
+                            trailing: const Icon(Icons.alarm),
+                            // Add more details as needed
                           ),
-                          ...group.items.map((notificationSchedule) {
-                            // Display individual SOS history items for the time
-                            return Card(
-                              margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
-                              color: AppColor(theme).white,
-                              elevation: 0,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: ListTile(
-                                  title: Text(notificationSchedule.title ?? ''),
-                                  subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(notificationSchedule.message ?? ''),
-                                      const SizedBox(height: 3),
-                                      Text('Date & Time: ${formatDate(ref, DateTime.parse(notificationSchedule.time!), selectedDateFormat)} ${formatTime(
-                                        ref,
-                                        DateTime.parse(notificationSchedule.time!),
-                                        selectedTimeFormat,
-                                      )}'),
-                                    ],
-                                  ),
-                                  trailing: const Icon(Icons.alarm),
-                                  // Add more details as needed
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ],
+                        ),
                       );
-                    },
-                  );
-                }
+                    }).toList(),
+                  ],
+                );
               },
             );
-          } else {
-            return const Text('No data available'); // Handle the case where data is null
           }
         },
       ),

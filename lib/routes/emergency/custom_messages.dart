@@ -62,6 +62,9 @@ class _CustomMessageGeneratorPageState extends ConsumerState<CustomMessageGenera
   Widget build(BuildContext context) {
     final dp = Density.init(context);
     final textFieldDirection = ref.watch(textFieldDirectionProvider.select((value) => value));
+    if (savedMessages.isEmpty) {
+      SharedPreferencesService.remove('sosMessage');
+    }
     return WillPopScope(
       onWillPop: () async {
         if (isEditMode && editMessage != null) {
@@ -99,37 +102,43 @@ class _CustomMessageGeneratorPageState extends ConsumerState<CustomMessageGenera
                   width: double.infinity,
                   height: 56,
                   padding: const EdgeInsets.all(10.0),
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    borderRadius: BorderRadius.circular(10),
-                    underline: Container(),
-                    style: TextStyle(color: AppColor(theme).alert_2, fontSize: 16, fontFamily: FontResoft.sourceSansPro, package: FontResoft.package),
-                    menuMaxHeight: 450,
-                    hint: Text(
-                      'Select Message',
-                      style: TextStyle(color: AppColor(theme).black, fontSize: 16, fontFamily: FontResoft.sourceSansPro, package: FontResoft.package),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      isDense: true,
+                      elevation: 0,
+                      dropdownColor: AppColor(theme).white,
+                      borderRadius: BorderRadius.circular(12),
+                      underline: Container(),
+                      style: TextStyle(color: AppColor(theme).alert_2, fontSize: 16, fontFamily: FontResoft.sourceSansPro, package: FontResoft.package),
+                      menuMaxHeight: 450,
+                      hint: Text(
+                        'Select Message',
+                        style: TextStyle(color: AppColor(theme).black, fontSize: 16, fontFamily: FontResoft.sourceSansPro, package: FontResoft.package),
+                      ),
+                      iconSize: 30,
+                      value: selectedMessage.isNotEmpty ? selectedMessage : null,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          if (isEditMode && editMessage != null) {
+                            savedMessages.insert(editMessage!.$1, editMessage!.$2);
+                            _customMessageController.clear();
+                            editMessage = null;
+                            isEditMode = false;
+                          } else {
+                            selectedMessage = newValue ?? '';
+                            _customMessageController.text = newValue ?? '';
+                          }
+                        });
+                      },
+                      // H: CONSTANTS
+                      items: Constants.emergencyMessages.map((String message) {
+                        return DropdownMenuItem<String>(
+                          value: message,
+                          child: Text(message),
+                        );
+                      }).toList(),
                     ),
-                    iconSize: 30,
-                    value: selectedMessage.isNotEmpty ? selectedMessage : null,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        if (isEditMode && editMessage != null) {
-                          savedMessages.insert(editMessage!.$1, editMessage!.$2);
-                          _customMessageController.clear();
-                          editMessage = null;
-                          isEditMode = false;
-                        } else {
-                          selectedMessage = newValue ?? '';
-                          _customMessageController.text = newValue ?? '';
-                        }
-                      });
-                    },
-                    items: Constants.emergencyMessages.map((String message) {
-                      return DropdownMenuItem<String>(
-                        value: message,
-                        child: Text(message),
-                      );
-                    }).toList(),
                   ),
                 ),
               ),
@@ -321,7 +330,7 @@ class _CustomMessageGeneratorPageState extends ConsumerState<CustomMessageGenera
     fetchSavedMessages();
   }
 
-  Future<void> fetchSavedMessages() async {
+  void fetchSavedMessages() {
     final savedMessagesJson = SharedPreferencesService.getStringList('savedMessages') ?? [];
 
     if (savedMessagesJson.isEmpty) {
@@ -330,7 +339,7 @@ class _CustomMessageGeneratorPageState extends ConsumerState<CustomMessageGenera
       return;
     }
     if (savedMessagesJson.length > maxMessageAllowed) {
-    savedMessagesJson.removeRange(0, savedMessagesJson.length - maxMessageAllowed);
+      savedMessagesJson.removeRange(0, savedMessagesJson.length - maxMessageAllowed);
     }
 
     setState(() {
@@ -417,25 +426,25 @@ class _CustomMessageGeneratorPageState extends ConsumerState<CustomMessageGenera
     return content;
   }
 
-  Future<void> saveMessage(CustomMessage message) async {
+  void saveMessage(CustomMessage message) async {
     final savedMessagesJson = savedMessages.map((message) {
       return jsonEncode(message.toJson());
     }).toList();
-    await SharedPreferencesService.setStringList('savedMessages', savedMessagesJson);
+    SharedPreferencesService.setStringList('savedMessages', savedMessagesJson);
   }
 
-  Future<void> deleteMessages(List<String> idsToDelete) async {
+  void deleteMessages(List<String> idsToDelete) {
     setState(() {
       savedMessages.removeWhere((message) => idsToDelete.contains(message.id));
     });
-    await saveMessageListToPrefs(savedMessages);
+    saveMessageListToPrefs(savedMessages);
   }
 
-  Future<void> saveMessageListToPrefs(List<CustomMessage> messages) async {
+  void saveMessageListToPrefs(List<CustomMessage> messages) async {
     final savedMessagesJson = messages.map((message) {
       return jsonEncode(message.toJson());
     }).toList();
-    await SharedPreferencesService.setStringList('savedMessages', savedMessagesJson);
+    SharedPreferencesService.setStringList('savedMessages', savedMessagesJson);
   }
 
   Future<void> exportMessages() async {
@@ -486,7 +495,7 @@ class _CustomMessageGeneratorPageState extends ConsumerState<CustomMessageGenera
           selectedMessage = ''; // Reset selected message
         });
 
-        await saveMessageListToPrefs(savedMessages);
+        saveMessageListToPrefs(savedMessages);
 
         ScaffoldX(sKey: key).toast('Messages imported successfully.', TextAlign.center, Colors.green);
       } catch (e) {

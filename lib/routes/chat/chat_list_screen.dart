@@ -1,10 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/main.dart';
-
-import 'chat_screen.dart';
-import 'new_chat_screen.dart';
 
 class ChatListScreen extends StatefulWidget {
   final String userId;

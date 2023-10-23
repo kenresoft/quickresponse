@@ -91,13 +91,12 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                 ),
                 onTap: () {
                   saveContact(filteredContacts[index]);
-                  getProfileInfoFromSharedPreferences().then(
-                    (profileInfo) => addFirebaseContact(
-                      userId: profileInfo.uid!,
-                      name: filteredContacts[index].name!,
-                      phoneNumber: filteredContacts[index].phone!,
-                    ),
+                  addFirebaseContact(
+                    userId: uid,
+                    name: filteredContacts[index].name!,
+                    phoneNumber: filteredContacts[index].phone!,
                   );
+
                   replace(context, Constants.contacts);
                 },
               ),
@@ -154,17 +153,9 @@ class _ContactPageState extends ConsumerState<ContactPage> {
     ).then((selectedContact) {
       if (selectedContact != null) {
         ref.watch(contactModelProvider.notifier).addContact(selectedContact);
-
         saveContact(selectedContact);
-        getProfileInfoFromSharedPreferences().then(
-          (profileInfo) => addFirebaseContact(
-            userId: profileInfo.uid!,
-            name: selectedContact.name!,
-            phoneNumber: selectedContact.phone!,
-          ),
-        );
+        addFirebaseContact(userId: uid, name: selectedContact.name!, phoneNumber: selectedContact.phone!);
         replace(context, Constants.contacts);
-        //.whenComplete(() => replace(context, Constants.contacts));
       }
     });
   }

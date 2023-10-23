@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:quickresponse/main.dart';
 
 class CustomDropdown<T> extends StatelessWidget {
   final T? value;
@@ -33,7 +33,12 @@ class CustomDropdown<T> extends StatelessWidget {
             items: items,
             onChanged: onChanged,
             isExpanded: true,
-            style: const TextStyle(fontSize: 16),
+            isDense: true,
+            elevation: 0,
+            dropdownColor: AppColor(theme).dropdown,
+            borderRadius: BorderRadius.circular(12),
+            menuMaxHeight: 160,
+            style: TextStyle(fontSize: 13, fontFamily: FontResoft.sourceSansPro, package: FontResoft.package),
           ),
         ),
       ),

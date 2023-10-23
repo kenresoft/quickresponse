@@ -204,15 +204,7 @@ class _EditContactPageState extends ConsumerState<EditContactPage> {
     );
 
     updateEditedContact(updatedContact);
-    getProfileInfoFromSharedPreferences().then(
-      (profileInfo) => updateFirebaseContact(
-        userId: profileInfo.uid!,
-        name: updatedContact.name!,
-        phoneNumber: updatedContact.phone!,
-        relationship: updatedContact.relationship!,
-        age: updatedContact.age.toString(),
-      ),
-    );
+    updateFirebaseContact(userId: uid, name: updatedContact.name!, phoneNumber: updatedContact.phone!, relationship: updatedContact.relationship!, age: updatedContact.age.toString());
     // After saving, you can use Navigator.pop() to return to the previous screen,
     // passing the updated contact as a result.
     //Navigator.pop(context, updatedContact);

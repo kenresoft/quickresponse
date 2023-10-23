@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quickresponse/utils/extensions.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import '../data/constants/styles.dart';
-import '../providers/providers.dart';
+import '../../data/constants/styles.dart';
+import '../../providers/settings/prefs.dart';
 
 enum PageTitle { privacyPolicy, termsAndConditions }
 
@@ -71,7 +71,6 @@ class _HTMLDialogState extends ConsumerState<HTMLDialog> {
   @override
   Widget build(BuildContext context) {
     Density dp = Density.init(context);
-    final theme = ref.watch(themeProvider.select((value) => value));
     return WillPopScope(
       onWillPop: () async {
         // Prevent the dialog from closing on outside click
@@ -79,7 +78,7 @@ class _HTMLDialogState extends ConsumerState<HTMLDialog> {
       },
       child: Dialog(
         surfaceTintColor: Colors.transparent,
-        backgroundColor: theme ? appColor.background : appColor.backgroundDark,
+        backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: SingleChildScrollView(
@@ -94,7 +93,7 @@ class _HTMLDialogState extends ConsumerState<HTMLDialog> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: WebViewWidget(
-                  controller: _controller..setBackgroundColor(theme ? appColor.white : appColor.black),
+                  controller: _controller..setBackgroundColor(theme ? AppColor(theme).white : AppColor(theme).black),
                 ),
               ),
             ),

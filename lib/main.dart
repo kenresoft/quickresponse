@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+import 'package:quickresponse/widgets/screens/hero_page.dart';
+
 import 'imports.dart';
 
 export 'imports.dart';
@@ -14,7 +17,10 @@ void main() async {
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
   await SharedPreferencesService.init();
-  await BackgroundService.init();
+  if (!kIsWeb) {
+    await BackgroundService.init();
+  }
+
   initializeTimeZones();
 
   await flutterLocalNotificationsPlugin.initialize(
@@ -53,7 +59,7 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -125,13 +131,16 @@ class _MyAppState extends State<MyApp> {
 }
 
 final GoRouter _router = GoRouter(
-  /*redirect: (context, state) {
+  redirect: (context, state) {
     bool isAuthenticated = isSignedIn();
     if (!isAuthenticated) {
-      return Constants.authentication;
+      if (authenticate) {
+        return Constants.authentication;
+      }
+      return Constants.home;
     }
     return null;
-  },*/
+  },
   routes: <GoRoute>[
     route(Constants.root, authenticate ? const DeviceAuthentication() : const Home()),
     route(Constants.home, const Home()),
@@ -171,6 +180,11 @@ final GoRouter _router = GoRouter(
     _route('/m', (context, state) {
       final record = state.extra as (String, String);
       return GroupMembersScreen(groupId: record.$1, currentUserId: record.$2);
+    }),
+
+    _route(Constants.heroPage, (context, state) {
+      final tip = state.extra as EmergencyTip;
+      return HeroPage(tip: tip);
     }),
 
     /*_route(Constants.travellersAlarm, (context, state) {

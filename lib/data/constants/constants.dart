@@ -5,7 +5,7 @@ class Constants {
   static const String packageName = 'quickresponse';
   static const String root = '/';
 
-  //Navigation routes
+//Navigation routes
   static const String home = '/home';
   static const String camera = '/camera';
   static const String contacts = '/contacts';
@@ -30,13 +30,17 @@ class Constants {
   static const String userSearchScreen = '/userSearchScreen';
   static const String media = '/media';
   static const String userProfilePage = '/userProfilePage';
+  static const String heroPage = '/heroPage';
+
+/*  static const String userProfilePage = '/userProfilePage';
+  static const String userProfilePage = '/userProfilePage';*/
   static const String error = '/error';
 
-  //Images route
+//Images route
   static const String imageDir = "assets/images";
   static const String iconDir = "assets/icons";
 
-  //Images
+//Images
   static const String profile = "$imageDir/profile.png";
   static const String laptop = "$imageDir/laptop.png";
   static const String moon = "$imageDir/moon.png";
@@ -47,8 +51,9 @@ class Constants {
   static const String logo = "$imageDir/logo.png";
   static const String logo2 = "$imageDir/logo2.jpg";
 
-  //Icons
+//Icons
   static const String appIcon = "$iconDir/icon.png";
+  static const String google = "$iconDir/google.svg";
   static const String drivingPin = "$iconDir/driving_pin.png";
   static const String destinationMapMarker = "$iconDir/destination_map_marker.png";
 
@@ -70,4 +75,184 @@ class Constants {
     "Urgent help required, call now!",
     "This is an emergency situation, please respond!",
   ];
+
+  static const Map<String, String> keywordsToTypes = {
+    'danger': 'Medical Emergency',
+    'emergency': 'Medical Emergency',
+    '911': 'Medical Emergency',
+    'assistance': 'Medical Emergency',
+    'hurt': 'Medical Emergency',
+    'ambulance': 'Medical Emergency',
+    'injury': 'Medical Emergency',
+    'medical': 'Medical Emergency',
+    'hospital': 'Medical Emergency',
+    'pain': 'Medical Emergency',
+    'fire': 'Fire Emergency',
+    'firefighters': 'Fire Emergency',
+    'flame': 'Fire Emergency',
+    'burn': 'Fire Emergency',
+    'smoke': 'Fire Emergency',
+    'urgent': 'General Emergency',
+    'help': 'General Emergency',
+    'crisis': 'General Emergency',
+    'dangerous': 'General Emergency',
+    'police': 'Security Alert',
+    'burglary': 'Security Alert',
+    'robbery': 'Security Alert',
+    'thief': 'Security Alert',
+    'stolen': 'Security Alert',
+    'lost': 'General Emergency',
+    'accident': 'General Emergency',
+    'injured': 'General Emergency',
+    'collision': 'General Emergency',
+    'trouble': 'General Emergency',
+    'safety': 'General Emergency',
+    'panic': 'General Emergency',
+    'disaster': 'Natural Disaster',
+    'earthquake': 'Natural Disaster',
+    'flood': 'Natural Disaster',
+    'storm': 'Natural Disaster',
+    'tornado': 'Natural Disaster',
+    'hurricane': 'Natural Disaster',
+    'danger zone': 'Natural Disaster',
+    'evacuate': 'Natural Disaster',
+    'tsunami': 'Natural Disaster',
+    'warning': 'Natural Disaster',
+    'alert': 'Natural Disaster',
+    'crash': 'Accident',
+    'invasion': 'Security Alert',
+    'attack': 'Security Alert',
+    'stranded': 'General Emergency',
+    'collapse': 'General Emergency',
+    'rescue': 'General Emergency',
+    'mayday': 'General Emergency',
+    'ambush': 'Security Alert',
+    'hostage': 'Security Alert',
+    'fight': 'Security Alert',
+    'unsafe': 'General Emergency',
+    'drowning': 'General Emergency',
+    'poison': 'General Emergency',
+    'gas leak': 'General Emergency',
+    'shooting': 'Security Alert',
+    'weapon': 'Security Alert',
+    'gun': 'Security Alert',
+    'bomb': 'Security Alert',
+    'explosion': 'Security Alert',
+    'terrorist': 'Security Alert',
+    'suspicious': 'Security Alert',
+    'intruder': 'Security Alert',
+    'dangerous person': 'Security Alert',
+    'toxic': 'General Emergency',
+    'unsafe area': 'General Emergency',
+    'plague': 'Health Emergency',
+    'epidemic': 'Health Emergency',
+    'pandemic': 'Health Emergency',
+    'contagious': 'Health Emergency',
+    'outbreak': 'Health Emergency',
+    'virus': 'Health Emergency',
+    'illness': 'Health Emergency',
+    'contamination': 'Health Emergency',
+    'biohazard': 'Health Emergency',
+    'dangerous substance': 'Health Emergency',
+    'radiation': 'Health Emergency',
+    'nuclear': 'Health Emergency',
+    'quarantine': 'Health Emergency',
+    'infected': 'Health Emergency',
+    'infection': 'Health Emergency',
+    'suspected case': 'Health Emergency',
+    'chemical spill': 'Health Emergency',
+    'biohazard spill': 'Health Emergency',
+    'radiation leak': 'Health Emergency',
+    'nuclear accident': 'Health Emergency',
+    'toxic fumes': 'Health Emergency',
+    'gas explosion': 'Health Emergency',
+    'dangerous gas': 'Health Emergency',
+    'biological hazard': 'Health Emergency',
+    'radiation exposure': 'Health Emergency',
+    'hazardous material': 'Health Emergency',
+    'toxic substance': 'Health Emergency',
+    'disease outbreak': 'Health Emergency',
+    'emergency surgery': 'Medical Emergency',
+    'cardiac arrest': 'Medical Emergency',
+    'choking': 'Medical Emergency',
+    'unconscious': 'Medical Emergency',
+    'stroke': 'Medical Emergency',
+    'seizure': 'Medical Emergency',
+    'diabetic emergency': 'Medical Emergency',
+    'respiratory distress': 'Medical Emergency',
+    'unconsciousness': 'Medical Emergency',
+    'broken bones': 'Medical Emergency',
+    'head injury': 'Medical Emergency',
+    'bleeding': 'Medical Emergency',
+    'burn injury': 'Medical Emergency',
+    'poisoning': 'Medical Emergency',
+    'overdose': 'Medical Emergency',
+    'allergic reaction': 'Medical Emergency',
+    'heatstroke': 'Medical Emergency',
+    'hypothermia': 'Medical Emergency',
+    'dehydration': 'Medical Emergency',
+    'heart attack': 'Medical Emergency',
+    'asthma attack': 'Medical Emergency',
+    'severe pain': 'Medical Emergency',
+    'high fever': 'Medical Emergency',
+    'difficulty breathing': 'Medical Emergency',
+    'childbirth emergency': 'Medical Emergency',
+    'uncontrolled bleeding': 'Medical Emergency',
+    'emergency childbirth': 'Medical Emergency',
+    'fainting': 'Medical Emergency',
+    'dislocated joint': 'Medical Emergency',
+    'allergic shock': 'Medical Emergency',
+    'eye injury': 'Medical Emergency',
+    'abdominal pain': 'Medical Emergency',
+    'insect bite': 'Medical Emergency',
+    'animal bite': 'Medical Emergency',
+    'snake bite': 'Medical Emergency',
+    'spider bite': 'Medical Emergency',
+    'electric shock': 'Medical Emergency',
+    'head trauma': 'Medical Emergency',
+    'neck injury': 'Medical Emergency',
+    'back injury': 'Medical Emergency',
+    'severe headache': 'Medical Emergency',
+    'severe allergic reaction': 'Medical Emergency',
+    'disorientation': 'Medical Emergency',
+    'confusion': 'Medical Emergency',
+    'slurred speech': 'Medical Emergency',
+    'paralysis': 'Medical Emergency',
+    'chest pain': 'Medical Emergency',
+    'rapid heartbeat': 'Medical Emergency',
+    'weakness': 'Medical Emergency',
+    'numbness': 'Medical Emergency',
+    'loss of consciousness': 'Medical Emergency',
+    'pale skin': 'Medical Emergency',
+    'blue lips': 'Medical Emergency',
+    'trouble speaking': 'Medical Emergency',
+    'facial drooping': 'Medical Emergency',
+    'seizure warning': 'Medical Emergency',
+    'severe bleeding': 'Medical Emergency',
+    'difficulty swallowing': 'Medical Emergency',
+    'altered mental state': 'Medical Emergency',
+    'unusual behavior': 'Medical Emergency',
+    'unresponsiveness': 'Medical Emergency',
+    'severe vomiting': 'Medical Emergency',
+    'severe diarrhea': 'Medical Emergency',
+    'high blood pressure': 'Medical Emergency',
+    'low blood pressure': 'Medical Emergency',
+    'difficulty urinating': 'Medical Emergency',
+    'blood in urine': 'Medical Emergency',
+    'blood in stool': 'Medical Emergency',
+    'uncontrolled shivering': 'Medical Emergency',
+    'extreme fatigue': 'Medical Emergency',
+    'irregular heartbeat': 'Medical Emergency',
+    'chest tightness': 'Medical Emergency',
+    'extreme thirst': 'Medical Emergency',
+    'cough': 'Medical Emergency',
+    'wheezing': 'Medical Emergency',
+    'headache': 'Medical Emergency',
+    'dizziness': 'Medical Emergency',
+    'vomiting': 'Medical Emergency',
+    'diarrhea': 'Medical Emergency',
+    'shortness of breath': 'Medical Emergency',
+    'fatigue': 'Medical Emergency',
+    'tingling': 'Medical Emergency',
+  };
 }

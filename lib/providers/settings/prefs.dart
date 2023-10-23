@@ -1,5 +1,5 @@
-import '../../services/preference.dart';
-import 'date_time_format.dart';
+import 'package:quickresponse/data/emergency/emergency_alert.dart';
+import 'package:quickresponse/main.dart';
 
 // H: Theme
 bool get theme {
@@ -79,8 +79,6 @@ set authenticate(bool value) {
 //H: Location Updates Pause
 bool get stopLocationUpdate {
   return SharedPreferencesService.getBool('isLocationUpdatesPaused') ?? false;
-
-  /// Launch home directly
 }
 
 set stopLocationUpdate(bool value) {
@@ -96,7 +94,7 @@ set locationInterval(int value) {
   SharedPreferencesService.setInt('locationInterval', value);
 }
 
-//H: User
+//H : User
 String get uid {
   return SharedPreferencesService.getString('uid') ?? 'No uid';
 }
@@ -121,4 +119,58 @@ int get itemsPerPage {
 
 set itemsPerPage(int value) {
   SharedPreferencesService.setInt('itemsPerPage', value);
+}
+
+//H: 1- Emergency Alert
+List<EmergencyAlert> get emergencyAlerts {
+  final alertJson = SharedPreferencesService.getString('emergencyAlerts');
+  if (alertJson != null) {
+    final List<dynamic> alertList = json.decode(alertJson);
+    return alertList.map((json) => EmergencyAlert.fromJson(json)).toList();
+  }
+  return [];
+}
+
+set emergencyAlerts(List<EmergencyAlert> value) {
+  final alertJson = json.encode(value.map((alert) => alert.toJson()).toList());
+  SharedPreferencesService.setString('emergencyAlerts', alertJson);
+}
+
+void deleteEmergencyAlert(EmergencyAlert emergencyAlert) {
+  List<EmergencyAlert> alerts = emergencyAlerts;
+  alerts.removeWhere((alert) => alert.id.log == emergencyAlert.id.log);
+  emergencyAlerts = alerts;
+}
+
+// H: Alert Message
+String get sosMessage {
+  return SharedPreferencesService.getString('sosMessage') ?? '';
+}
+
+set sosMessage(String value) {
+  SharedPreferencesService.setString('sosMessage', value);
+}
+
+List<String> get customMessagesList {
+  return (SharedPreferencesService.getStringList('savedMessages') ?? []).map(
+    (jsonString) {
+      try {
+        final json = jsonDecode(jsonString);
+        return CustomMessage.fromJson(json).message;
+      } catch (e) {
+        return 'Invalid Message';
+      }
+    },
+  ).toList();
+}
+
+// H:
+
+// H: Theme
+bool get isButtonDisabled {
+  return SharedPreferencesService.getBool('isButtonDisabled') ?? false;
+}
+
+set isButtonDisabled(bool value) {
+  SharedPreferencesService.setBool('isButtonDisabled', value);
 }

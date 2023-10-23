@@ -1,20 +1,9 @@
-import 'dart:async';
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/main.dart';
-import 'package:quickresponse/utils/extensions.dart';
-import 'package:quickresponse/utils/wrapper.dart';
-import 'package:quickresponse/widgets/display/blinking_text.dart';
-import 'package:quickresponse/widgets/display/color_mix.dart';
 
-import '../../data/constants/styles.dart';
-import '../../providers/settings/prefs.dart';
-import '../../widgets/screens/appbar.dart';
+import '../../widgets/display/color_mix.dart';
 
 class DeviceAuthentication extends ConsumerStatefulWidget {
   const DeviceAuthentication({super.key});
@@ -70,7 +59,7 @@ class _DeviceAuthenticationState extends ConsumerState<DeviceAuthentication> {
         timer.cancel();
         _stopProgress();
         // Navigate to the main app screen
-        isSignedIn() ? replace(context, Constants.home) : replace(context, Constants.signIn);
+        /*isSignedIn() ? */replace(context, Constants.home)/* : replace(context, Constants.signIn)*/;
       } else {
         // Update the progress value gradually
         final progress = elapsedTime.inMilliseconds / duration.inMilliseconds;
@@ -172,10 +161,7 @@ class _DeviceAuthenticationState extends ConsumerState<DeviceAuthentication> {
               title: const Text('Authentication Error'),
               content: const Text('An error occurred during authentication. Please try again.'),
               actions: [
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
+                TextButton(child: const Text('OK'), onPressed: () => Navigator.of(context).pop()),
               ],
             );
           },

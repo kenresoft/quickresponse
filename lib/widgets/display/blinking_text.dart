@@ -1,20 +1,23 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 class BlinkingText extends StatefulWidget {
   const BlinkingText(
-    this.data, {
-    super.key,
-    this.style,
-    this.blink = true,
-    this.delay = false,
-  });
+      this.data, {
+        super.key,
+        this.style,
+        this.blink = true,
+        this.delay = false,
+        this.isNotText = false,
+        this.child,
+      });
 
-  final String data;
+  final String? data;
   final TextStyle? style;
   final bool blink;
   final bool delay;
+  final bool isNotText;
+  final Widget? child;
 
   @override
   State<BlinkingText> createState() => _BlinkingTextState();
@@ -22,6 +25,7 @@ class BlinkingText extends StatefulWidget {
 
 class _BlinkingTextState extends State<BlinkingText> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -30,15 +34,17 @@ class _BlinkingTextState extends State<BlinkingText> with SingleTickerProviderSt
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _controller.reverse();
-        } else if (status == AnimationStatus.dismissed) {
+      if (status == AnimationStatus.completed) {
+        _controller.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        _controller.forward();
+      }
+    });
+    if (widget.delay && mounted) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (mounted) {
           _controller.forward();
         }
-      });
-    if (widget.delay && mounted) {
-      Timer.periodic(const Duration(seconds: 1), (timer) {
-        _controller.forward();
       });
     } else {
       _controller.forward();
@@ -48,6 +54,7 @@ class _BlinkingTextState extends State<BlinkingText> with SingleTickerProviderSt
   @override
   void dispose() {
     _controller.dispose();
+    _timer?.cancel(); // Cancel the timer when disposing
     super.dispose();
   }
 
@@ -59,8 +66,10 @@ class _BlinkingTextState extends State<BlinkingText> with SingleTickerProviderSt
         builder: (context, child) {
           return Opacity(
             opacity: widget.blink ? _controller.value : 1,
-            child: Text(
-              widget.data,
+            child: widget.isNotText
+                ? widget.child
+                : Text(
+              widget.data ?? '',
               style: widget.style,
             ),
           );

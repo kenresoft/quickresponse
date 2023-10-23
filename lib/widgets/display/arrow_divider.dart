@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:quickresponse/data/constants/colors.dart';
+
+import '../../data/constants/styles.dart';
+import '../../providers/settings/prefs.dart';
 
 class ArrowDivider extends CustomPainter {
   @override
@@ -10,7 +12,7 @@ class ArrowDivider extends CustomPainter {
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5
-      ..color = AppColor.divider;
+      ..color = AppColor(theme).divider;
 
     final path = Path()
       ..moveTo(0, 0)

@@ -19,17 +19,19 @@ class CreateGroupScreen extends StatelessWidget {
       groupId = _groupIdController.text; // Use manual group ID if provided
     }
 
-    String groupName = _groupNameController.text;
-    String groupDescription = _groupDescriptionController.text;
-    Group newGroup = Group(
-      groupId: groupId,
-      groupName: groupName,
-      groupDescription: groupDescription,
-      adminId: userId,
-      members: [userId],
-      adminIds: [userId],
-    );
-    createGroup(newGroup); // Call Firestore function to create a new group
+    String groupName = _groupNameController.text.trim();
+    String groupDescription = _groupDescriptionController.text.trim();
+    if (groupName.isNotEmpty && groupDescription.isNotEmpty) {
+      Group newGroup = Group(
+        groupId: groupId,
+        groupName: groupName,
+        groupDescription: groupDescription,
+        adminId: userId,
+        members: [userId],
+        adminIds: [userId],
+      );
+      createGroup(newGroup); // Call Firestore function to create a new group
+    }
   }
 
   @override
@@ -37,8 +39,12 @@ class CreateGroupScreen extends StatelessWidget {
     String userId = getCurrentUserId(); // Get the current user's ID
 
     return Scaffold(
-      appBar: AppBar(
-        title: GestureDetector(onTap: () => launch(context, '/cs'), child: const Text('Create Group')),
+      backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+      appBar: CustomAppBar(
+        leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor(theme).navIconSelected),
+        title: const Text('Create Group', style: TextStyle(fontSize: 20)),
+        actionTitle: 'View All',
+        onActionClick: () => launch(context, '/cs'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

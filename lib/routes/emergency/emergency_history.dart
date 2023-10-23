@@ -1,6 +1,8 @@
 import 'package:quickresponse/main.dart';
 
-class EmergencyAlert {
+import '../../data/emergency/emergency_alert.dart';
+
+/*class EmergencyAlert {
   final String id;
   final String type;
   final DateTime dateTime;
@@ -18,7 +20,7 @@ class EmergencyAlert {
     required this.customMessage,
     required this.hasLocationData,
   });
-}
+}*/
 
 class EmergencyHistoryPage extends ConsumerStatefulWidget {
   const EmergencyHistoryPage({super.key});
@@ -28,8 +30,8 @@ class EmergencyHistoryPage extends ConsumerStatefulWidget {
 }
 
 class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
-  List<EmergencyAlert> emergencyAlerts = [
-    EmergencyAlert(
+  List<EmergencyAlert> alerts = [
+    /*EmergencyAlert(
       id: '1',
       type: 'Medical Emergency',
       dateTime: DateTime(2023, 9, 10, 10, 30),
@@ -136,7 +138,7 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
       details: 'Patient with difficulty breathing',
       customMessage: 'Call an ambulance!',
       hasLocationData: true,
-    ),
+    ),*/
   ];
 
   // Add variables for filtering, sorting, searching, and export
@@ -171,22 +173,9 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
     // Filter, sort, and search the alerts
     final filteredAlerts = _filterAndSortAlerts(emergencyAlerts);
     final dp = Density.init(context);
-    final page = ref.watch(pageProvider.select((value) => value));
-    //final theme = ref.watch(themeProvider.select((value) => value));
 
     return WillPopScope(
-      onWillPop: () async {
-        bool isLastPage = page.isEmpty;
-        if (isLastPage) {
-          launch(context, Constants.home);
-          return false;
-          //return (await showAnimatedDialog(context))!;
-        } else {
-          launch(context, page.last);
-          ref.watch(pageProvider.notifier).setPage = page..remove(page.last);
-          return true;
-        }
-      },
+      onWillPop: () => replace(context, Constants.home),
       child: focus(
         _focusNode,
         Scaffold(
@@ -263,23 +252,9 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Checkbox(
-                  value: searchByKeyword,
-                  onChanged: (value) {
-                    setState(() {
-                      searchByKeyword = value!;
-                    });
-                  },
-                ),
+                Checkbox(value: searchByKeyword, onChanged: (value) => setState(() => searchByKeyword = value!)),
                 const Text('Search by Keyword'),
-                Checkbox(
-                  value: searchByLocation,
-                  onChanged: (value) {
-                    setState(() {
-                      searchByLocation = value!;
-                    });
-                  },
-                ),
+                Checkbox(value: searchByLocation, onChanged: (value) => setState(() => searchByLocation = value!)),
                 const Text('Search by Location'),
               ],
             ),
@@ -288,11 +263,7 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
               child: PageView.builder(
                 controller: _pageController,
                 itemCount: totalPages, // Updated itemCount
-                onPageChanged: (int page) {
-                  setState(() {
-                    currentPage = page;
-                  });
-                },
+                onPageChanged: (int page) => setState(() => currentPage = page),
                 itemBuilder: (context, index) {
                   final startIndex = index * itemsPerPage;
                   final endIndex = (startIndex + itemsPerPage <= selectedAlerts.length) ? (startIndex + itemsPerPage) : selectedAlerts.length;
@@ -309,17 +280,10 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
                           color: AppColor(theme).white,
                           elevation: 0,
                           child: ListTile(
-                            title: Text('${alert.type} Alert'),
+                            title: Text('${alert.type} ${alert.type.contains('Security') ? '' : 'Alert'}'),
                             subtitle: Text(
-                              'Date & Time: ${formatDate(
-                                ref,
-                                alert.dateTime,
-                                dateFormat,
-                              )} ${formatTime(
-                                ref,
-                                alert.dateTime,
-                                timeFormat,
-                              )}',
+                              '${formatDate(alert.dateTime, dateFormat)} ~ ${formatTime(alert.dateTime, timeFormat)}',
+                              style: const TextStyle(fontWeight: FontWeight.w300),
                             ),
                             trailing: IconButton(
                               icon: Icon(CupertinoIcons.delete_simple, size: 18, color: AppColor(theme).navIconSelected),
@@ -327,12 +291,7 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
                             ),
                             onTap: () {
                               // Implement navigation to a detailed view of the alert
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EmergencyDetailPage(alert: alert),
-                                ),
-                              );
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => EmergencyDetailPage(alert: alert)));
                             },
                           ),
                         );
@@ -353,12 +312,7 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
                     width: 10,
                     height: 10,
                     margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: pageIndex == currentPage
-                          ? AppColor(theme).navIconSelected // Change this color to the desired color
-                          : AppColor(theme).text, // Default color
-                    ),
+                    decoration: BoxDecoration(shape: BoxShape.circle, color: pageIndex == currentPage ? AppColor(theme).navIconSelected : AppColor(theme).text),
                   );
                 },
               ),
@@ -383,9 +337,13 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
       title: const Text('Filter by Type'),
       list: [
         _buildOption(context, 'All'),
-        _buildOption(context, 'Medical'),
-        _buildOption(context, 'Fire'),
-        _buildOption(context, 'Other'),
+        _buildOption(context, 'Accident'),
+        _buildOption(context, 'Fire Emergency'),
+        _buildOption(context, 'General Emergency'),
+        _buildOption(context, 'Health Emergency'),
+        _buildOption(context, 'Medical Emergency'),
+        _buildOption(context, 'Security Alert'),
+        _buildOption(context, 'Natural Disaster'),
       ],
       selection: (value) => selectedFilter = value,
     );
@@ -414,6 +372,8 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
           title: title,
           content: Column(mainAxisSize: MainAxisSize.min, children: list),
         );
@@ -498,17 +458,17 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
   }
 
   // Function to show a confirmation dialog before deleting an alert
-  Future<void> _showDeleteConfirmationDialog(BuildContext context, EmergencyAlert alert) async {
+  Future<void> _showDeleteConfirmationDialog(BuildContext context, EmergencyAlert emergencyAlert) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // Dialog cannot be dismissed by tapping outside
       builder: (BuildContext context) {
         return AlertDialog(
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
           title: const Text('Delete Alert'),
           content: const SingleChildScrollView(
-            child: ListBody(children: [
-              Text('Are you sure you want to delete this alert?'),
-            ]),
+            child: Text('Are you sure you want to delete this alert?'),
           ),
           actions: [
             TextButton(
@@ -522,7 +482,7 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
               onPressed: () {
                 // Remove the alert from the list
                 setState(() {
-                  emergencyAlerts.remove(alert);
+                  deleteEmergencyAlert(emergencyAlert);
                   selectedAlerts = _filterAndSortAlerts(emergencyAlerts);
                 });
                 Navigator.of(context).pop(); // Close the dialog
@@ -552,7 +512,7 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
     final String exportText = exportData.toString();
 
     // Share the exported data using the share package
-    Share.share(exportText, subject: 'Emergency Alerts Export');
+    Share.share(exportText, subject: 'Emergency Alerts - Export');
   }
 }
 
@@ -569,15 +529,20 @@ class _EmergencyDetailPageState extends ConsumerState<EmergencyDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${widget.alert.type} Alert Details'),
+      backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+      appBar: CustomAppBar(
+        title: Text('${widget.alert.type} ${widget.alert.type.contains('Security') ? '' : 'Alert'} Details', style: const TextStyle(fontSize: 20)),
+        leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor(theme).navIconSelected),
+        actionTitle: '',
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Date & Time: ${_formatDate(widget.alert.dateTime)}'),
+            Text(
+              'Date & Time: ${formatDate(widget.alert.dateTime, dateFormat)} ~ ${formatTime(widget.alert.dateTime, timeFormat)}',
+            ),
             Text('Location: ${widget.alert.location}'),
             Text('Details: ${widget.alert.details}'),
             Text('Custom Message: ${widget.alert.customMessage}'),
@@ -588,8 +553,8 @@ class _EmergencyDetailPageState extends ConsumerState<EmergencyDetailPage> {
     );
   }
 
-  // Helper method to format the date based on the selected date format
-  String _formatDate(DateTime dateTime) {
+// Helper method to format the date based on the selected date format
+/*String _formatDate(DateTime dateTime) {
     //final selectedDateFormat = ref.watch(dateFormatProvider.select((value) => value));
     switch (dateFormat) {
       case DateFormatOption.format1:
@@ -601,5 +566,5 @@ class _EmergencyDetailPageState extends ConsumerState<EmergencyDetailPage> {
       default:
         return DateFormat.yMd().add_jm().format(dateTime);
     }
-  }
+  }*/
 }

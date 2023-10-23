@@ -102,12 +102,7 @@ class _ContactsState extends ConsumerState<Contacts> {
       _filteredContacts.removeAt(index);
       _kContacts = _filteredContacts;
       updateContact(contactToDelete);
-      getProfileInfoFromSharedPreferences().then(
-        (profileInfo) => deleteFirebaseContact(
-          userId: profileInfo.uid!,
-          phoneNumber: contactToDelete.phone!,
-        ),
-      );
+      deleteFirebaseContact(userId: uid, phoneNumber: contactToDelete.phone!);
     });
   }
 

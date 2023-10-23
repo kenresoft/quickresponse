@@ -59,6 +59,7 @@ dependencies:
   background_sms: ^0.0.4
   contacts_service: ^0.6.3
   flutter_ringtone_player: ^3.2.0
+  flutter_svg: ^2.0.7
 #  flutter_callkit_incoming:
 #    path: 'packages/flutter_callkit_incoming'
 
@@ -89,7 +90,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.3
+  flutter_lints: ^3.0.0
   flutter_launcher_icons: ^0.13.1
   change_app_package_name: ^1.1.0
 
