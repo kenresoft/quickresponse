@@ -80,7 +80,7 @@ class _CustomMessageGeneratorPageState extends ConsumerState<CustomMessageGenera
         backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
         appBar: CustomAppBar(
           leadingColor: AppColor(theme).navIconSelected,
-          title: const Text('Custom Message Generator', style: TextStyle(fontSize: 20)),
+          title: const Text('SOS Message Generator', style: TextStyle(fontSize: 20)),
           actionTitle: '',
           actionIcon: null,
         ),
