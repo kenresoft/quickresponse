@@ -148,105 +148,95 @@ class _ContactsState extends ConsumerState<Contacts> {
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: [
-                const SizedBox(height: 15),
-                SizedBox(
-                  height: 50,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: TextField(
-                          focusNode: _focusNode,
-                          controller: _controller,
-                          textAlign: TextAlign.center,
-                          autofillHints: _kContacts.map((e) => e.name!),
-                          decoration: InputDecoration(
-                            fillColor: AppColor(theme).white,
-                            filled: true,
-                            focusColor: AppColor(theme).white,
-                            prefixIconColor: AppColor(theme).navIconSelected,
-                            suffixIconColor: AppColor(theme).navIconSelected,
-                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(40), borderSide: BorderSide.none),
-                            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(40), borderSide: BorderSide(color: AppColor(theme).border)),
-                            hintText: 'Search',
-                            prefixIcon: const Icon(CupertinoIcons.search, size: 20),
-                            suffixIcon: const Icon(CupertinoIcons.mic, size: 20),
+            child: Column(children: [
+              const SizedBox(height: 15),
+              SizedBox(
+                height: 50,
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                  Flexible(
+                    child: TextField(
+                      focusNode: _focusNode,
+                      controller: _controller,
+                      textAlign: TextAlign.center,
+                      autofillHints: _kContacts.map((e) => e.name!),
+                      decoration: InputDecoration(
+                        fillColor: AppColor(theme).white,
+                        filled: true,
+                        focusColor: AppColor(theme).white,
+                        prefixIconColor: AppColor(theme).navIconSelected,
+                        suffixIconColor: AppColor(theme).navIconSelected,
+                        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(40), borderSide: BorderSide.none),
+                        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(40), borderSide: BorderSide(color: AppColor(theme).border)),
+                        hintText: 'Search',
+                        prefixIcon: const Icon(CupertinoIcons.search, size: 20),
+                        suffixIcon: const Icon(CupertinoIcons.mic, size: 20),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          _searchTerm = value;
+                          _filteredContacts = _kContacts.where((contact) => contact.name!.toLowerCase().contains(_searchTerm.toLowerCase())).toList();
+                        });
+                      },
+                    ),
+                  ),
+                  Row(children: [const SizedBox(width: 15), Text(_sortOrder != SortOrder.ascending ? 'ASC ' : 'DESC')]),
+                  IconButton(
+                    icon: const Icon(CupertinoIcons.sort_down, size: 24),
+                    onPressed: _sortContacts,
+                  ),
+                ]),
+              ),
+              0.025.dpH(dp).spY,
+              condition(
+                _isLoading,
+                const Center(child: CircularProgressIndicator()),
+                Expanded(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _filteredContacts.length,
+                    itemBuilder: (context, index) {
+                      //FileHelper.file(_filteredContacts[index].imageFile).then((file) => mImageFile = file);
+                      return GestureDetector(
+                        onTap: () {
+                          launch(context, Constants.contactDetails, _filteredContacts[index]);
+                        },
+                        child: Card(
+                          margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
+                          color: AppColor(theme).white,
+                          elevation: 0,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                              Row(children: [
+                                profilePicture(_filteredContacts[index].imageFile, size: 25),
+                                //const Image(image: ExactAssetImage(Constants.moon), height: 50),
+                                0.02.dpW(dp).spX,
+                                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                  SizedBox(
+                                    width: dp.width - 170,
+                                    child: Text(_filteredContacts[index].name ?? 'Name not defined', style: TextStyle(fontWeight: FontWeight.w600, color: AppColor(theme).black)),
+                                  ),
+                                  Text(_filteredContacts[index].phone ?? 'Undefined', style: TextStyle(fontSize: 13, color: AppColor(theme).alert_2)),
+                                ]),
+                              ]),
+                              InkWell(
+                                onTap: () => _deleteContact(index),
+                                splashColor: AppColor(theme).overlay,
+                                borderRadius: BorderRadius.circular(30),
+                                child: Container(
+                                  padding: const EdgeInsets.all(14),
+                                  child: Icon(CupertinoIcons.delete_simple, size: 18, color: AppColor(theme).navIconSelected),
+                                ),
+                              )
+                            ]),
                           ),
-                          onChanged: (value) {
-                            setState(() {
-                              _searchTerm = value;
-                              _filteredContacts = _kContacts.where((contact) => contact.name!.toLowerCase().contains(_searchTerm.toLowerCase())).toList();
-                            });
-                          },
                         ),
-                      ),
-                      Row(children: [const SizedBox(width: 15), Text(_sortOrder != SortOrder.ascending ? 'ASC ' : 'DESC')]),
-                      IconButton(
-                        icon: const Icon(CupertinoIcons.sort_down, size: 24),
-                        onPressed: _sortContacts,
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
-                0.025.dpH(dp).spY,
-                _isLoading // Display loading indicator based on the loading state
-                    ? const Center(child: CircularProgressIndicator()) // Use CircularProgressIndicator or any other loading indicator
-                    : Expanded(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: _filteredContacts.length,
-                          itemBuilder: (context, index) {
-                            /*_contactCount = ref.watch(contactCountProvider.select((value) => value));
-                            if (_contactCount != _filteredContacts.length) {
-                              Future(() => ref.watch(contactCountProvider.notifier).setCurrent = _filteredContacts.length);
-                            }*/
-                            //FileHelper.file(_filteredContacts[index].imageFile).then((file) => mImageFile = file);
-                            return GestureDetector(
-                              onTap: () {
-                                launch(context, Constants.contactDetails, _filteredContacts[index]);
-                              },
-                              child: Card(
-                                margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
-                                color: AppColor(theme).white,
-                                elevation: 0,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                    Row(children: [
-                                      profilePicture(_filteredContacts[index].imageFile, size: 25),
-                                      //const Image(image: ExactAssetImage(Constants.moon), height: 50),
-                                      0.02.dpW(dp).spX,
-                                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                        Text(
-                                          _filteredContacts[index].name ?? 'Name not defined',
-                                          style: TextStyle(fontWeight: FontWeight.w600, color: AppColor(theme).black),
-                                        ),
-                                        Text(
-                                          _filteredContacts[index].phone ?? 'Undefined',
-                                          style: TextStyle(fontSize: 13, color: AppColor(theme).alert_2),
-                                        ),
-                                      ]),
-                                    ]),
-                                    InkWell(
-                                      onTap: () => _deleteContact(index),
-                                      splashColor: AppColor(theme).overlay,
-                                      borderRadius: BorderRadius.circular(30),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(14),
-                                        child: Icon(CupertinoIcons.delete_simple, size: 18, color: AppColor(theme).navIconSelected),
-                                      ),
-                                    )
-                                  ]),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-              ],
-            ),
+              ),
+            ]),
           ),
           bottomNavigationBar: const BottomNavigator(currentIndex: 2),
         ),

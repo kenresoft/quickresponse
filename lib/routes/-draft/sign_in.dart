@@ -63,7 +63,7 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
+      /*appBar: CustomAppBar(
         title: const Text('Sign In', style: TextStyle(fontSize: 20)),
         leading: Container(
           margin: const EdgeInsets.all(10),
@@ -74,7 +74,7 @@ class _SignInState extends State<SignIn> {
         onActionClick: () {
           context.toast('Authenticate to access the app');
         },
-      ),
+      ),*/
       body: Stack(
         children: [
           // Background Image with Blur

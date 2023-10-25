@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
-
-import 'camera_preview.dart';
-
+import 'package:quickresponse/main.dart';
 
 class CameraScreen extends StatelessWidget {
   const CameraScreen({super.key});

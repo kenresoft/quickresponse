@@ -7,17 +7,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../providers/settings/prefs.dart';
-import '../camera/camera_preview.dart';
 import '../../data/constants/constants.dart';
 import '../../data/constants/styles.dart';
 import '../../data/model/contact.dart';
+import '../../providers/settings/prefs.dart';
 import '../../utils/extensions.dart';
 import '../../utils/util.dart';
-import '../../widgets/display/blinking_text.dart';
 import '../../widgets/inputs/alert_button.dart';
-import '../../widgets/screens/emergency_card.dart';
 import '../../widgets/screens/suggestion_card.dart';
+import '../camera/camera_preview.dart';
 
 class Call extends StatefulWidget {
   const Call({
@@ -103,9 +101,9 @@ class _CallState extends State<Call> {
         }
       },
       child: Scaffold(
-        backgroundColor: shouldHide ? AppColor(theme).black : AppColor(theme).overlay,
+        backgroundColor: shouldHide ? AppColor(theme).black : Colors.transparent,
         body: Center(
-          child: Column(children: [
+          child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
             0.05.dpH(dp).spY,
             GestureDetector(
               onTap: () => setState(() {
@@ -120,9 +118,7 @@ class _CallState extends State<Call> {
               ),
             ),
             GestureDetector(
-              onTap: () => setState(() {
-                shouldHide = !shouldHide;
-              }),
+              onTap: () => setState(() => shouldHide = !shouldHide),
               child: Padding(
                 padding: const EdgeInsets.only(right: 15),
                 child: Align(
@@ -136,18 +132,19 @@ class _CallState extends State<Call> {
             0.05.dpH(dp).spY,
             Text('Want to call emergency number?', style: TextStyle(fontSize: 16, color: AppColor(theme).white)),
             0.05.dpH(dp).spY,
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            /*Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               EmergencyCard(
-                child: BlinkingText(contact?.phone ?? '112', style: TextStyle(fontSize: 55, color: AppColor(theme).action, fontWeight: FontWeight.w500)),
+                child: SizedBox(
+                    width: dp.width - 80, child: Blink(data: contact?.phone ?? '112', align: TextAlign.center, style: TextStyle(fontSize: 55, color: AppColor(theme).action, fontWeight: FontWeight.w500))),
               ),
               0.05.dpW(dp).spX,
               contact?.phone == null
                   ? EmergencyCard(
-                      child: BlinkingText('911', style: TextStyle(fontSize: 55, color: AppColor(theme).action_2, fontWeight: FontWeight.w500), delay: true),
+                      child: Blink(data: '911', style: TextStyle(fontSize: 55, color: AppColor(theme).action_2, fontWeight: FontWeight.w500), delay: true),
                     )
                   : const SizedBox(),
-            ]),
-            0.10.dpH(dp).spY,
+            ]),*/
+            /*0.10.dpH(dp).spY,
             Text('Who needs help?', style: TextStyle(fontSize: 25, color: AppColor(theme).white, fontWeight: FontWeight.w600)),
             0.03.dpH(dp).spY,
             SizedBox(
@@ -161,7 +158,8 @@ class _CallState extends State<Call> {
                       });
                     }, buttonCarouselController: buttonCarouselController),
             ),
-            0.07.dpH(dp).spY,
+            0.07.dpH(dp).spY,*/
+            0.5.dpH(dp).spY,
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30),
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
