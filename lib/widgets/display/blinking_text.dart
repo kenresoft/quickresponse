@@ -1,16 +1,17 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-class BlinkingText extends StatefulWidget {
-  const BlinkingText(
-      this.data, {
-        super.key,
-        this.style,
-        this.blink = true,
-        this.delay = false,
-        this.isNotText = false,
-        this.child,
-      });
+class Blink extends StatefulWidget {
+  const Blink({
+    super.key,
+    this.data,
+    this.style,
+    this.blink = true,
+    this.delay = false,
+    this.isNotText = false,
+    this.child,
+  });
 
   final String? data;
   final TextStyle? style;
@@ -20,10 +21,10 @@ class BlinkingText extends StatefulWidget {
   final Widget? child;
 
   @override
-  State<BlinkingText> createState() => _BlinkingTextState();
+  State<Blink> createState() => _BlinkState();
 }
 
-class _BlinkingTextState extends State<BlinkingText> with SingleTickerProviderStateMixin {
+class _BlinkState extends State<Blink> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   Timer? _timer;
 
@@ -34,12 +35,12 @@ class _BlinkingTextState extends State<BlinkingText> with SingleTickerProviderSt
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     )..addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _controller.reverse();
-      } else if (status == AnimationStatus.dismissed) {
-        _controller.forward();
-      }
-    });
+        if (status == AnimationStatus.completed) {
+          _controller.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          _controller.forward();
+        }
+      });
     if (widget.delay && mounted) {
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (mounted) {
@@ -60,21 +61,26 @@ class _BlinkingTextState extends State<BlinkingText> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Opacity(
-            opacity: widget.blink ? _controller.value : 1,
-            child: widget.isNotText
-                ? widget.child
-                : Text(
-              widget.data ?? '',
-              style: widget.style,
+    return widget.isNotText
+        ? AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Opacity(opacity: widget.blink ? _controller.value : 1, child: widget.child!);
+            },
+          )
+        : Center(
+            child: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, child) {
+                return Opacity(
+                  opacity: widget.blink ? _controller.value : 1,
+                  child: Text(
+                    widget.data ?? '',
+                    style: widget.style,
+                  ),
+                );
+              },
             ),
           );
-        },
-      ),
-    );
   }
 }
