@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:quickresponse/routes/user/faq.dart';
 import 'package:quickresponse/routes/main/hero_page.dart';
+import 'package:quickresponse/routes/user/faq.dart';
 
 import 'imports.dart';
 
@@ -44,9 +44,7 @@ void main() async {
   DatabaseClient();
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
-      statusBarColor: AppColor(theme).background,
-      statusBarBrightness: Brightness.dark,
-      statusBarIconBrightness: Brightness.dark,
+      //statusBarColor: AppColor(theme).background,
       systemNavigationBarColor: AppColor(theme).text,
       systemNavigationBarDividerColor: AppColor(theme).divider,
     ),
@@ -92,10 +90,7 @@ class _MyAppState extends State<MyApp> {
           textTheme: TextTheme(bodyMedium: TextStyle(color: AppColor(theme).title_2)),
           cardColor: Colors.white,
           dialogBackgroundColor: Colors.white,
-          dividerColor: AppColor(theme).divider,
-          //scaffoldBackgroundColor: AppColor(theme).background,
-          //bottomNavigationBarTheme: BottomNavigationBarThemeData(backgroundColor: AppColor(theme).white),
-          appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent)),
+          dividerColor: AppColor(theme).divider),
       darkTheme: ThemeData(
           useMaterial3: true,
           brightness: Brightness.dark,
@@ -107,9 +102,7 @@ class _MyAppState extends State<MyApp> {
           textTheme: TextTheme(bodyMedium: TextStyle(color: AppColor(theme).title_2)),
           cardColor: AppColor(theme).black,
           dialogBackgroundColor: AppColor(theme).black,
-          dividerColor: AppColor(theme).divider,
-          //scaffoldBackgroundColor: AppColor(theme).backgroundDark,
-          appBarTheme: const AppBarTheme(backgroundColor: Colors.transparent)),
+          dividerColor: AppColor(theme).divider),
       routeInformationProvider: _router.routeInformationProvider,
       routeInformationParser: _router.routeInformationParser,
       routerDelegate: _router.routerDelegate,
@@ -120,15 +113,6 @@ class _MyAppState extends State<MyApp> {
       localizationsDelegates: const [],
     );
   }
-
-/*  Future<void> initAppPreferences() async {
-    theme = theme;
-    //final bool theme = SharedPreferencesService.getBool('theme') ?? true;
-    //await Future(() => ref.watch(themeProvider.notifier).toggleTheme(theme));
-    //ref.watch(timeFormatProvider.notifier).timeFormat;
-    //timeFormat;
-    //ref.watch(timeSeparatorProvider.notifier).timeSeparator;
-  }*/
 }
 
 final GoRouter _router = GoRouter(
@@ -147,12 +131,12 @@ final GoRouter _router = GoRouter(
     route(Constants.home, const Home()),
     route(Constants.camera, const CameraScreen()),
     route(Constants.contacts, const Contacts()),
-    //route(Constants.contactDetails, const ContactDetails()),
-    //route(Constants.editContactPage, const EditContactPage()),
+
     _route(Constants.contactDetails, (context, state) {
       final contact = state.extra as ContactModel;
       return ContactDetails(contact: contact); // Pass the contact data to ContactDetails
     }),
+
     _route(Constants.editContactPage, (context, state) {
       final contact = state.extra as ContactModel;
       return EditContactPage(contact: contact);
@@ -199,7 +183,6 @@ final GoRouter _router = GoRouter(
     route(Constants.alarm, const AlarmScreen()),
     route(Constants.message, const CustomMessageGeneratorPage()),
     route(Constants.history, const EmergencyHistoryPage()),
-    //route(Constants.settings, const SettingsPage()),
     route(Constants.subscription, const SubscriptionPage()),
     route(Constants.authentication, const DeviceAuthentication()),
     route(Constants.signIn, const SignIn()),
