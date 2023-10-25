@@ -1,9 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fontresoft/fontresoft.dart';
-
-import '../../data/constants/styles.dart';
-import '../../providers/settings/prefs.dart';
+import 'package:quickresponse/main.dart';
 
 class CustomAppBar extends ConsumerStatefulWidget implements PreferredSizeWidget {
   final Widget? title;
@@ -40,6 +35,7 @@ class _CustomAppBarState extends ConsumerState<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
       iconTheme: IconThemeData(color: widget.leadingColor ?? (widget.actionIcon is IconData ? AppColor(theme).navIconSelected : Colors.white)),
       title: widget.title,
       leading: widget.leading,

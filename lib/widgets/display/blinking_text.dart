@@ -6,6 +6,7 @@ class Blink extends StatefulWidget {
   const Blink({
     super.key,
     this.data,
+    this.align,
     this.style,
     this.blink = true,
     this.delay = false,
@@ -14,6 +15,7 @@ class Blink extends StatefulWidget {
   });
 
   final String? data;
+  final TextAlign? align;
   final TextStyle? style;
   final bool blink;
   final bool delay;
@@ -76,6 +78,7 @@ class _BlinkState extends State<Blink> with SingleTickerProviderStateMixin {
                   opacity: widget.blink ? _controller.value : 1,
                   child: Text(
                     widget.data ?? '',
+                    textAlign: widget.align ?? TextAlign.start,
                     style: widget.style,
                   ),
                 );
