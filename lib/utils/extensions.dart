@@ -21,10 +21,10 @@ extension Dp on num {
 }
 
 extension BuildCxt<T> on BuildContext {
-  void toast(T msg, [TextAlign? textAlign, Color? color]) {
+  void toast(T msg, [TextAlign? textAlign, Color? color, Color? textColor]) {
     ScaffoldMessenger.of(this).showSnackBar(
       SnackBar(
-        content: Text(msg.toString(), textAlign: textAlign, style: TextStyle(color: AppColor(theme).black)),
+        content: Text(msg.toString(), textAlign: textAlign, style: TextStyle(color: textColor ?? AppColor(theme).black)),
         backgroundColor: color ?? AppColor(theme).black,
         showCloseIcon: true,
       ),
