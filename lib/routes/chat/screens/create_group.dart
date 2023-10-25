@@ -2,7 +2,7 @@ import 'package:quickresponse/main.dart';
 import 'package:quickresponse/routes/chat/service.dart';
 
 import '../model.dart';
-import 'helper.dart';
+import '../helper.dart';
 
 class CreateGroupScreen extends StatelessWidget {
   final TextEditingController _groupNameController = TextEditingController();

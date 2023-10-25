@@ -72,35 +72,3 @@ class Chat {
         'timestamp': timestamp,
       };
 }
-
-/*class Chat {
-  String chatId;
-  String groupId;
-  String senderId;
-  String message;
-  Timestamp timestamp;
-
-  Chat({
-    required this.chatId,
-    required this.groupId,
-    required this.senderId,
-    required this.message,
-    required this.timestamp,
-  });
-
-  factory Chat.fromJson(Map<String, dynamic> json) => Chat(
-    chatId: json['chatId'],
-    groupId: json['groupId'],
-    senderId: json['senderId'],
-    message: json['message'],
-    timestamp: json['timestamp'], // No need to parse here, assuming it's a Timestamp from Firestore
-  );
-
-  Map<String, dynamic> toJson() => {
-    'chatId': chatId,
-    'groupId': groupId,
-    'senderId': senderId,
-    'message': message,
-    'timestamp': timestamp, // No need to format here, assuming it's a Timestamp
-  };
-}*/

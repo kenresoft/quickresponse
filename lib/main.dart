@@ -132,31 +132,6 @@ final GoRouter _router = GoRouter(
     route(Constants.camera, const CameraScreen()),
     route(Constants.contacts, const Contacts()),
 
-    _route(Constants.contactDetails, (context, state) {
-      final contact = state.extra as ContactModel;
-      return ContactDetails(contact: contact); // Pass the contact data to ContactDetails
-    }),
-
-    _route(Constants.editContactPage, (context, state) {
-      final contact = state.extra as ContactModel;
-      return EditContactPage(contact: contact);
-    }),
-
-    _route(Constants.chat, (context, state) {
-      final record = state.extra as (String, String, String);
-      return ChatScreen(chatId: record.$1, userId: record.$2, receiverId: record.$3);
-    }),
-
-    _route(Constants.chatsList, (context, state) {
-      final user = state.extra as String;
-      return ChatListScreen(userId: user);
-    }),
-
-    _route(Constants.newChatsList, (context, state) {
-      final user = state.extra as String;
-      return NewChatScreen(userId: user);
-    }),
-
     _route(Constants.settings, (context, state) {
       final type = state.extra as SettingType?;
       return SettingsPage(settingType: type ?? SettingType.none);
@@ -172,11 +147,6 @@ final GoRouter _router = GoRouter(
       return HeroPage(tip: tip);
     }),
 
-    /*_route(Constants.travellersAlarm, (context, state) {
-      final response = state.extra as NotificationResponseModel;
-      return TravellersAlarm(notificationResponse: response);
-    }),*/
-    route(Constants.userSearchScreen, const UserSearchScreen()),
     route(Constants.contactsPage, const ContactPage()),
     //route(Constants.call, const Call()),
     route(Constants.locationMap, const LocationMap()),
@@ -191,12 +161,9 @@ final GoRouter _router = GoRouter(
     route(Constants.media, const MediaScreen()),
     route(Constants.userProfilePage, const UserProfilePage()),
     route(Constants.faq, const FAQScreen()),
-
     route('/cgs', CreateGroupScreen()),
     route('/cs', const GroupsScreen()),
     //route('cg', const GroupChatScreen(group: group)),
-
-    //route(Constants.mapScreen, const MapScreen()),
     route(Constants.error, const ErrorPage()),
   ],
   errorBuilder: (context, state) => const ErrorPage(),

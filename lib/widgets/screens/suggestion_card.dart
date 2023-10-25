@@ -1,14 +1,5 @@
-import 'package:background_sms/background_sms.dart';
-import 'package:extensionresoft/extensionresoft.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-
-import '../../data/constants/styles.dart';
-import '../../data/model/contact.dart';
-import '../../providers/settings/prefs.dart';
-import '../../routes/emergency/call.dart';
-import '../../utils/extensions.dart';
+import 'package:quickresponse/main.dart';
 
 class SuggestionCard extends StatelessWidget {
   const SuggestionCard({

@@ -1,4 +1,4 @@
-import 'package:quickresponse/routes/chat/screens/helper.dart';
+import 'package:quickresponse/routes/chat/helper.dart';
 import 'package:quickresponse/main.dart';
 import '../model.dart';
 import '../service.dart';

@@ -96,7 +96,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
                     isRecordingVideo: _isRecordingVideo,
                     isRecordingAudio: _isRecordingAudio,
                   ),
-                  videoTimer: _getRemainingTime(),
+                  videoTimer: _videoTimer,
                 ),
               ),
             );
@@ -121,6 +121,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
 
         // Start a timer for 10 seconds
         _videoTimer = Timer(const Duration(seconds: 10), () {
+          _videoTimer.log;
           _stopRecording();
         });
       } catch (e) {
@@ -250,15 +251,6 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
     String url = await uploadFileToStorage(file, "media/${profile.uid}/$folder/", fileName);
     await addMediaMetadataToFirestore("${profile.uid}", folder, url, fileName);
   }*/
-
-  String _getRemainingTime() {
-    if (_videoTimer != null && _videoTimer!.isActive) {
-      final remainingSeconds = _videoTimer!.tick;
-      return remainingSeconds.toString();
-    } else {
-      return '0';
-    }
-  }
 }
 
 class CallProperties {

@@ -1,10 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:quickresponse/data/model/contact.dart';
 import 'package:quickresponse/main.dart';
-import 'package:quickresponse/widgets/inputs/alert_button.dart';
-
-import '../../data/constants/constants.dart';
-import '../../routes/map/location_map.dart';
 
 class MiniMap extends StatelessWidget {
   const MiniMap({
