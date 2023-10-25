@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:quickresponse/widgets/screens/hero_page.dart';
+import 'package:quickresponse/routes/user/faq.dart';
+import 'package:quickresponse/routes/main/hero_page.dart';
 
 import 'imports.dart';
 
@@ -206,6 +207,7 @@ final GoRouter _router = GoRouter(
     route(Constants.travellersAlarm, const Emergency()),
     route(Constants.media, const MediaScreen()),
     route(Constants.userProfilePage, const UserProfilePage()),
+    route(Constants.faq, const FAQScreen()),
 
     route('/cgs', CreateGroupScreen()),
     route('/cs', const GroupsScreen()),
