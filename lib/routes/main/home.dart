@@ -107,7 +107,10 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
-        appBar: AppBar(toolbarHeight: 0),
+        appBar: AppBar(
+          toolbarHeight: 0,
+          backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+        ),
         body: SingleChildScrollView(child: Center(child: buildPage(context, dp))),
         bottomNavigationBar: const BottomNavigator(currentIndex: 0),
       ),
@@ -188,7 +191,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
                         context.toast('Alert Delivered successfully!\nMESSAGE: "$sosMessage"', TextAlign.center, Colors.green.shade300);
                       }, () => context.toast('Default Message Not Selected!', TextAlign.center, Colors.orange.shade300));
                     },
-                    () => context.toast('No Defined SOS Message!', TextAlign.center, Colors.red.shade300),
+                    () => context.toast('No Defined SOS Message!', TextAlign.center, Colors.red.shade300, Colors.white),
                   );
                 },
               ),
@@ -204,7 +207,11 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
               shape: const CircleBorder(),
               backgroundColor: AppColor(theme).miniAlert,
               tooltip: 'Alert for contacts',
-              onPressed: conditionFunction(!isSignedIn(), () => _showSignInDialog, () => _showSOSDialog),
+              onPressed: condition(
+                customMessagesList.isEmpty,
+                () => context.toast('No Defined SOS Message!', TextAlign.center, Colors.red.shade300, Colors.white),
+                conditionFunction(!isSignedIn(), () => _showSignInDialog, () => _showSOSDialog),
+              ),
               child: const Icon(CupertinoIcons.mail),
             ),
           ),
@@ -319,7 +326,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           },
           child: Row(children: [
             Column(children: [
-              BlinkingText(trim(_streetAddress), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: AppColor(theme).text)),
+              Blink(data: trim(_streetAddress), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: AppColor(theme).text)),
               const Text('See your location', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.green)),
             ]),
             const Icon(CupertinoIcons.location_solid, color: Colors.green, size: 13),

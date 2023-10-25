@@ -1,13 +1,5 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-
-import '../../main.dart';
-import '../../services/firebase/firebase_contact.dart';
-import '../../utils/file_helper.dart';
-
-// ... (other imports and constants)
+import 'package:quickresponse/main.dart';
 
 class EditContactPage extends ConsumerStatefulWidget {
   final ContactModel contact;

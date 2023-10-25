@@ -1,17 +1,7 @@
-import 'dart:async';
-import 'dart:io';
-
-import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:quickresponse/main.dart';
 import 'package:record/record.dart';
-
-import '../../utils/file_helper.dart';
-import '../emergency/call.dart';
 
 class CameraPreviewWidget extends StatefulWidget {
   final CameraDescription camera;
@@ -52,7 +42,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
       await _initializeControllerFuture;
     } catch (e) {
       // Handle camera initialization error
-      print('Error initializing camera: $e');
+      'Error initializing camera: $e'.log;
     }
   }
 
@@ -63,11 +53,9 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
       Permission.storage,
     ].request();
 
-    if (statuses[Permission.camera] != PermissionStatus.granted ||
-        statuses[Permission.microphone] != PermissionStatus.granted ||
-        statuses[Permission.storage] != PermissionStatus.granted) {
+    if (statuses[Permission.camera] != PermissionStatus.granted || statuses[Permission.microphone] != PermissionStatus.granted || statuses[Permission.storage] != PermissionStatus.granted) {
       // Handle permission denied scenarios
-      print('Camera or storage permission is not granted.');
+      'Camera or storage permission is not granted.'.log;
     }
   }
 
@@ -136,9 +124,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
           _stopRecording();
         });
       } catch (e) {
-        if (kDebugMode) {
-          print(e);
-        }
+        e.log;
       }
     } else {
       _stopRecording();
@@ -172,7 +158,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
 
         //await upload(videoFile, videoFileName, 'videos');
       } catch (e) {
-        print(e);
+        e.log;
       }
     }
   }
@@ -230,7 +216,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
 
         //await upload(File(audioPath), audioFileName, 'audios');
       } catch (e) {
-        print(e);
+        e.log;
       }
     } else {
       _stopRecordingAudio();
@@ -243,7 +229,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
         await Record().stop();
         setState(() => _isRecordingAudio = false);
       } catch (e) {
-        print(e);
+        e.log;
       }
     }
   }

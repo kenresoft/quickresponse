@@ -74,31 +74,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         const SizedBox(height: 16),
                         buildCard(CupertinoIcons.mail, 'Email', profileInfo.email!, theme),
                         const SizedBox(height: 16),
-                        buildCard(CupertinoIcons.phone, 'Phone', profileInfo.phoneNumber ?? '', theme),
+                        buildPhoneCard(CupertinoIcons.phone, 'Phone', profileInfo.phoneNumber ?? '', theme),
                         const SizedBox(height: 16),
                         buildCard(CupertinoIcons.staroflife, 'Profile Status', profileInfo.isComplete.toString(), theme),
                         const SizedBox(height: 16),
                         buildNoteCard(),
                         const SizedBox(height: 16),
-                        /*buildCard(
-                                CupertinoIcons.time,
-                                'Last Signed In',
-                                '${formatDateTime(
-                                  ref,
-                                  profileInfo.timestamp!.toDate(),
-                                  selectedDateFormat,
-                                )} ${formatTime(
-                                  ref,
-                                  profileInfo.timestamp!.toDate(),
-                                  selectedTimeFormat,
-                                )}',
-                                theme),
-                            const SizedBox(height: 16),*/
                         InkWell(
                           onTap: () => launch(context, Constants.settings),
                           child: buildCard(CupertinoIcons.settings, 'Settings', 'View App Settings', theme),
                         ),
                         const SizedBox(height: 16),
+                        InkWell(
+                          onTap: () => launch(context, Constants.faq),
+                          child: buildCard(CupertinoIcons.question_circle, 'FAQ', 'View App Settings', theme),
+                        ),
+                        const SizedBox(height: 16),
+
                         InkWell(
                           onTap: () => showDialog(
                             context: context,
@@ -111,13 +103,19 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ),
                         const SizedBox(height: 16),
 
-                        Center(
+                        InkWell(
+                          onTap: () => launch(context, Constants.signIn),
+                          child: buildCard(CupertinoIcons.settings, 'Settings', 'View App Settings', theme),
+                        ),
+                        const SizedBox(height: 16),
+
+                        /*Center(
                           child: ElevatedButton(
                             style: const ButtonStyle(surfaceTintColor: MaterialStatePropertyAll(Colors.white)),
                             onPressed: () => phoneEditDialog(context, profileInfo),
                             child: const Text('Change Phone Number'),
                           ),
-                        ),
+                        ),*/
                         const SizedBox(height: 16),
                         // Add current location and app usage summary widgets here
                       ]),
@@ -158,10 +156,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(left: 16),
-                  child: Icon(
-                    isEditing ? CupertinoIcons.check_mark : CupertinoIcons.pencil_ellipsis_rectangle,
-                    color: AppColor(theme).navIconSelected,
-                    size: 30,
+                  child: Blink(
+                    isNotText: true,
+                    child: Icon(
+                      isEditing ? CupertinoIcons.check_mark : CupertinoIcons.pencil_ellipsis_rectangle,
+                      color: AppColor(theme).navIconSelected,
+                      size: 30,
+                    ),
                   ),
                 ),
               ),
@@ -242,7 +243,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           child: CircleAvatar(
             radius: 60,
             backgroundColor: AppColor(theme).white,
-            child: ClipRRect(borderRadius: BorderRadius.circular(30),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
               child: CachedNetworkImage(
                 fit: BoxFit.fill,
                 imageUrl: profileInfo.photoURL!,
@@ -267,6 +269,33 @@ class _UserProfilePageState extends State<UserProfilePage> {
         child: ListTile(
           contentPadding: EdgeInsets.zero,
           leading: Padding(padding: const EdgeInsets.only(left: 16), child: Icon(iconData, color: AppColor(theme).navIconSelected, size: 30)),
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+            overflow: TextOverflow.ellipsis, // Add ellipsis for overflow
+            maxLines: 1, // Limit to a single line
+          ),
+          subtitle: Text(subTitle),
+        ),
+      ),
+    );
+  }
+
+  Card buildPhoneCard(IconData iconData, String title, String subTitle, bool theme) {
+    return Card(
+      margin: EdgeInsets.zero,
+      color: AppColor(theme).white,
+      elevation: 0,
+      child: Center(
+        child: ListTile(
+          contentPadding: EdgeInsets.zero,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: GestureDetector(
+              onTap: () => phoneEditDialog(context, profileInfo),
+              child: Blink(isNotText: true, child: Icon(iconData, color: AppColor(theme).navIconSelected, size: 30)),
+            ),
+          ),
           title: Text(
             title,
             style: const TextStyle(fontWeight: FontWeight.bold),

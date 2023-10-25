@@ -205,8 +205,8 @@ class _DeviceAuthenticationState extends ConsumerState<DeviceAuthentication> {
                 child: Padding(
                   padding: EdgeInsets.symmetric(vertical: 0.08.dpH(dp), horizontal: 0.08.dpW(dp)),
                   child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    BlinkingText(
-                      'Security Pass',
+                    Blink(
+                      data: 'Security Pass',
                       style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, letterSpacing: 2, color: !theme ? AppColor(theme).white : AppColor(theme).black),
                     ),
                     const SizedBox(height: 70),
