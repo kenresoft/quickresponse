@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
-import '../widgets/display/toast.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:quickresponse/imports.dart';
 
 class Util {
   Util._();
@@ -82,4 +80,89 @@ class Util {
 
     return formattedCategory;
   }
+}
+
+sendMessage(String phoneNumber, String message, {int? simSlot}) async {
+  var result = await BackgroundSms.sendMessage(phoneNumber: phoneNumber, message: message, simSlot: simSlot);
+  if (result == SmsStatus.sent) {
+    "Sent".log;
+  } else {
+    "Failed".log;
+  }
+}
+
+//_sendMessage(String number) async {
+//await FlutterPhoneDirectCaller.callNumber(number);
+
+//this._currentUuid = _uuid.v4();
+/*    CallKitParams params = const CallKitParams(
+        id: '1a2b3c4d' */ /*this._currentUuid*/ /*,
+        nameCaller: 'Hien Nguyen',
+        handle: '0123456789',
+        type: 1,
+        extra: <String, dynamic>{'userId': '1a2b3c4d'},
+        ios: IOSParams(handleType: 'generic')
+    );
+    await FlutterCallkitIncoming.startCall(params);*/
+
+/*StreamBuilder<PhoneState>(
+      initialData: PhoneState.nothing(),
+      stream: PhoneState.stream,
+      builder: (context, a) {
+        return SizedBox();
+      },
+    );*/
+
+//}
+
+Widget buildContactsCarousel(String userId, {required Function() onTap, required CarouselController buttonCarouselController}) {
+  return CarouselSlider.builder(
+    itemCount: 3,
+    itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
+      "$itemIndex : $pageViewIndex".log;
+      return GestureDetector(
+        onTap: () {
+          onTap();
+        },
+        child: Center(
+          child: Column(children: [
+            Stack(
+              children: [
+                AnimatedPositioned(
+                  left: 0,
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  duration: const Duration(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundImage: AssetImage(Constants.profile),
+                  ),
+                ),
+              ],
+            ),
+            Text('$itemIndex', style: TextStyle(fontSize: 18, color: AppColor(theme).white)),
+          ]),
+        ),
+      );
+    },
+    carouselController: buttonCarouselController,
+    options: CarouselOptions(
+      enableInfiniteScroll: false,
+      enlargeCenterPage: true,
+      viewportFraction: 0.35,
+      aspectRatio: 1.0,
+      enlargeFactor: 0.5,
+      enlargeStrategy: CenterPageEnlargeStrategy.zoom,
+    ),
+  );
 }

@@ -5,7 +5,7 @@ import 'package:quickresponse/main.dart';
 import '../../../data/model/chat/chat.dart' as c;
 import '../model.dart';
 import '../service.dart';
-import 'helper.dart';
+import '../helper.dart';
 
 class GroupChatScreen extends StatefulWidget {
   final String groupId;

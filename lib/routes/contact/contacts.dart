@@ -196,40 +196,35 @@ class _ContactsState extends ConsumerState<Contacts> {
                     itemCount: _filteredContacts.length,
                     itemBuilder: (context, index) {
                       //FileHelper.file(_filteredContacts[index].imageFile).then((file) => mImageFile = file);
-                      return GestureDetector(
-                        onTap: () {
-                          launch(context, Constants.contactDetails, _filteredContacts[index]);
-                        },
-                        child: Card(
-                          margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
-                          color: AppColor(theme).white,
-                          elevation: 0,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                              Row(children: [
-                                profilePicture(_filteredContacts[index].imageFile, size: 25),
-                                //const Image(image: ExactAssetImage(Constants.moon), height: 50),
-                                0.02.dpW(dp).spX,
-                                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                  SizedBox(
-                                    width: dp.width - 170,
-                                    child: Text(_filteredContacts[index].name ?? 'Name not defined', style: TextStyle(fontWeight: FontWeight.w600, color: AppColor(theme).black)),
-                                  ),
-                                  Text(_filteredContacts[index].phone ?? 'Undefined', style: TextStyle(fontSize: 13, color: AppColor(theme).alert_2)),
-                                ]),
-                              ]),
-                              InkWell(
-                                onTap: () => _deleteContact(index),
-                                splashColor: AppColor(theme).overlay,
-                                borderRadius: BorderRadius.circular(30),
-                                child: Container(
-                                  padding: const EdgeInsets.all(14),
-                                  child: Icon(CupertinoIcons.delete_simple, size: 18, color: AppColor(theme).navIconSelected),
+                      return Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
+                        color: AppColor(theme).white,
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                            Row(children: [
+                              profilePicture(_filteredContacts[index].imageFile, size: 25),
+                              //const Image(image: ExactAssetImage(Constants.moon), height: 50),
+                              0.02.dpW(dp).spX,
+                              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                SizedBox(
+                                  width: dp.width - 170,
+                                  child: Text(_filteredContacts[index].name ?? 'Name not defined', style: TextStyle(fontWeight: FontWeight.w600, color: AppColor(theme).black)),
                                 ),
-                              )
+                                Text(_filteredContacts[index].phone ?? 'Undefined', style: TextStyle(fontSize: 13, color: AppColor(theme).alert_2)),
+                              ]),
                             ]),
-                          ),
+                            InkWell(
+                              onTap: () => _deleteContact(index),
+                              splashColor: AppColor(theme).overlay,
+                              borderRadius: BorderRadius.circular(30),
+                              child: Container(
+                                padding: const EdgeInsets.all(14),
+                                child: Icon(CupertinoIcons.delete_simple, size: 18, color: AppColor(theme).navIconSelected),
+                              ),
+                            )
+                          ]),
                         ),
                       );
                     },

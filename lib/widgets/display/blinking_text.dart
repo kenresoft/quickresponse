@@ -35,7 +35,7 @@ class _BlinkState extends State<Blink> with SingleTickerProviderStateMixin {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 1500),
     )..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           _controller.reverse();
@@ -67,7 +67,7 @@ class _BlinkState extends State<Blink> with SingleTickerProviderStateMixin {
         ? AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
-              return Opacity(opacity: widget.blink ? _controller.value : 1, child: widget.child!);
+              return Opacity(opacity: widget.blink ? buildValue : 1, child: widget.child!);
             },
           )
         : Center(
@@ -75,7 +75,7 @@ class _BlinkState extends State<Blink> with SingleTickerProviderStateMixin {
               animation: _controller,
               builder: (context, child) {
                 return Opacity(
-                  opacity: widget.blink ? _controller.value : 1,
+                  opacity: widget.blink ? buildValue : 1,
                   child: Text(
                     widget.data ?? '',
                     textAlign: widget.align ?? TextAlign.start,
@@ -85,5 +85,13 @@ class _BlinkState extends State<Blink> with SingleTickerProviderStateMixin {
               },
             ),
           );
+  }
+
+  double get buildValue {
+    if (_controller.value <= 0.3) {
+      return 0.3;
+    } else {
+      return _controller.value;
+    }
   }
 }

@@ -55,17 +55,20 @@ class _AlertButtonState extends State<AlertButton> with TickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      onTap: widget.showSecondShadow ? null : widget.onPressed,
       onLongPress: () {
-        _isPressedNotifier.value = !_isPressedNotifier.value;
-        if (widget.onPressed != null) {
-          if (widget.delay == const Duration(seconds: 0)) {
-            widget.onPressed!();
-            _isPressedNotifier.value = !_isPressedNotifier.value;
-          } else {
-            Future.delayed(const Duration(seconds: 3), () {
+        if (widget.showSecondShadow) {
+          _isPressedNotifier.value = !_isPressedNotifier.value;
+          if (widget.onPressed != null) {
+            if (widget.delay == Duration.zero) {
               widget.onPressed!();
               _isPressedNotifier.value = !_isPressedNotifier.value;
-            });
+            } else {
+              Future.delayed(widget.delay!, () {
+                widget.onPressed!();
+                _isPressedNotifier.value = !_isPressedNotifier.value;
+              });
+            }
           }
         }
       },
@@ -80,7 +83,7 @@ class _AlertButtonState extends State<AlertButton> with TickerProviderStateMixin
                   borderRadius: BorderRadius.all(Radius.elliptical(widget.width, widget.height)),
                   color: ColorTween(begin: AppColor(theme).btn_1, end: AppColor(theme).btn_2).evaluate(_gradientAnimationController),
                   border: Border.all(width: widget.borderWidth, color: isPressed ? Colors.transparent : Colors.grey),
-                  boxShadow: isPressed
+                  boxShadow: isPressed && widget.showSecondShadow
                       ? [
                           BoxShadow(color: Colors.white.withOpacity(0.6), spreadRadius: 3),
                           BoxShadow(
