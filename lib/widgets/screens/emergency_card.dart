@@ -10,11 +10,13 @@ class EmergencyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: AppColor(theme).overlay,
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-      child: child,
+    return Center(
+      child: Card(
+        color: AppColor(theme).overlay,
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        child: child,
+      ),
     );
   }
 }
