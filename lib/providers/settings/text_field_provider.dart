@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../routes/main/settings.dart';
+import '../../routes/user/settings.dart';
 
 final textFieldDirectionProvider = StateNotifierProvider<TextFieldDirectionNotifier, TextFieldDirection>((ref) {
   return TextFieldDirectionNotifier();
