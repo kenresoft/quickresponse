@@ -30,6 +30,7 @@ class Constants {
   static const String userSearchScreen = '/userSearchScreen';
   static const String media = '/media';
   static const String userProfilePage = '/userProfilePage';
+  static const String faq = '/faq';
   static const String heroPage = '/heroPage';
 
 /*  static const String userProfilePage = '/userProfilePage';
