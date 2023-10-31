@@ -7,7 +7,6 @@ import '../data/model/notification_schedule.dart';
 import '../providers/settings/prefs.dart';
 import '../widgets/display/notifications.dart';
 import 'firebase/firebase_notification_schedule.dart';
-import 'firebase/firebase_profile.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -55,7 +54,7 @@ await Future.delayed(Duration(seconds: 1));
         if (j == totalAlarms - 1) {
           scheduledTime = selectedDateTime.copyWith(second: 0);
           getProfileInfoFromSharedPreferences().then(
-            (profileInfo) => addFirebaseNotificationSchedule(
+            (profileInfo) => addNotificationSchedule(
               userId: profileInfo.uid!,
               time: selectedDateTime.copyWith(second: 0).toString(),
               recipient: notificationId.toString(),
@@ -72,7 +71,7 @@ await Future.delayed(Duration(seconds: 1));
           body: body,
         );
         getProfileInfoFromSharedPreferences().then(
-          (profileInfo) => addFirebaseNotificationSchedule(
+          (profileInfo) => addNotificationSchedule(
             userId: profileInfo.uid!,
             time: scheduledTime.toString(),
             recipient: notificationId.toString(),
@@ -88,11 +87,11 @@ await Future.delayed(Duration(seconds: 1));
 
           if (j == totalAlarms - 1) {
             getProfileInfoFromSharedPreferences().then(
-              (profileInfo) => deleteFirebaseNotificationSchedule(userId: profileInfo.uid!, time: selectedDateTime.copyWith(second: 00).toString()),
+              (profileInfo) => deleteNotificationSchedule(userId: profileInfo.uid!, time: selectedDateTime.copyWith(second: 00).toString()),
             );
           } else {
             getProfileInfoFromSharedPreferences().then(
-              (profileInfo) => deleteFirebaseNotificationSchedule(userId: profileInfo.uid!, time: scheduledTime.toString()),
+              (profileInfo) => deleteNotificationSchedule(userId: profileInfo.uid!, time: scheduledTime.toString()),
             );
           }
 
@@ -113,20 +112,19 @@ await Future.delayed(Duration(seconds: 1));
 
   void scheduleNotificationBatch({
     required DateTime selectedDateTime,
+    required void Function() stateCallback,
     required void Function(NotificationSchedule schedule, int count) onTimerCallback,
     String? title,
     String? body,
   }) {
-    int intervalInSeconds = 30 * 60;
+    int intervalInSeconds = 10 /** 60*/; //30*60
     int notificationIdPrefix = 100;
 
     // Calculate the total number of alarms required based on the selected time
-    final int totalAlarms = (selectedDateTime.difference(DateTime.now()).inSeconds / intervalInSeconds).ceil();
+    final int totalAlarms = (selectedDateTime.difference(DateTime.now()).inSeconds.log / intervalInSeconds).ceil();
 
-    totalAlarms.log;
-    cancelExistingSchedules(
-      (isReadyToSchedule) {},
-    );
+    //totalAlarms.log;
+    cancelExistingSchedules((isReadyToSchedule) {});
 
     // Schedule the periodic alarms with unique notification IDs
     for (int i = 1; i <= totalAlarms; i++) {
@@ -134,9 +132,9 @@ await Future.delayed(Duration(seconds: 1));
       final DateTime scheduledTime = DateTime.now().add(Duration(seconds: i * intervalInSeconds));
 
       // Check if it's the last alarm and set it to the exact selected time
-      if (i == totalAlarms) {
+      /*if (i == totalAlarms) {
         scheduleNotification(scheduledTime: selectedDateTime.copyWith(second: 00), notificationId: notificationId, title: title, body: body);
-        addFirebaseNotificationSchedule(
+        addNotificationSchedule(
           userId: uid,
           time: selectedDateTime.copyWith(second: 00).toString(),
           recipient: notificationId.toString(),
@@ -144,9 +142,9 @@ await Future.delayed(Duration(seconds: 1));
           message: body ?? '',
         );
         //onScheduleCallback(NotificationSchedule(time: selectedDateTime.copyWith(second: 00).toString(), recipient: notificationId.toString()));
-      } else {
+      } else*/ {
         scheduleNotification(scheduledTime: scheduledTime, notificationId: notificationId, title: title, body: body);
-        addFirebaseNotificationSchedule(
+        addNotificationSchedule(
           userId: uid,
           time: scheduledTime.toString(),
           recipient: notificationId.toString(),
@@ -160,25 +158,29 @@ await Future.delayed(Duration(seconds: 1));
       //startAlarm();
 
       // Schedule a timer for stopping the alarm and canceling this specific notification after 60 seconds
-      final timer = Timer(Duration(seconds: (i * intervalInSeconds) + intervalInSeconds), () {
+      final timer = Timer(Duration(seconds: (i * intervalInSeconds)), () {
         // Stop the alarm for this notification
         stopAlarm();
 
         flutterLocalNotificationsPlugin.cancel(notificationId);
         if (i == totalAlarms) {
-          deleteFirebaseNotificationSchedule(userId: uid, time: selectedDateTime.copyWith(second: 00).toString());
+          deleteNotificationSchedule(userId: uid, time: selectedDateTime.copyWith(second: 00).toString());
+          cancelExistingSchedules((isReadyToSchedule) {});
         } else {
-          deleteFirebaseNotificationSchedule(userId: uid, time: scheduledTime.toString());
+          deleteNotificationScheduleById(userId: uid, recipient: notificationId.toString() /*scheduledTime.toString()*/);
         }
+        stateCallback();
         consecutiveAlarms++;
 
         if (consecutiveAlarms >= 3) {
           onTimerCallback(NotificationSchedule(recipient: notificationId.toString()), consecutiveAlarms);
-          consecutiveAlarms.log;
+
+          ///consecutiveAlarms.log;
         }
         // Remove the timer from the list
         _timers.remove(notificationId);
-        consecutiveAlarms.log;
+
+        ///consecutiveAlarms.log;
       });
 
       // Store the timer
@@ -219,7 +221,8 @@ await Future.delayed(Duration(seconds: 1));
     resetCounter(null, value: 1);
     flutterLocalNotificationsPlugin.cancelAll();
     cancelAllTimers();
-    deleteAllFirebaseNotificationSchedule(userId: uid).then((value) => callback(true));
+    deleteAllNotificationSchedules(userId: uid);
+    callback(true);
   }
 
   void startAlarm() async {

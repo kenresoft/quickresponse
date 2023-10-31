@@ -32,7 +32,7 @@ class LocationService {
 
     // Check if location service is enabled
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    serviceEnabled.log;
+    ///serviceEnabled.log;
     if (!serviceEnabled) {
       onPermissionDenied(false);
       //return;
