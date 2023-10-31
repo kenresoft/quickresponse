@@ -42,7 +42,7 @@ Future<void> saveUserProfileToFirestore(User user) async {
     }
     await _firestore.collection('users').doc(user.uid).collection('profile').doc('profileInfo').set(profileInfo.toJson());
     await saveProfileInfoToSharedPreferences(profileInfo);
-    profileInfo.uid.log;
+    profileInfo.uid;
   } catch (e) {
     'Error creating user profile: $e'.log;
   }
