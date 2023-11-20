@@ -1,8 +1,5 @@
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:quickresponse/main.dart';
 
 class EmergencyTip {
   final String category;
@@ -20,15 +17,16 @@ class EmergencyTip {
   factory EmergencyTip.fromJson(Map<String, dynamic> json) {
     IconData iconData;
     iconData = switch (json['category']) {
-      'fire' => CupertinoIcons.flame,
-      'home_invasion' => CupertinoIcons.house,
-      'robbery' => CupertinoIcons.money_dollar,
-      'assault' => CupertinoIcons.shield,
-      'kidnapping' => CupertinoIcons.person_2_alt,
-      'car_accident' => CupertinoIcons.car,
-      'lost_in_the_woods' => CupertinoIcons.tree,
-      'security' => CupertinoIcons.lock_open_fill,
-      _ => CupertinoIcons.exclamationmark
+      'fire' => FontAwesomeIcons.fire,
+      'home_invasion' => FontAwesomeIcons.house,
+      'robbery' => FontAwesomeIcons.personRifle,
+      'assault' => FontAwesomeIcons.faceSadTear,
+      'kidnapping' => FontAwesomeIcons.personRunning,
+      'car_accident' => FontAwesomeIcons.car,
+      'lost_in_the_woods' => FontAwesomeIcons.tree,
+      'security' => FontAwesomeIcons.personMilitaryToPerson,
+      'medical' => FontAwesomeIcons.hospital,
+      _ => FontAwesomeIcons.personCircleQuestion
     };
 
     return EmergencyTip(
