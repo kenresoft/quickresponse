@@ -177,7 +177,7 @@ class _SignInState extends State<SignIn> {
               const SizedBox(height: 16.0),
               ListTile(
                 leading: Image.asset(
-                  Constants.laptop, // Replace with your image path
+                  Constants.logo, // Replace with your image path
                   width: 32.0, // Adjust image size as needed
                   height: 32.0,
                 ),
