@@ -1,5 +1,4 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:quickresponse/utils/util.dart';
 
 import '../../main.dart';
 import '../display/color_mix.dart';
@@ -15,25 +14,27 @@ class TipSlider extends StatefulWidget {
 }
 
 class _TipSliderState extends State<TipSlider> {
+
   @override
   Widget build(BuildContext context) {
     return CarouselSlider.builder(
       itemCount: widget.tips.length,
       itemBuilder: (BuildContext context, int index, int realIndex) {
-        EmergencyTip tip = widget.tips[index];
+        var tip = widget.tips[index];
         return GestureDetector(
           onTap: () => conditionFunction(isSignedIn(), () => launch(context, Constants.heroPage, tip), () => _showSignInDialog()),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              //SvgPicture.asset(Constants.redCross, width: 50, height: 50),
               ColorMix(gradient: AppColor(theme).alertMix, child: Icon(widget.tips[index].iconData, size: 56.0, color: AppColor(theme).action)),
               const SizedBox(height: 16.0),
               ColorMix(
                 gradient: AppColor(theme).textMix,
-                child: Text(Util.formatCategory(widget.tips[index].category), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0, color: AppColor(theme).action)),
+                child: Text(Util.formatCategory(widget.tips[index].category), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColor(theme).action)),
               ),
               const SizedBox(height: 8.0),
-              Text(widget.tips[index].shortDescription, style: const TextStyle(fontSize: 14.0)),
+              Text(widget.tips[index].shortDescription, style: const TextStyle(fontSize: 15.0), textAlign: TextAlign.center),
             ]),
           ),
         );
