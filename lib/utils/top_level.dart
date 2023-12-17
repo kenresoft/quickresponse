@@ -12,36 +12,38 @@ GestureDetector focus(FocusNode focusNode, Widget child) {
   );
 }
 
-Future<void> saveContact(ContactModel selectedContact) async {
+void saveContact(ContactModel selectedContact, VoidCallback callback) {
   // Load the existing contacts from SharedPreferences
-  final existingContacts = await Wrapper()._loadContactsFromPrefs();
+  var existingContacts = Wrapper()._loadContactsFromPrefs();
+  /*for (var element in existingContacts) {
+    if (element.phone == selectedContact.phone!.replaceAll(' ', '')) {
+      callback();
+      return;
+    }
+  }*/
 
   // Add the selected contact to the existing contacts
   existingContacts.add(selectedContact);
-
+  /*existingContacts = existingContacts.map((element) {
+    var e = element;
+    e.phone?.replaceAll(' ', '');
+    return e;
+  }).toList();*/
   // Save the updated contacts list to SharedPreferences
-  await Wrapper()._saveContactsToPrefs(existingContacts);
+  Wrapper()._saveContactsToPrefs(existingContacts);
+  addFirebaseContact(userId: uid, name: selectedContact.name!, phoneNumber: selectedContact.phone!.replaceAll(' ', '-'));
 }
 
-Future<void> saveContacts(List<ContactModel> contacts) async {
-  await Wrapper()._saveContactsToPrefs(contacts);
+void updateContact(ContactModel contact) async {
+  Wrapper()._updateEditedContactInPrefs(contact);
 }
 
-Future<void> setContacts(List<ContactModel> contacts) async {
-  await Wrapper()._clearContactsPref();
-  await Wrapper()._saveContactsToPrefs(contacts);
+List<ContactModel> loadContacts() {
+  return Wrapper()._loadContactsFromPrefs();
 }
 
-Future<List<ContactModel>> loadContacts() async {
-  return await Wrapper()._loadContactsFromPrefs();
-}
-
-Future<void> updateContact(ContactModel contactModel) async {
-  Wrapper()._updateContactInPrefs(contactModel);
-}
-
-Future<void> updateEditedContact(ContactModel contactModel) async {
-  Wrapper()._updateEditedContactInPrefs(contactModel);
+void deleteContact(ContactModel contactModel) {
+  Wrapper()._deleteContactAndUpdatePrefs(contactModel);
 }
 
 Future<void> signOut() async {
@@ -105,8 +107,8 @@ String dateFromTimestamp(Timestamp timestamp) {
 // Helper method to format the time based on the selected time separator
 String formatTime(DateTime dateTime, TimeFormatOption formatOption) {
   return switch (formatOption) {
-    TimeFormatOption.format12Hours => DateFormat('hh${timeSeparator}mm a').format(dateTime),
-    TimeFormatOption.format24Hours => DateFormat('HH${timeSeparator}mm').format(dateTime),
+    TimeFormatOption.format12Hours => DateFormat('hh${timeSeparator}mm${timeSeparator}ss a').format(dateTime),
+    TimeFormatOption.format24Hours => DateFormat('HH${timeSeparator}mm${timeSeparator}ss').format(dateTime),
     //_ => DateFormat('hh${timeSeparator}mm a').format(dateTime) // Default format (12-hour)
   };
 }
