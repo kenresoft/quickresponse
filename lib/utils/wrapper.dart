@@ -1,19 +1,4 @@
-import 'dart:convert';
-import 'dart:math';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:intl/intl.dart';
 import 'package:quickresponse/imports.dart';
-import 'package:quickresponse/utils/extensions.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../data/model/contact.dart';
-import '../providers/settings/date_time_format.dart';
-import '../providers/settings/prefs.dart';
 
 part '../utils/top_level.dart';
 
@@ -22,8 +7,8 @@ class Wrapper {
 
   /// ---- LOAD/SAVE CONTACT TO STORAGE
 // Function to load contacts from SharedPreferences
-  Future<List<ContactModel>> _loadContactsFromPrefs() async {
-    final jsonContacts = await _loadContactsJsonFromPrefs();
+  List<ContactModel> _loadContactsFromPrefs() {
+    final jsonContacts = SharedPreferencesService.getString('contacts');
     if (jsonContacts != null) {
       return _contactsFromJson(jsonContacts);
     }
@@ -31,15 +16,13 @@ class Wrapper {
   }
 
 // Function to save the JSON string to SharedPreferences
-  Future<void> _saveContactsToPrefs(List<ContactModel> contacts) async {
-    final prefs = await SharedPreferences.getInstance();
+  void _saveContactsToPrefs(List<ContactModel> contacts) {
     final jsonContacts = _contactsToJson(contacts);
-    await prefs.setString('contacts', jsonContacts);
+    SharedPreferencesService.setString('contacts', jsonContacts);
   }
 
-  Future<void> _clearContactsPref() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('contacts');
+  void _clearContactsPref() {
+    SharedPreferencesService.remove('contacts');
   }
 
   /// ---- JSON CONVERTERS
@@ -76,23 +59,16 @@ class Wrapper {
   }
 
   /// ---- SHARED PREFERENCE SETUP
-// Function to retrieve the JSON string from SharedPreferences
-  Future<String?> _loadContactsJsonFromPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('contacts');
-  }
 
-  /// ---- UPDATE
-
-  Future<void> _updateContactInPrefs(ContactModel contactToDelete) async {
-    final existingContacts = await _loadContactsFromPrefs();
+  void _updateContactInPrefs(ContactModel contactToDelete) {
+    final existingContacts = _loadContactsFromPrefs();
     existingContacts.removeWhere((contact) => contact.name == contactToDelete.name && contact.phone == contactToDelete.phone);
 
-    await _saveContactsToPrefs(existingContacts);
+    _saveContactsToPrefs(existingContacts);
   }
 
-  Future<void> _deleteContactAndUpdatePrefs(ContactModel contactToDelete) async {
-    final existingContacts = await _loadContactsFromPrefs();
+  void _deleteContactAndUpdatePrefs(ContactModel contactToDelete) {
+    final existingContacts = _loadContactsFromPrefs();
 
     // Find the index of the contact to be deleted based on a unique identifier (e.g., phone number).
     final index = existingContacts.indexWhere((contact) => contact.phone == contactToDelete.phone);
@@ -102,12 +78,12 @@ class Wrapper {
       existingContacts.removeAt(index);
 
       // Save the updated contacts list to SharedPreferences.
-      await _saveContactsToPrefs(existingContacts);
+      _saveContactsToPrefs(existingContacts);
     }
   }
 
-  Future<void> _updateEditedContactInPrefs(ContactModel updatedContact) async {
-    final existingContacts = await _loadContactsFromPrefs();
+  void _updateEditedContactInPrefs(ContactModel updatedContact) {
+    final existingContacts = _loadContactsFromPrefs();
 
     // Find the index of the contact to be updated based on a unique identifier (e.g., phone number).
     final index = existingContacts.indexWhere((contact) => contact.phone == updatedContact.phone);
@@ -116,7 +92,7 @@ class Wrapper {
       existingContacts[index] = updatedContact;
 
       // Save the updated contacts list to SharedPreferences.
-      await _saveContactsToPrefs(existingContacts);
+      _saveContactsToPrefs(existingContacts);
     }
   }
 }

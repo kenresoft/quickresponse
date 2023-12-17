@@ -40,3 +40,9 @@ extension LogExtension<T> on T {
     return this;
   }
 }
+
+extension P<T, R> on T {
+  R? let(Function(T? str) callback) {
+    return callback(this);
+  }
+}
