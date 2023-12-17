@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:quickresponse/imports.dart';
 import 'package:quickresponse/utils/extensions.dart';
 
 import '../data/constants/styles.dart';
@@ -67,7 +68,7 @@ Widget profilePicture(String? targetFile, {double? size, bool isLoading = false,
               ? Padding(
                   padding: const EdgeInsets.all(5),
                   child: Icon(
-                    CupertinoIcons.person_alt, // Display a default icon if no image is selected
+                    FontAwesomeIcons.person, // Display a default icon if no image is selected
                     size: size != null ? size + size - 5 : 90,
                     color: AppColor(theme).navIconSelected,
                   ),

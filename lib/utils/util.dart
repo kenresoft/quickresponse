@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:quickresponse/imports.dart';
 
 class Util {
@@ -56,6 +57,19 @@ class Util {
         }
       },
     );
+  }
+
+  static Future<void> requestPermissions() async {
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.camera,
+      Permission.microphone,
+      Permission.storage,
+    ].request();
+
+    if (statuses[Permission.camera] != PermissionStatus.granted || statuses[Permission.microphone] != PermissionStatus.granted || statuses[Permission.storage] != PermissionStatus.granted) {
+      // Handle permission denied scenarios
+      'Camera or storage permission is not granted.'.log;
+    }
   }
 
   static lockOrientation() {
@@ -119,7 +133,7 @@ Widget buildContactsCarousel(String userId, {required Function() onTap, required
   return CarouselSlider.builder(
     itemCount: 3,
     itemBuilder: (BuildContext context, int itemIndex, int pageViewIndex) {
-      "$itemIndex : $pageViewIndex".log;
+      ///"$itemIndex : $pageViewIndex".log;
       return GestureDetector(
         onTap: () {
           onTap();
