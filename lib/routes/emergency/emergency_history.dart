@@ -1,27 +1,5 @@
 import 'package:quickresponse/main.dart';
 
-import '../../data/emergency/emergency_alert.dart';
-
-/*class EmergencyAlert {
-  final String id;
-  final String type;
-  final DateTime dateTime;
-  final String location;
-  final String details;
-  final String customMessage;
-  final bool hasLocationData; // Added to check if location data is available
-
-  EmergencyAlert({
-    required this.id,
-    required this.type,
-    required this.dateTime,
-    required this.location,
-    required this.details,
-    required this.customMessage,
-    required this.hasLocationData,
-  });
-}*/
-
 class EmergencyHistoryPage extends ConsumerStatefulWidget {
   const EmergencyHistoryPage({super.key});
 
@@ -30,117 +8,6 @@ class EmergencyHistoryPage extends ConsumerStatefulWidget {
 }
 
 class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
-  List<EmergencyAlert> alerts = [
-    /*EmergencyAlert(
-      id: '1',
-      type: 'Medical Emergency',
-      dateTime: DateTime(2023, 9, 10, 10, 30),
-      location: '123 Main St, City',
-      details: 'Patient unconscious',
-      customMessage: 'Please send help!',
-      hasLocationData: true, // Example with location data
-    ),
-    EmergencyAlert(
-      id: '2',
-      type: 'Fire Emergency',
-      dateTime: DateTime(2023, 9, 9, 15, 45),
-      location: '456 Elm St, Town',
-      details: 'Building on fire',
-      customMessage: 'Fire department needed!',
-      hasLocationData: false, // Example without location data
-    ),
-    EmergencyAlert(
-      id: '11',
-      type: 'Fire Emergency',
-      dateTime: DateTime(2023, 9, 11, 8, 15),
-      location: '789 Oak St, Village',
-      details: 'Smoke in the building',
-      customMessage: 'Call the fire department!',
-      hasLocationData: false,
-    ),
-    EmergencyAlert(
-      id: '12',
-      type: 'Medical Emergency',
-      dateTime: DateTime(2023, 9, 10, 12, 30),
-      location: '567 Pine St, Town',
-      details: 'Patient with severe injuries',
-      customMessage: 'Urgent medical assistance needed!',
-      hasLocationData: true,
-    ),
-    EmergencyAlert(
-      id: '13',
-      type: 'Security Alert',
-      dateTime: DateTime(2023, 9, 9, 18, 45),
-      location: '321 Cedar St, City',
-      details: 'Suspicious activity reported',
-      customMessage: 'Requesting police presence',
-      hasLocationData: true,
-    ),
-    EmergencyAlert(
-      id: '14',
-      type: 'Natural Disaster',
-      dateTime: DateTime(2023, 9, 8, 14, 30),
-      location: '123 Maple St, Village',
-      details: 'Earthquake tremors detected',
-      customMessage: 'Stay safe!',
-      hasLocationData: true,
-    ),
-    EmergencyAlert(
-      id: '15',
-      type: 'Medical Emergency',
-      dateTime: DateTime(2023, 9, 7, 16, 20),
-      location: '456 Birch St, Town',
-      details: 'Patient unconscious',
-      customMessage: 'Please send help!',
-      hasLocationData: true,
-    ),
-    EmergencyAlert(
-      id: '16',
-      type: 'Fire Emergency',
-      dateTime: DateTime(2023, 9, 6, 10, 45),
-      location: '987 Elm St, City',
-      details: 'Building on fire',
-      customMessage: 'Fire department needed!',
-      hasLocationData: false,
-    ),
-    EmergencyAlert(
-      id: '17',
-      type: 'Security Alert',
-      dateTime: DateTime(2023, 9, 5, 19, 15),
-      location: '654 Cedar St, Village',
-      details: 'Burglary reported',
-      customMessage: 'Requesting immediate assistance',
-      hasLocationData: true,
-    ),
-    EmergencyAlert(
-      id: '18',
-      type: 'Natural Disaster',
-      dateTime: DateTime(2023, 9, 4, 13, 55),
-      location: '234 Pine St, Town',
-      details: 'Flood warning in effect',
-      customMessage: 'Seek higher ground!',
-      hasLocationData: true,
-    ),
-    EmergencyAlert(
-      id: '19',
-      type: 'Fire Emergency',
-      dateTime: DateTime(2023, 9, 3, 17, 10),
-      location: '567 Oak St, City',
-      details: 'Smoke and flames visible',
-      customMessage: 'Urgent fire response needed!',
-      hasLocationData: false,
-    ),
-    EmergencyAlert(
-      id: '20',
-      type: 'Medical Emergency',
-      dateTime: DateTime(2023, 9, 2, 9, 30),
-      location: '123 Elm St, Village',
-      details: 'Patient with difficulty breathing',
-      customMessage: 'Call an ambulance!',
-      hasLocationData: true,
-    ),*/
-  ];
-
   // Add variables for filtering, sorting, searching, and export
   String? selectedFilter;
   String? selectedSort;
@@ -179,12 +46,13 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
       child: focus(
         _focusNode,
         Scaffold(
+          resizeToAvoidBottomInset: false,
           backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
           appBar: CustomAppBar(
-            leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor(theme).navIconSelected),
+            leading: const LogoCard(),
             title: const Text('Emergency History', style: TextStyle(fontSize: 20)),
-            actionTitle: '',
-            actionIcon: null,
+            actionTitle: 'Delete All',
+            onActionClick: () => _showDeleteAllConfirmationDialog(context),
           ),
           body: Column(children: [
             // Filter and Sort Options
@@ -219,12 +87,10 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
                     currentPage = 0; // Reset to the first page when searching
                   });
                 },
-                style: TextStyle(
-                  // Customize text style
-                  color: AppColor(theme).black,
-                  fontSize: 16.0,
-                ),
+                style: TextStyle(color: AppColor(theme).black, fontSize: 16.0),
+                maxLines: textFieldDirection == TextFieldDirection.vertical ? 2 : 1,
                 decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
                   fillColor: AppColor(theme).white,
                   filled: true,
                   focusColor: AppColor(theme).white,
@@ -282,7 +148,7 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
                           child: ListTile(
                             title: Text('${alert.type} ${alert.type.contains('Security') ? '' : 'Alert'}'),
                             subtitle: Text(
-                              '${formatDate(alert.dateTime, dateFormat)} ~ ${formatTime(alert.dateTime, timeFormat)}',
+                              '${formatDate(alert.dateTime, dateFormat)} | ${formatTime(alert.dateTime, timeFormat)}',
                               style: const TextStyle(fontWeight: FontWeight.w300),
                             ),
                             trailing: IconButton(
@@ -324,7 +190,7 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
             isExpanded: false,
             child: const Icon(Icons.ios_share),
           ),
-          bottomNavigationBar: const BottomNavigator(currentIndex: 3),
+          bottomNavigationBar: bottomNavigator(context, 3),
         ),
       ),
     );
@@ -467,15 +333,11 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
           surfaceTintColor: Colors.transparent,
           backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
           title: const Text('Delete Alert'),
-          content: const SingleChildScrollView(
-            child: Text('Are you sure you want to delete this alert?'),
-          ),
+          content: const SingleChildScrollView(child: Text('Are you sure you want to delete this alert?')),
           actions: [
             TextButton(
               child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
               child: const Text('Delete'),
@@ -495,24 +357,62 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
   }
 
   void _exportAlerts(List<EmergencyAlert> alerts) {
-    // Create a string to hold the exported data
-    final StringBuffer exportData = StringBuffer();
+    if (alerts.isNotEmpty) {
+      // Create a string to hold the exported data
+      final StringBuffer exportData = StringBuffer();
 
-    // Iterate through the alerts and add them to the exportData string
-    for (final alert in alerts) {
-      exportData.writeln('Type: ${alert.type}');
-      exportData.writeln('Date & Time: ${alert.dateTime}');
-      exportData.writeln('Location: ${alert.location}');
-      exportData.writeln('Details: ${alert.details}');
-      exportData.writeln('Custom Message: ${alert.customMessage}');
-      exportData.writeln(''); // Add an empty line to separate alerts
+      // Iterate through the alerts and add them to the exportData string
+      for (final alert in alerts) {
+        exportData.writeln('Type: ${alert.type}');
+        exportData.writeln('Date & Time: ${alert.dateTime}');
+        exportData.writeln('Location: ${alert.location}');
+        exportData.writeln('Details: ${alert.details}');
+        exportData.writeln('Custom Message: ${alert.customMessage}');
+        exportData.writeln(''); // Add an empty line to separate alerts
+      }
+
+      // Convert the StringBuffer to a string
+      final String exportText = exportData.toString();
+
+      // Share the exported data using the share package
+      Share.share(exportText, subject: 'Emergency Alerts - Export');
+    } else {
+      context.toast('SOS History is empty!');
     }
+  }
 
-    // Convert the StringBuffer to a string
-    final String exportText = exportData.toString();
-
-    // Share the exported data using the share package
-    Share.share(exportText, subject: 'Emergency Alerts - Export');
+  Future<void> _showDeleteAllConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+          title: const Text('Delete All Alerts'),
+          content: const SingleChildScrollView(child: Text('Are you sure you want to delete all alerts?')),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Delete All'),
+              onPressed: () {
+                // Remove all alerts from the list
+                setState(() {
+                  deleteAllEmergencyAlerts();
+                  selectedAlerts = [];
+                  currentPage = 0;
+                  totalPages = 0;
+                });
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
@@ -541,7 +441,7 @@ class _EmergencyDetailPageState extends ConsumerState<EmergencyDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Date & Time: ${formatDate(widget.alert.dateTime, dateFormat)} ~ ${formatTime(widget.alert.dateTime, timeFormat)}',
+              'Date & Time: ${formatDate(widget.alert.dateTime, dateFormat)} | ${formatTime(widget.alert.dateTime, timeFormat)}',
             ),
             Text('Location: ${widget.alert.location}'),
             Text('Details: ${widget.alert.details}'),

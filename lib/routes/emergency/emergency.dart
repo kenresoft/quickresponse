@@ -1,4 +1,3 @@
-import 'package:quickresponse/data/emergency/emergency_alert.dart';
 import 'package:quickresponse/main.dart';
 
 final notificationService = NotificationService();
@@ -27,7 +26,10 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
     super.initState();
   }
 
-  void sendSecuritySMS(BuildContext context, NotificationSchedule notificationSchedule, int count) {
+//H: EDIT HERE>>>
+  void sendSecuritySMS(NotificationSchedule notificationSchedule, int count) {
+    //context.toast('SEND SMS - $count');
+    //ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('content')));
     addFirebaseSOSHistory(
       userId: uid,
       type: EmergencyAlert.getAlertTypeFromCustomMessage(sosMessage),
@@ -46,107 +48,153 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
     notificationService.cancelExistingSchedules((value) => isReadyToSchedule = value);
     setState(() {
       selectedDateTime = null;
-      isReadyToSchedule = false;
+      //isReadyToSchedule = true;
     });
   }
 
-  void _showTimePicker(PageController pageController) {
-    showTimePicker(
+  void _showTimePicker(BuildContext context, PageController pageController) {
+    showDialog(
       context: context,
-      initialTime: TimeOfDay.now(),
-    ).then((pickedTime) {
-      if (pickedTime != null) {
-        setState(() {
-          selectedDateTime = DateTime(
-            DateTime.now().year,
-            DateTime.now().month,
-            DateTime.now().day,
-            pickedTime.hour,
-            pickedTime.minute,
-          );
+      builder: (BuildContext context) {
+        int hours = 0;
+        int minutes = 0;
+        int seconds = 0;
 
-          final notificationService = NotificationService();
-          if (selectedDateTime != null) {
-            notificationService.scheduleNotificationBatch(
-              title: 'Emergency Alert',
-              body: 'Click to mute Alarm',
-              selectedDateTime: selectedDateTime!,
-              onTimerCallback: (schedule, count) => sendSecuritySMS(context, NotificationSchedule(), count),
-            );
-            isReadyToSchedule = false;
-            pageController.animateToPage(1, duration: const Duration(seconds: 1), curve: Curves.decelerate);
-          }
-        });
-      }
-    });
+        return AlertDialog(
+          backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
+          title: Text('Set Duration', style: TextStyle(color: AppColor(theme).title)),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      hours = int.tryParse(value) ?? 0;
+                    },
+                    decoration: const InputDecoration(labelText: 'Hours'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      minutes = int.tryParse(value) ?? 0;
+                    },
+                    decoration: const InputDecoration(labelText: 'Minutes'),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) {
+                      seconds = int.tryParse(value) ?? 0;
+                    },
+                    decoration: const InputDecoration(labelText: 'Seconds'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                int totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                if (totalSeconds > 0) {
+                  setState(() {
+                    selectedDateTime = DateTime.now().add(Duration(seconds: totalSeconds));
+
+                    final notificationService = NotificationService();
+                    if (selectedDateTime != null) {
+                      notificationService.scheduleNotificationBatch(
+                        title: 'Emergency Alert',
+                        body: 'Click to mute Alarm',
+                        selectedDateTime: selectedDateTime!,
+                        stateCallback: () {
+                          if (mounted) {
+                            setState(() {});
+                          }
+                        },
+                        onTimerCallback: (schedule, count) {
+                          log('message');
+                          sendSecuritySMS(NotificationSchedule(), count);
+                        },
+                      );
+                      isReadyToSchedule = false;
+                      pageController.animateToPage(1, duration: const Duration(seconds: 1), curve: Curves.decelerate);
+                    }
+                  });
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Set Duration'),
+            ),
+          ]),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
-    final page = ref.watch(pageProvider.select((value) => value));
 
     return WillPopScope(
       onWillPop: () async {
-        bool isLastPage = page.isEmpty;
-        if (isLastPage) {
-          launch(context, Constants.home);
-          return false;
-          //return (await showAnimatedDialog(context))!;
-        } else {
-          launch(context, page.last);
-          ref.watch(pageProvider.notifier).setPage = page..remove(page.last);
-          return true;
-        }
+        launch(context, Constants.home);
+        return false;
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
         appBar: CustomAppBar(
-          leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor(theme).navIconSelected),
+          leading: const LogoCard(),
           title: Text(_pageTitles[_currentPage], style: const TextStyle(fontSize: 20)),
-          actionTitle: 'Theme',
-          actionIcon: CupertinoIcons.lock_shield,
-          onActionClick: () => setState(() {
-            theme = !theme;
-          }),
+          actionTitle: 'Set Interval',
+          onActionClick: () => launch(context, Constants.settings, SettingType.travelAlarmInterval),
         ),
-        body: Column(children: [
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (int index) {
-                setState(() {
-                  _currentPage = index;
-                });
-              },
-              children: [
-                _buildFirstPage(theme, timeFormat, _pageController, context),
-                _buildSecondPage(dateFormat, timeFormat),
-              ],
+        body: Center(
+          child: Column(children: [
+            RealTimeWidget(selectedTimeFormat: TimeFormatOption.format12Hours, selectedTimeSeparator: timeSeparator, style: TextStyle(fontSize: 15, color: AppColor(theme).text)),
+            0.02.dpH(dp).spY,
+            Expanded(
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (int index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                children: [
+                  _buildFirstPage(theme, timeFormat, _pageController, context),
+                  _buildSecondPage(dateFormat, timeFormat),
+                ],
+              ),
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List<Widget>.generate(
-              2,
-              (pageIndex) {
-                pageIndex.log;
-                return Container(
-                  width: 10,
-                  height: 10,
-                  margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: pageIndex == _currentPage
-                        ? AppColor(theme).navIconSelected // Change this color to the desired color
-                        : AppColor(theme).text, // Default color
-                  ),
-                );
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List<Widget>.generate(
+                2,
+                (pageIndex) {
+                  ///pageIndex.log;
+                  return Container(
+                    width: 10,
+                    height: 10,
+                    margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: pageIndex == _currentPage
+                          ? AppColor(theme).navIconSelected // Change this color to the desired color
+                          : AppColor(theme).text, // Default color
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
-        ]),
-        bottomNavigationBar: const BottomNavigator(currentIndex: 1),
+          ]),
+        ),
+        bottomNavigationBar: bottomNavigator(context, 1),
       ),
     );
   }
@@ -178,7 +226,7 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
                   ),
               trailing: const Icon(CupertinoIcons.bus),
               onTap: () => isReadyToSchedule
-                  ? _showTimePicker(pageController)
+                  ? _showTimePicker(context, pageController)
                   : context.toast(
                       'Not ready to schedule yet!\nPlease wait...',
                       TextAlign.center,
@@ -251,10 +299,10 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
             color: AppColor(theme).white,
             elevation: 0,
             child: ListTile(
-              title: const Text('View Chat'),
-              subtitle: const Text('View chats'),
-              trailing: const Icon(CupertinoIcons.photo_fill_on_rectangle_fill),
-              onTap: () => launch(context, Constants.newChatsList, uid /* ('abc', uid, 'receiver')*/),
+              title: const Text('Settings'),
+              subtitle: const Text('VView App Settings'),
+              trailing: const Icon(CupertinoIcons.settings),
+              onTap: () => launch(context, Constants.settings),
             ),
           ),
           const SizedBox(height: 30),
@@ -264,74 +312,62 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
   }
 
   Widget _buildSecondPage(DateFormatOption selectedDateFormat, TimeFormatOption selectedTimeFormat) {
+    final notificationScheduleList = getNotificationSchedules(userId: uid);
+
+    if (notificationScheduleList.isEmpty) {
+      return const Center(
+        child: Text('No travelling alarm scheduled!', style: TextStyle(fontSize: 21)),
+      );
+    }
+
+    // Group SOS history items by time
+    final groupedNotificationSchedule = groupNotificationScheduleByTime(notificationScheduleList);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: StreamBuilder<List<NotificationSchedule>>(
-        stream: getFirebaseNotificationSchedule(userId: uid),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is loading
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            final notificationScheduleList = snapshot.data!;
+      child: ListView.builder(
+        itemCount: groupedNotificationSchedule.length,
+        itemBuilder: (context, index) {
+          final group = groupedNotificationSchedule[index];
 
-            if (notificationScheduleList.isEmpty) {
-              return const Center(
-                child: Text('No travelling alarm scheduled!', style: TextStyle(fontSize: 21)),
-              );
-            }
-
-            // Group SOS history items by time
-            final groupedNotificationSchedule = groupNotificationScheduleByTime(notificationScheduleList);
-
-            return ListView.builder(
-              itemCount: groupedNotificationSchedule.length,
-              itemBuilder: (context, index) {
-                final group = groupedNotificationSchedule[index];
-
-                // Display the time as a separator
-                return Column(
-                  children: [
-                    ListTile(
-                      title: Text('Time: ${formatTime(DateFormat.Hm().parseStrict(group.time), selectedTimeFormat)}'),
-                      // You can customize the separator appearance here
-                      // For example, you can use a Divider or a different widget.
-                      // Here, I'm using a Container with a line separator.
-                      subtitle: Container(
-                        height: 1,
-                        color: Colors.blue,
+          // Display the time as a separator
+          return Column(
+            children: [
+              ListTile(
+                title: Text('Time: ${formatTime(DateFormat.Hm().parseStrict(group.time), selectedTimeFormat)}'),
+                // You can customize the separator appearance here
+                // For example, you can use a Divider or a different widget.
+                // Here, I'm using a Container with a line separator.
+                subtitle: Container(
+                  height: 1,
+                  color: Colors.blue,
+                ),
+              ),
+              ...group.items.map((notificationSchedule) {
+                // Display individual SOS history items for the time
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
+                  color: AppColor(theme).white,
+                  elevation: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      title: Text(notificationSchedule.title ?? ''),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(notificationSchedule.message ?? ''),
+                          const SizedBox(height: 3),
+                          Text('Date & Time: ${formatDate(DateTime.parse(notificationSchedule.time!), selectedDateFormat)} ${formatTime(DateTime.parse(notificationSchedule.time!), selectedTimeFormat)}'),
+                        ],
                       ),
+                      trailing: const Icon(Icons.alarm),
+                      // Add more details as needed
                     ),
-                    ...group.items.map((notificationSchedule) {
-                      // Display individual SOS history items for the time
-                      return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
-                        color: AppColor(theme).white,
-                        elevation: 0,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ListTile(
-                            title: Text(notificationSchedule.title ?? ''),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(notificationSchedule.message ?? ''),
-                                const SizedBox(height: 3),
-                                Text('Date & Time: ${formatDate(DateTime.parse(notificationSchedule.time!), selectedDateFormat)} ${formatTime(DateTime.parse(notificationSchedule.time!), selectedTimeFormat)}'),
-                              ],
-                            ),
-                            trailing: const Icon(Icons.alarm),
-                            // Add more details as needed
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ],
+                  ),
                 );
-              },
-            );
-          }
+              }),
+            ],
+          );
         },
       ),
     );

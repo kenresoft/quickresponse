@@ -61,7 +61,6 @@ class _CustomMessageGeneratorPageState extends ConsumerState<CustomMessageGenera
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
-    final textFieldDirection = ref.watch(textFieldDirectionProvider.select((value) => value));
     if (savedMessages.isEmpty) {
       SharedPreferencesService.remove('sosMessage');
     }
@@ -152,11 +151,11 @@ class _CustomMessageGeneratorPageState extends ConsumerState<CustomMessageGenera
               child: Center(
                 child: TextField(
                   maxLength: 100,
-                  maxLines: textFieldDirection == TextFieldDirection.vertical ? 2 : 1,
                   focusNode: _focusNode,
                   controller: _customMessageController,
+                  maxLines: textFieldDirection == TextFieldDirection.vertical ? 2 : 1,
                   decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
                     fillColor: AppColor(theme).white,
                     filled: true,
                     focusColor: AppColor(theme).white,

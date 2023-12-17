@@ -31,18 +31,18 @@ class _AlarmScreenState extends State<AlarmScreen> {
 
   void cancelAlarm() {
     isAlarmActive = false;
-    FlutterRingtonePlayer.stop();
+    FlutterRingtonePlayer().stop();
     cancelNotification(notificationId: 1);
   }
 
   Future<void> _ringAlarm() async {
     if (isAlarmActive) {
       alarmCount++;
-      FlutterRingtonePlayer.playAlarm(looping: true);
+      FlutterRingtonePlayer().playAlarm(looping: true);
       await Future.delayed(
         const Duration(seconds: 5),
         () async {
-          FlutterRingtonePlayer.stop();
+          FlutterRingtonePlayer().stop();
 
           context.toast(alarmCount);
         },
