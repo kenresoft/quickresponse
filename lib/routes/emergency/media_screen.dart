@@ -19,6 +19,12 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
   }
 
   @override
+  void dispose() {
+    audioPlayer.stop();
+    audioPlayer.dispose();
+    super.dispose();
+  }
+  @override
   Widget build(BuildContext context) {
     Density dp = Density.init(context);
     //final theme = ref.watch(themeProvider.select((value) => value));
@@ -26,7 +32,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
       appBar: CustomAppBar(
         title: const Text('Emergency Media', style: TextStyle(fontSize: 20)),
-        leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor(theme).navIconSelected),
+        leading: const LogoCard(),
         actionTitle: '',
         actionIcon: PopupMenuButton<MediaType>(
           surfaceTintColor: Colors.white,
@@ -412,7 +418,7 @@ class _VideoPlayState extends ConsumerState<VideoPlay> {
 class ImageDisplay extends ConsumerStatefulWidget {
   final String imageUrl;
 
-  const ImageDisplay({Key? key, required this.imageUrl}) : super(key: key);
+  const ImageDisplay({super.key, required this.imageUrl});
 
   @override
   ConsumerState<ImageDisplay> createState() => _ImageDisplayState();
@@ -433,7 +439,7 @@ class _ImageDisplayState extends ConsumerState<ImageDisplay> {
             leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor(theme).navIconSelected),
             actionTitle: '',
             actionIcon: CupertinoIcons.photo,
-            onActionClick: () {},
+            //onActionClick: () {},
           ),
           body: Container(
             height: isPortrait ? 900 : null,
@@ -445,7 +451,7 @@ class _ImageDisplayState extends ConsumerState<ImageDisplay> {
                 child: FutureBuilder<Uint8List?>(
                   future: loadImage(widget.imageUrl),
                   builder: (context, snapshot) {
-                    if (snapshot.hasData) {
+                    if (snapshot.hasData && snapshot.data != null) {
                       return SingleChildScrollView(
                         child: Image.memory(
                           snapshot.data!,
