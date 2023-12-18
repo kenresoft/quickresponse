@@ -9,14 +9,14 @@ Widget buildImage(ProfileInfo? user) {
             child: CachedNetworkImage(
               imageUrl: user.photoURL!,
               placeholder: (context, url) => buildIcon,
-              errorWidget: (context, url, error) => Icon(CupertinoIcons.exclamationmark_triangle, color: AppColor(theme).action),
+              errorWidget: (context, url, error) => Icon(FontAwesomeIcons.personCircleQuestion, color: AppColor(theme).action),
             ),
           )
         : buildIcon,
   );
 }
 
-Widget get buildIcon => const Icon(CupertinoIcons.info);
+Widget get buildIcon => Icon(FontAwesomeIcons.personCircleExclamation, color: AppColor(theme).action);
 
 String getFirstName(String? fullName) {
   if (fullName != null) {

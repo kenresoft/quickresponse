@@ -5,23 +5,23 @@ import 'package:intl/intl.dart';
 
 import '../../providers/settings/date_time_format.dart';
 
-class RealTimeTimeWidget extends StatefulWidget {
+class RealTimeWidget extends StatefulWidget {
   final TimeFormatOption selectedTimeFormat;
   final String selectedTimeSeparator;
   final TextStyle style;
 
-  const RealTimeTimeWidget({
-    Key? key,
+  const RealTimeWidget({
+    super.key,
     required this.selectedTimeFormat,
     required this.selectedTimeSeparator,
     required this.style,
-  }) : super(key: key);
+  });
 
   @override
-  State<RealTimeTimeWidget> createState() => _RealTimeTimeWidgetState();
+  State<RealTimeWidget> createState() => _RealTimeWidgetState();
 }
 
-class _RealTimeTimeWidgetState extends State<RealTimeTimeWidget> {
+class _RealTimeWidgetState extends State<RealTimeWidget> {
   late DateFormat _timeFormatter;
   late Timer _timer;
 
@@ -41,10 +41,8 @@ class _RealTimeTimeWidgetState extends State<RealTimeTimeWidget> {
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
-        setState(() {
-          // Rebuild the widget every second to update the time
-          _timeFormatter = _getTimeFormatter();
-        });
+        // Rebuild the widget every second to update the time
+        setState(() => _timeFormatter = _getTimeFormatter());
       }
     });
   }
