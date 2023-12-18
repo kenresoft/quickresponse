@@ -1,5 +1,4 @@
 import 'package:path/path.dart' as path;
-import 'package:permission_handler/permission_handler.dart';
 import 'package:quickresponse/main.dart';
 import 'package:record/record.dart';
 
@@ -15,20 +14,17 @@ class CameraPreviewWidget extends StatefulWidget {
 class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-  late XFile? _recordedVideo;
+  late AudioRecorder _audioRecorder;
   bool _isCapturingImage = false;
   bool _isRecordingVideo = false;
   bool _isRecordingAudio = false;
   String? _audioPath;
 
-  StreamController<int> _timerStreamController = StreamController<int>();
-  late Timer _recordingTimer;
-  int _elapsedSeconds = 0;
-
   @override
   void initState() {
     super.initState();
     _initializeCamera();
+    _audioRecorder = AudioRecorder();
   }
 
   Future<void> _initializeCamera() async {
@@ -46,22 +42,10 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
     }
   }
 
-  Future<void> _requestPermissions() async {
-    Map<Permission, PermissionStatus> statuses = await [
-      Permission.camera,
-      Permission.microphone,
-      Permission.storage,
-    ].request();
-
-    if (statuses[Permission.camera] != PermissionStatus.granted || statuses[Permission.microphone] != PermissionStatus.granted || statuses[Permission.storage] != PermissionStatus.granted) {
-      // Handle permission denied scenarios
-      'Camera or storage permission is not granted.'.log;
-    }
-  }
-
   @override
   void dispose() {
     _controller.dispose();
+    _audioRecorder.dispose();
     super.dispose();
   }
 
@@ -89,7 +73,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
                 _controller,
                 child: Call(
                   onImageCapture: () => _takePicture(),
-                  onVideoRecord: () => _startRecording(),
+                  onVideoRecord: () => _startVideoRecording(),
                   onAudioRecord: () => _startRecordingAudio(),
                   properties: CallProperties(
                     isCapturingImage: _isCapturingImage,
@@ -97,6 +81,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
                     isRecordingAudio: _isRecordingAudio,
                   ),
                   videoTimer: _videoTimer,
+                  audioTimer: _audioTimer,
                 ),
               ),
             );
@@ -110,8 +95,9 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
   }
 
   Timer? _videoTimer;
+  Timer? _audioTimer;
 
-  void _startRecording() async {
+  void _startVideoRecording() async {
     if (!_controller.value.isRecordingVideo) {
       try {
         _controller.startVideoRecording();
@@ -120,7 +106,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
         });
 
         // Start a timer for 10 seconds
-        _videoTimer = Timer(const Duration(seconds: 10), () {
+        _videoTimer = Timer(Duration(seconds: videoRecordLength), () {
           _videoTimer.log;
           _stopRecording();
         });
@@ -180,7 +166,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
 
         // Take the picture
         XFile picture = await _controller.takePicture();
-        setState(() => _isCapturingImage = true);
+        Future(() => setState(() => _isCapturingImage = true));
 
         // Copy the picture to the desired path
         final File pictureFile = File(picture.path);
@@ -204,15 +190,23 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
         final String audioFileName = 'AUD_$timestamp.wav';
         final String audioPath = path.join(storagePath, audioFileName);
 
-        await Record().start(
+        await _audioRecorder.start(
+          const RecordConfig(
+            encoder: AudioEncoder.wav,
+            bitRate: 128000,
+            sampleRate: 44100,
+          ),
           path: audioPath,
-          encoder: AudioEncoder.wav,
-          bitRate: 128000,
-          samplingRate: 44100,
         );
         setState(() {
           _isRecordingAudio = true;
           _audioPath = audioPath;
+        });
+
+        // Start a timer for 10 seconds
+        _audioTimer = Timer(const Duration(seconds: 10), () {
+          _audioTimer.log;
+          _stopRecordingAudio();
         });
 
         //await upload(File(audioPath), audioFileName, 'audios');
@@ -227,7 +221,10 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
   void _stopRecordingAudio() async {
     if (_isRecordingAudio) {
       try {
-        await Record().stop();
+        // Cancel the timer if it's active
+        _audioTimer?.cancel();
+
+        await _audioRecorder.stop();
         setState(() => _isRecordingAudio = false);
       } catch (e) {
         e.log;
@@ -246,7 +243,7 @@ class _CameraPreviewWidgetState extends State<CameraPreviewWidget> {
     // Do something with the picked image (e.g., show preview, save, etc.)
   }
 
-  /*Future<void> upload(File file, String fileName, String folder) async {
+/*Future<void> upload(File file, String fileName, String folder) async {
     var profile = await getProfileInfoFromSharedPreferences();
     String url = await uploadFileToStorage(file, "media/${profile.uid}/$folder/", fileName);
     await addMediaMetadataToFirestore("${profile.uid}", folder, url, fileName);
