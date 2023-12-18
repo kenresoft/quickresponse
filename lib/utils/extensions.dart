@@ -42,7 +42,7 @@ extension LogExtension<T> on T {
 }
 
 extension P<T, R> on T {
-  R? let(Function(T? str) callback) {
-    return callback(this);
+  R? let(Function(T? it) block) {
+    return block(this);
   }
 }
