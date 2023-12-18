@@ -12,8 +12,10 @@ class ContactSearch extends SearchDelegate<ContactModel> {
         icon: const Icon(CupertinoIcons.clear),
         onPressed: () {
           query = '';
+          FocusManager.instance.primaryFocus!.unfocus();
         },
       ),
+      const SizedBox(width: 5)
     ];
   }
 
@@ -21,24 +23,10 @@ class ContactSearch extends SearchDelegate<ContactModel> {
   void showResults(BuildContext context) {}
 
   @override
-  Widget buildLeading(BuildContext context) {
-    return IconButton(
-      icon: const Icon(CupertinoIcons.chevron_left),
-      onPressed: () {
-        close(context, ContactModel(name: 'Empty', phone: 'Empty')); // Return an empty ContactModel
-      },
-    );
-  }
+  Widget buildLeading(BuildContext context) => IconButton(icon: const Icon(CupertinoIcons.chevron_left), onPressed: () => finish(context));
 
   @override
-  Widget buildResults(BuildContext context) {
-    return buildSuggestions(context);
-  }
-
-/*  @override
-  PreferredSizeWidget buildBottom(BuildContext context) {
-    return const CustomAppBar(actionTitle: "actionTitle");
-  }*/
+  Widget buildResults(BuildContext context) => buildSuggestions(context);
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -98,10 +86,7 @@ class ContactSearch extends SearchDelegate<ContactModel> {
                 suggestionList[index].phone ?? 'No phone',
                 style: TextStyle(color: AppColor(theme).black, fontSize: 14, fontFamily: FontResoft.sourceSansPro, package: FontResoft.package),
               ),
-              onTap: () {
-                //saveContact(suggestionList[index]);
-                close(context, suggestionList[index]); // Close the search and return the selected result
-              },
+              onTap: () => close(context, suggestionList[index]),
             ),
           );
         },
