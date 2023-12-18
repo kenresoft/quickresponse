@@ -2,6 +2,7 @@ import 'package:quickresponse/main.dart';
 import 'package:quickresponse/providers/note_provider.dart';
 
 import '../../widgets/dialogs/html_dialog.dart';
+import '../../widgets/display/custom_expansion_card.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -42,10 +43,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
       child: focus(
         _focusNode,
         Scaffold(
+          resizeToAvoidBottomInset: false,
           backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
           appBar: CustomAppBar(
             title: const Text('User Account', style: TextStyle(fontSize: 20)),
-            leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor(theme).navIconSelected),
+            leading: const LogoCard(),
             actionTitle: '',
             action2: GestureDetector(
               onTap: () => isSignedIn() ? _showSignOutConfirmationDialog(context, theme) : launchReplace(context, Constants.authentication),
@@ -76,14 +78,25 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         const SizedBox(height: 16),
                         buildPhoneCard(CupertinoIcons.phone, 'Phone', profileInfo.phoneNumber ?? '', theme),
                         const SizedBox(height: 16),
-                        buildCard(CupertinoIcons.staroflife, 'Profile Status', profileInfo.isComplete.toString(), theme),
+                        buildCard(
+                          CupertinoIcons.staroflife,
+                          'Profile Status',
+                          profileInfo.isComplete.let(
+                            (it) => it == true
+                                ? 'Complete'
+                                : profileInfo.phoneNumber == null
+                                    ? 'Not complete\nNo phone number provided'
+                                    : 'Not complete',
+                          ),
+                          theme,
+                        ),
                         const SizedBox(height: 16),
                         buildNoteCard(),
-                        const SizedBox(height: 16),
+                        /*const SizedBox(height: 16),
                         InkWell(
                           onTap: () => launch(context, Constants.settings),
                           child: buildCard(CupertinoIcons.settings, 'Settings', 'View App Settings', theme),
-                        ),
+                        ),*/
                         const SizedBox(height: 16),
                         InkWell(
                           onTap: () => launch(context, Constants.faq),
@@ -101,13 +114,22 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           ),
                           child: buildCard(CupertinoIcons.padlock, 'Terms and Policy', 'View App Privacy Policy & Terms', theme),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 8),
 
-                        InkWell(
-                          onTap: () => launch(context, Constants.signIn),
-                          child: buildCard(CupertinoIcons.settings, 'Settings', 'View App Settings', theme),
+                        CustomExpansionCard(
+                          title: 'About App',
+                          content: 'Stay Safe with Quick Response\n'
+                              '-------------------------------------\n'
+                              'Quick Response is your ultimate emergency companion where you can access a range of emergency and security features.'
+                              '\n'
+                              'It is designed to help you during emergencies. Explore its features and stay prepared!'
+                              '\n\n'
+                              'Version: ${1.0}'
+                              '\n\n'
+                              '© ${DateTime.now().year}, SharpResponse Tech.',
+                          subTitle: 'View About App',
+                          iconData: CupertinoIcons.device_phone_portrait,
                         ),
-                        const SizedBox(height: 16),
 
                         /*Center(
                           child: ElevatedButton(
@@ -166,23 +188,43 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ),
                 ),
               ),
-              subtitle: isEditing
-                  ? TextField(
-                      controller: _aboutMeController,
-                      focusNode: _focusNode,
-                      minLines: 1,
-                      maxLines: 5,
-                      maxLength: 500,
-                      cursorOpacityAnimates: true,
-                      cursorWidth: 1,
-                      decoration: const InputDecoration(border: InputBorder.none),
-                    )
-                  : Text(note, style: const TextStyle(fontSize: 16.0)),
+              subtitle: condition(
+                isEditing,
+                TextField(
+                  controller: _aboutMeController,
+                  focusNode: _focusNode,
+                  minLines: 1,
+                  maxLines: 5,
+                  maxLength: 500,
+                  cursorOpacityAnimates: true,
+                  cursorWidth: 1,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  onChanged: (value) {
+                    if (isEditing) note = value;
+                  },
+                ),
+                Text(note, style: const TextStyle(fontSize: 16.0)),
+              ),
+              trailing: InkWell(
+                onTap: shareNote,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: FaIcon(FontAwesomeIcons.share, size: 20, color: AppColor(theme).navIconSelected),
+                ),
+              ),
             );
           },
         ),
       ),
     );
+  }
+
+  void shareNote() {
+    if (note.isNotEmpty) {
+      Share.share(note, subject: 'Emergency Alerts - Export');
+    } else {
+      context.toast('Note is empty!', TextAlign.center, Colors.red.shade300, Colors.white);
+    }
   }
 
   void phoneEditDialog(BuildContext context, ProfileInfo profileInfo) {
@@ -217,11 +259,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   bool isProfileComplete = newPhoneNumber.isNotEmpty; // Update the logic for isProfileComplete as needed
                   updatePhoneNumberInSharedPreferences(newPhoneNumber, isProfileComplete);
                   updateUserProfile(profileInfo.uid!, {'phoneNumber': newPhoneNumber, 'isComplete': isProfileComplete});
-                  Navigator.of(context).pop();
                   setState(() {});
+                  Navigator.of(context).pop();
                 } else {
                   // Handle empty phone number case if necessary
-                  context.toast('Phone can\'t be empty!', TextAlign.center, Colors.red);
+                  context.toast('Phone can\'t be empty!', TextAlign.center, Colors.red.shade300, Colors.white);
                   Navigator.of(context).pop();
                 }
               },

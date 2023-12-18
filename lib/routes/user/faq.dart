@@ -26,25 +26,27 @@ class _FAQScreenState extends State<FAQScreen> {
       question: 'What information is sent when I trigger an SOS alert?',
       answer: 'When you trigger an SOS alert, the app sends your current location, along with any additional information you have provided in your profile, to your emergency contacts or emergency services.',
     ),
-    FAQItem(
+    /*FAQItem(
       question: 'Is it possible to cancel an SOS alert once it has been sent?',
       answer:
           'Yes, if you accidentally trigger an SOS alert, you typically have a short window of time to cancel it. The exact method may vary based on the app, so it\'s essential to check the app\'s instructions for specific details.',
-    ),
+    ),*/
     FAQItem(
       question: 'Will the app work without an internet connection?',
       answer:
-          'Some SOS apps are designed to work offline and can send distress signals via SMS even without an internet connection. However, it\'s crucial to check the app\'s features and requirements to ensure its functionality in offline mode.',
+          'While the app is capable of sending distress signals via SMS without an internet connection, we recommend having an internet connection for optimal functionality. An internet connection is particularly useful for features like location fetching, which can provide more accurate and timely assistance during emergencies.',
     ),
     FAQItem(
       question: 'How can I ensure that my emergency contacts receive my SOS alerts promptly?',
-      answer:
-          'To ensure that your emergency contacts receive your SOS alerts promptly, make sure they have a stable internet connection or cellular network. Additionally, instruct them to keep their phones nearby and the app notifications enabled.',
+      answer: 'To ensure that your emergency contacts receive your SOS alerts promptly, it\'s important to follow these steps:\n\n'
+          '1. Confirm that your emergency contacts have a stable internet connection or cellular network to receive notifications.\n'
+          '2. Instruct them to keep their phones nearby and ensure that the app notifications are enabled.\n'
+          '3. Additionally, be aware that SMS charges may be incurred when sending SOS messages. Make sure you have sufficient credit to cover any potential charges before initiating an SOS.',
     ),
-    FAQItem(
+    /*FAQItem(
       question: 'Can I test the SOS feature to see how it works without actually sending an alert?',
       answer: 'Yes, many apps allow you to test the SOS feature without triggering a real alert. Check the app settings or user manual for a testing or demo mode that simulates the SOS functionality.',
-    ),
+    ),*/
     FAQItem(
       question: 'What should I do after sending an SOS alert?',
       answer:
@@ -61,9 +63,9 @@ class _FAQScreenState extends State<FAQScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
-      appBar: CustomAppBar(
-        title: const Text('Frequently Asked Questions', style: TextStyle(fontSize: 20)),
-        leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor(theme).navIconSelected),
+      appBar: const CustomAppBar(
+        title: Text('Frequently Asked Questions', style: TextStyle(fontSize: 20)),
+        leading: LogoCard(),
         actionTitle: '',
       ),
       body: Container(
@@ -120,7 +122,7 @@ class _FAQTileState extends State<FAQTile> {
 
 class FAQItem {
   final String question;
-  final String answer; 
+  final String answer;
 
   FAQItem({
     required this.question,
