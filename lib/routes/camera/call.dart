@@ -8,6 +8,7 @@ class Call extends StatefulWidget {
     this.onAudioRecord,
     this.properties,
     this.videoTimer,
+    this.audioTimer,
   });
 
   final GestureTapCallback? onImageCapture;
@@ -15,6 +16,7 @@ class Call extends StatefulWidget {
   final GestureTapCallback? onAudioRecord;
   final CallProperties? properties;
   final Timer? videoTimer;
+  final Timer? audioTimer;
 
   @override
   State<Call> createState() => _CallState();
@@ -24,10 +26,13 @@ class _CallState extends State<Call> {
   bool isContactTap = false;
   bool shouldHide = false;
   late Timer _timer; // Timer object for updating the video timer
-  int _elapsedSeconds = 10;
+  int _elapsedSeconds = videoRecordLength;
   bool ticking = false;
 
   String status = '';
+
+  bool isRecordingAudio = false;
+  bool isRecordingVideo = false;
 
   @override
   void initState() {
@@ -38,7 +43,7 @@ class _CallState extends State<Call> {
   @override
   void dispose() {
     Util.unlockOrientation();
-    _timer.cancel();
+    //_timer.cancel();
     super.dispose();
   }
 
@@ -104,62 +109,76 @@ class _CallState extends State<Call> {
                   Icons.video_camera_back_outlined,
                   Icons.video_collection_outlined,
                   onPressed: () {
-                    widget.onVideoRecord!();
-                    if (widget.properties!.isRecordingVideo) {
-                      _timer.cancel();
-                      _elapsedSeconds = 10;
-                      status = '';
-                    } else {
-                      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-                        setState(() {
-                          if (_elapsedSeconds == 59 || _elapsedSeconds <= 0) {
-                            _elapsedSeconds = 0;
-                          } else {
-                            _elapsedSeconds--;
-                          }
-                          if (!widget.properties!.isRecordingVideo) {
-                            _timer.cancel();
-                            _elapsedSeconds = 10;
-                            status = 'Media saved!';
-                            Future.delayed(const Duration(seconds: 2), () => setState(() => status = ''));
-                          }
+                    if (!isRecordingAudio) {
+                      widget.onVideoRecord!();
+                      if (widget.properties!.isRecordingVideo) {
+                        _timer.cancel();
+                        _elapsedSeconds = videoRecordLength;
+                        setState(() => isRecordingVideo = false);
+                        status = '';
+                      } else {
+                        _elapsedSeconds = videoRecordLength;
+                        setState(() => isRecordingVideo = true);
+                        _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+                          setState(() {
+                            if (/*_elapsedSeconds == 59 || */ _elapsedSeconds <= 0) {
+                              _elapsedSeconds = 0;
+                            } else {
+                              _elapsedSeconds--;
+                            }
+                            if (!widget.properties!.isRecordingVideo) {
+                              _timer.cancel();
+                              _elapsedSeconds = videoRecordLength;
+                              setState(() => isRecordingVideo = false);
+                              status = 'Media saved!';
+                              Future.delayed(const Duration(seconds: 2), () => setState(() => status = ''));
+                            }
+                          });
                         });
-                      });
+                      }
                     }
                   },
                 ),
                 AlertButton(
-                  height: 70,
-                  width: 70,
-                  borderWidth: 2,
-                  shadowWidth: 0,
-                  iconSize: 25,
-                  showSecondShadow: false,
-                  iconData: Icons.camera_alt,
-                  //iconData: widget.properties!.isCapturingImage ? Icons.play_arrow_outlined : Icons.call_end,
-                  onPressed: widget.onImageCapture /*finish(context)*/,
-                ),
+                    height: 70,
+                    width: 70,
+                    borderWidth: 2,
+                    shadowWidth: 0,
+                    iconSize: 25,
+                    showSecondShadow: false,
+                    iconData: widget.properties!.isCapturingImage ? Icons.play_arrow_outlined : Icons.camera_alt,
+                    onPressed: () {
+                      if (!isRecordingVideo) {
+                        widget.onImageCapture!();
+                      }
+                    }),
                 buildAudioIconButton(
                   CupertinoIcons.recordingtape,
                   Icons.audiotrack_outlined,
                   onPressed: () {
-                    widget.onAudioRecord;
-                    if (widget.properties!.isRecordingAudio) {
-                      _timer.cancel();
-                      _elapsedSeconds = 0;
-                      status = '';
-                    } else {
-                      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-                        setState(() {
-                          _elapsedSeconds++;
-                          if (!widget.properties!.isRecordingAudio) {
-                            _timer.cancel();
-                            _elapsedSeconds = 0;
-                            status = 'Media saved!';
-                            Future.delayed(const Duration(seconds: 2), () => setState(() => status = ''));
-                          }
+                    if (!isRecordingVideo) {
+                      widget.onAudioRecord!();
+                      if (widget.properties!.isRecordingAudio) {
+                        _timer.cancel();
+                        _elapsedSeconds = 0;
+                        setState(() => isRecordingAudio = false);
+                        status = '';
+                      } else {
+                        _elapsedSeconds = 0;
+                        setState(() => isRecordingAudio = true);
+                        _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+                          setState(() {
+                            _elapsedSeconds++;
+                            if (!widget.properties!.isRecordingAudio) {
+                              _timer.cancel();
+                              _elapsedSeconds = 0;
+                              setState(() => isRecordingAudio = false);
+                              status = 'Media saved!';
+                              Future.delayed(const Duration(seconds: 2), () => setState(() => status = ''));
+                            }
+                          });
                         });
-                      });
+                      }
                     }
                   },
                 ),
