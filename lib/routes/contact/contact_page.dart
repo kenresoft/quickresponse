@@ -1,21 +1,7 @@
 import 'package:contacts_service/contacts_service.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fontresoft/fontresoft.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:quickresponse/data/constants/constants.dart';
-import 'package:quickresponse/services/firebase/firebase_profile.dart';
+import 'package:quickresponse/main.dart';
 
-import '../../data/constants/styles.dart';
-import '../../data/model/contact.dart';
-import '../../main.dart';
-import '../../providers/contacts_provider.dart';
-import '../../providers/settings/prefs.dart';
-import '../../services/firebase/firebase_contact.dart';
-import '../../utils/wrapper.dart';
-import '../../widgets/screens/appbar.dart';
-import '../../widgets/screens/overlay_scaffold.dart';
 import 'contact_search.dart';
 
 class ContactPage extends ConsumerStatefulWidget {
@@ -59,17 +45,13 @@ class _ContactPageState extends ConsumerState<ContactPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      /*sKey: key,
-      onPressed1: () => _fetchContactFromDevice(),*/
       backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
       appBar: CustomAppBar(
         title: const Text('Contacts', style: TextStyle(fontSize: 20)),
         leading: const Icon(CupertinoIcons.increase_quotelevel),
         actionTitle: 'Search',
         actionIcon: CupertinoIcons.search,
-        onActionClick: () {
-          _searchForContact(context);
-        },
+        onActionClick: () => _searchForContact(context),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -90,13 +72,9 @@ class _ContactPageState extends ConsumerState<ContactPage> {
                   style: TextStyle(color: AppColor(theme).black, fontSize: 14, fontFamily: FontResoft.sourceSansPro, package: FontResoft.package),
                 ),
                 onTap: () {
-                  saveContact(filteredContacts[index]);
-                  addFirebaseContact(
-                    userId: uid,
-                    name: filteredContacts[index].name!,
-                    phoneNumber: filteredContacts[index].phone!,
-                  );
-
+                  saveContact(filteredContacts[index], () {
+                    context.toast('Contact already exists!', TextAlign.center, Colors.red.shade300, AppColor(theme).white);
+                  });
                   replace(context, Constants.contacts);
                 },
               ),
@@ -135,12 +113,12 @@ class _ContactPageState extends ConsumerState<ContactPage> {
         });
       } else {
         // No contacts found
-        ScaffoldX(sKey: key).toast('No Contacts Found');
+        context.toast('No Contacts Found', TextAlign.center, Colors.red.shade300, AppColor(theme).white);
       }
     } else {
       // Handle the case where the user denies permission
       // You might want to display a message or request permission again
-      ScaffoldX(sKey: key).toast('Permission Denied. \nPlease grant permission to access contacts.');
+      context.toast('Permission Denied. \nPlease grant permission to access contacts.', TextAlign.center, Colors.red.shade300, AppColor(theme).white);
     }
 
     return null;
@@ -152,9 +130,9 @@ class _ContactPageState extends ConsumerState<ContactPage> {
       delegate: ContactSearch(contacts),
     ).then((selectedContact) {
       if (selectedContact != null) {
-        ref.watch(contactModelProvider.notifier).addContact(selectedContact);
-        saveContact(selectedContact);
-        addFirebaseContact(userId: uid, name: selectedContact.name!, phoneNumber: selectedContact.phone!);
+        saveContact(selectedContact, () {
+          context.toast('Contact already exists!', TextAlign.center, Colors.red.shade300, AppColor(theme).white);
+        });
         replace(context, Constants.contacts);
       }
     });
