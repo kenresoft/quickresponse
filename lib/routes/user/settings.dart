@@ -2,12 +2,13 @@ import '../../main.dart';
 
 enum TextFieldDirection { horizontal, vertical }
 
-enum SettingType { locationUpdate, none }
+enum SettingType { locationUpdate, travelAlarmInterval, none }
 
 class SettingsPage extends ConsumerStatefulWidget {
-  const SettingsPage({this.settingType, super.key});
+  const SettingsPage(this.callback, {this.settingType, super.key});
 
   final SettingType? settingType;
+  final VoidCallback callback;
 
   @override
   ConsumerState<SettingsPage> createState() => _SettingsPageState();
@@ -16,33 +17,25 @@ class SettingsPage extends ConsumerStatefulWidget {
 class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    final dp = Density.init(context);
-    final page = ref.watch(pageProvider.select((value) => value));
-    final textFieldDirection = ref.watch(textFieldDirectionProvider.select((value) => value));
-    final ExpansionTileController expansionTileController = ExpansionTileController();
-    //SharedPreferencesService.remove('dateFormat');
-    //SharedPreferencesService.remove('dateSeparator');
     return WillPopScope(
       onWillPop: () async {
-        bool isLastPage = page.isEmpty;
-        if (isLastPage) {
+        if (widget.settingType == SettingType.none) {
           launch(context, Constants.home);
           return false;
-          //return (await showAnimatedDialog(context))!;
-        } else {
-          launch(context, page.last);
-          ref.watch(pageProvider.notifier).setPage = page..remove(page.last);
-          return true;
         }
+        return true;
       },
       child: Scaffold(
         backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
-        appBar: CustomAppBar(
-          leading: Icon(CupertinoIcons.increase_quotelevel, color: AppColor(theme).navIconSelected),
-          title: const Text('Settings', style: TextStyle(fontSize: 20)),
+        appBar: const CustomAppBar(
+          leading: LogoCard(),
+          title: Text('Settings', style: TextStyle(fontSize: 20)),
           actionTitle: '',
-          actionIcon: Icon(theme ? CupertinoIcons.sun_max_fill : CupertinoIcons.sun_max, color: AppColor(theme).navIconSelected),
-          onActionClick: () => setState(() => theme = !theme),
+          /*actionIcon: Icon(theme ? CupertinoIcons.sun_max_fill : CupertinoIcons.sun_max, color: AppColor(theme).navIconSelected),
+          onActionClick: () {
+            setState(() => theme = !theme);
+            widget.callback();
+          },*/
         ),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -83,7 +76,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   child: Theme(
                     data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                     child: ExpansionTile(
-                      //controller: expansionTileController,
                       initiallyExpanded: widget.settingType == SettingType.locationUpdate ? true : false,
                       textColor: AppColor(theme).text,
                       title: const Text('Location Updates'),
@@ -130,6 +122,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: RefreshIntervalToggleButtons(
+                            suffix: 's',
                             selectedInterval: locationInterval,
                             onIntervalSelected: (p0) => setState(() => locationInterval = p0),
                           ),
@@ -151,7 +144,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
-                          child: Text(locationIntervalDescription, style: TextStyle(color: AppColor(theme).title)),
+                          child: Text(customSOSMessageDescription, style: TextStyle(color: AppColor(theme).title)),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -178,7 +171,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
-                          child: Text(locationIntervalDescription, style: TextStyle(color: AppColor(theme).title)),
+                          child: Text(itemsPerPageDescription, style: TextStyle(color: AppColor(theme).title)),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -196,13 +189,70 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
                   color: AppColor(theme).white,
                   elevation: 0,
+                  child: Theme(
+                    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                    child: ExpansionTile(
+                      textColor: AppColor(theme).text,
+                      title: const Text('Video Record Length'),
+                      trailing: Icon(CupertinoIcons.memories_badge_minus, color: AppColor(theme).navIconSelected),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
+                          child: Text(videoRecordingLengthDescription, style: TextStyle(color: AppColor(theme).title)),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: RefreshIntervalToggleButtons(
+                            intervalList: const [10, 20, 30, 45, 60, 120],
+                            suffix: 's',
+                            selectedInterval: videoRecordLength,
+                            onIntervalSelected: (p0) => setState(() => videoRecordLength = p0),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
+                  color: AppColor(theme).white,
+                  elevation: 0,
+                  child: Theme(
+                    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                    child: ExpansionTile(
+                      initiallyExpanded: widget.settingType == SettingType.travelAlarmInterval ? true : false,
+                      textColor: AppColor(theme).text,
+                      title: const Text('Travel Alarm Interval'),
+                      trailing: Icon(CupertinoIcons.car_detailed, color: AppColor(theme).navIconSelected),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16).copyWith(bottom: 8),
+                          child: Text(sosAlarmIntervalDescription, style: TextStyle(color: AppColor(theme).title)),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: RefreshIntervalToggleButtons(
+                            intervalList: const [1, 5, 10, 20, 30, 45, 60, 120],
+                            suffix: 'min',
+                            selectedInterval: travelAlarmInterval,
+                            onIntervalSelected: (p0) => setState(() => travelAlarmInterval = p0),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                /*Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
+                  color: AppColor(theme).white,
+                  elevation: 0,
                   child: ListTile(
                     title: const Text('Custom Messages'),
                     subtitle: const Text('Set up custom emergency messages'),
                     trailing: const Icon(CupertinoIcons.lock_shield),
                     onTap: () => launch(context, '/cgs'),
                   ),
-                ),
+                ),*/
                 Card(
                   margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 4),
                   color: AppColor(theme).white,
@@ -211,9 +261,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     title: const Text('Text Field Direction'),
                     trailing: CustomDropdown<TextFieldDirection>(
                       value: textFieldDirection,
-                      onChanged: (newValue) {
-                        ref.watch(textFieldDirectionProvider.notifier).setTextFieldDirection = newValue!;
-                      },
+                      onChanged: (newValue) => setState(() => textFieldDirection = newValue!),
                       items: [
                         DropdownMenuItem(
                           value: TextFieldDirection.horizontal,
@@ -308,6 +356,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                                       value: ', ',
                                       child: Text(', (Colon)', style: TextStyle(color: AppColor(theme).title)),
                                     ),
+                                    DropdownMenuItem(
+                                      value: ' ',
+                                      child: Text(' (None)', style: TextStyle(color: AppColor(theme).title)),
+                                    ),
                                     // Add more separator options as needed
                                   ],
                                 ),
@@ -373,7 +425,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
           ),
         ),
-        bottomNavigationBar: const BottomNavigator(currentIndex: 4),
+        bottomNavigationBar: bottomNavigator(context, 4),
       ),
     );
   }
@@ -389,6 +441,23 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       'gaining access to the app\'s features and content. This adds an extra layer of '
       'security to protect your data and privacy.';
 
+  String get customSOSMessageDescription => 'The Maximum Items of Allowed Custom SOS Message setting enables you to define '
+      'the number of personalized SOS messages you can create within the app.';
+
+  String get itemsPerPageDescription => 'The Items Per Page setting allows you to control the number of SOS events displayed '
+      'on a single page in the SOS History section.';
+
+  String get videoRecordingLengthDescription => 'The Video Recording Length setting allows you to specify the duration of recorded videos. '
+      'Adjust this setting to determine how long each video recording will be. '
+      'Ensure to balance video length with available storage space on '
+      'your device to manage storage efficiently.';
+
+  String get sosAlarmIntervalDescription => 'The Traveler\'s SOS Alarm Interval setting empowers you to define how frequently '
+      'the app checks your safety status when you are on a journey. By customizing '
+      'this interval, you can ensure that your safety is regularly monitored and '
+      'assistance can be promptly dispatched in case of an emergency. This provides an added layer of '
+      'security and peace of mind, especially when exploring unfamiliar destinations.';
+
   // Helper method to build a DropdownMenuItem with description and sample
   DropdownMenuItem<DateFormatOption> _buildDateFormatDropdownItem(
     DateFormatOption option,
@@ -398,13 +467,10 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   ) {
     return DropdownMenuItem(
       value: option,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(description, style: TextStyle(fontSize: 14, color: AppColor(theme).title)),
-          Text('Current Date: $sample', style: TextStyle(fontSize: 12, color: AppColor(theme).text)),
-        ],
-      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(description, style: TextStyle(fontSize: 14, color: AppColor(theme).title)),
+        Text('Current Date: $sample', style: TextStyle(fontSize: 12, color: AppColor(theme).text)),
+      ]),
     );
   }
 
@@ -416,41 +482,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   ) {
     return DropdownMenuItem(
       value: option,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(description, style: TextStyle(fontSize: 14, color: AppColor(theme).title)),
-          RealTimeTimeWidget(selectedTimeFormat: option, selectedTimeSeparator: sampleSeparator, style: TextStyle(fontSize: 12, color: AppColor(theme).text)),
-        ],
-      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(description, style: TextStyle(fontSize: 14, color: AppColor(theme).title)),
+        RealTimeWidget(selectedTimeFormat: option, selectedTimeSeparator: sampleSeparator, style: TextStyle(fontSize: 12, color: AppColor(theme).text)),
+      ]),
     );
-  }
-
-  // Helper method to get the description for the selected date format
-  String _getDateFormatDescription(DateFormatOption format) {
-    switch (format) {
-      case DateFormatOption.format1:
-        return 'Month/Day/Year (MM/dd/yyyy)';
-      case DateFormatOption.format2:
-        return 'Day-Month-Year (dd-MMM-yyyy)';
-      case DateFormatOption.format3:
-        return 'Year-Month-Day (yyyy-MM-dd)';
-      default:
-        return '';
-    }
-  }
-
-  // Helper method to get the sample time based on the selected time format and separator
-  String _getSampleTime(TimeFormatOption format, String separator) {
-    final currentTime = DateTime.now();
-    switch (format) {
-      case TimeFormatOption.format12Hours:
-        return DateFormat('hh${separator}mm a').format(currentTime);
-      case TimeFormatOption.format24Hours:
-        return DateFormat('HH${separator}mm').format(currentTime);
-      default:
-        return '';
-    }
   }
 }
 
@@ -459,7 +495,9 @@ class RefreshIntervalToggleButtons extends StatefulWidget {
   final int selectedInterval;
   final List<int>? intervalList;
 
-  const RefreshIntervalToggleButtons({super.key, required this.onIntervalSelected, required this.selectedInterval, this.intervalList});
+  final String? suffix;
+
+  const RefreshIntervalToggleButtons({super.key, required this.onIntervalSelected, required this.selectedInterval, this.intervalList, this.suffix});
 
   @override
   State<RefreshIntervalToggleButtons> createState() => _RefreshIntervalToggleButtonsState();
@@ -494,7 +532,7 @@ class _RefreshIntervalToggleButtonsState extends State<RefreshIntervalToggleButt
           borderWidth: 1,
           borderColor: AppColor(theme).alert_1,
           selectedBorderColor: AppColor(theme).alert_1,
-          children: intervals.map((interval) => Text(widget.intervalList != null ? '$interval' : '$interval s')).toList(),
+          children: intervals.map((interval) => Text(widget.suffix != null ? '$interval ${widget.suffix}' : '$interval')).toList(),
         ),
       ),
     );
