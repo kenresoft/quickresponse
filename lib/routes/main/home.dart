@@ -1,20 +1,26 @@
+import '../../a.dart';
 import '../../main.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
+class Home extends ConsumerStatefulWidget {
+  const Home({super.key, this.notificationAppLaunchDetails});
+
+  final NotificationAppLaunchDetails? notificationAppLaunchDetails;
+
+  bool get didNotificationLaunchApp => notificationAppLaunchDetails?.didNotificationLaunchApp ?? false;
 
   @override
-  State<Home> createState() => _HomeState();
+  ConsumerState<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with WidgetsBindingObserver {
+class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late Future<List<EmergencyTip>> _tips;
 
   //final LocationService _locationService = LocationService();
-  late String _locationData;
-  late String _streetAddress;
+ /* String? _locationData;
+  late String _streetAddress;*/
   bool _isPermissionDenied = false;
+  bool _notificationsEnabled = false;
 
   //bool _isLocationUpdatesPaused = false;
 
@@ -22,10 +28,14 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _tips = loadEmergencyTips();
-    _locationData = 'Fetching location...';
-    _streetAddress = 'Fetching address...';
+   /* _locationData = 'Fetching location...';
+    _streetAddress = 'Fetching address...';*/
     WidgetsBinding.instance.addObserver(this);
+    _isAndroidPermissionGranted();
+    _requestPermissions();
     _checkLocationPermission();
+    _configureDidReceiveLocalNotificationSubject();
+    _configureSelectNotificationSubject();
   }
 
   @override
@@ -33,17 +43,84 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     if (mounted) super.setState(fn);
   }
 
-  void _checkLocationPermission() async {
+  Future<void> _isAndroidPermissionGranted() async {
+    if (Platform.isAndroid) {
+      final bool granted = await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.areNotificationsEnabled() ?? false;
+      setState(() => _notificationsEnabled = granted);
+    }
+  }
+
+  Future<void> _requestPermissions() async {
+    if (Platform.isIOS || Platform.isMacOS) {
+      await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(alert: true, badge: true, sound: true);
+      await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()?.requestPermissions(alert: true, badge: true, sound: true);
+    } else if (Platform.isAndroid) {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation = flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      final bool? grantedNotificationPermission = await androidImplementation?.requestNotificationsPermission();
+      setState(() => _notificationsEnabled = grantedNotificationPermission ?? false);
+    }
+  }
+
+  void _configureDidReceiveLocalNotificationSubject() {
+    didReceiveLocalNotificationStream.stream.listen((ReceivedNotification receivedNotification) async {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) => CupertinoAlertDialog(
+          title: receivedNotification.title != null ? Text(receivedNotification.title!) : null,
+          content: receivedNotification.body != null ? Text(receivedNotification.body!) : null,
+          actions: <Widget>[
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () async {
+                Navigator.of(context, rootNavigator: true).pop();
+                await Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (BuildContext context) => const Emergency() /*SecondPage(receivedNotification.payload)*/,
+                  ),
+                );
+              },
+              child: const Text('Ok'),
+            )
+          ],
+        ),
+      );
+    });
+  }
+
+  void _configureSelectNotificationSubject() {
+    selectNotificationStream.stream.listen((String? payload) async {
+      await Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (BuildContext context) => const Emergency() /*SecondPage(payload)*/,
+      ));
+    });
+  }
+
+/*  @override
+  void dispose() {
+    didReceiveLocalNotificationStream.close();
+    selectNotificationStream.close();
+    super.dispose();
+  }*/
+
+  void _checkLocationPermission([VoidCallback? action]) async {
     bool isPermissionDenied = false;
     await LocationService.startLocationUpdates(
       (position) async {
         setState(() {
-          if (stopLocationUpdate) {
+          latitude = position.latitude;
+          longitude = position.longitude;
+          ref.read(positionProvider.notifier).setPosition = position;
+          /*if (stopLocationUpdate) {
+            setState(() {
+              locationData = 'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
+              position.log;
+              _getAddressFromCoordinates(position.latitude, position.longitude);
+            });
+*//*
             _locationData = 'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
-            _getAddressFromCoordinates(position.latitude, position.longitude);
-            latitude = position.latitude;
-            longitude = position.longitude;
-          }
+            position.log;
+            _getAddressFromCoordinates(position.latitude, position.longitude);*//*
+          }*/
         });
       },
       (isDenied) {
@@ -54,18 +131,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     setState(() => _isPermissionDenied = isPermissionDenied);
   }
 
-  Future<void> _getAddressFromCoordinates(double latitude, double longitude) async {
-    try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
-      if (placemarks.isNotEmpty) {
-        Placemark placemark = placemarks[0];
-        setState(() => _streetAddress = placemark.thoroughfare ?? 'Address not found');
-      }
-    } catch (e) {
-      setState(() => _streetAddress = 'Address not found');
-      'Error fetching address: $e'.log;
-    }
-  }
+
 
   // void _toggleLocationUpdates() {
   //   setState(() => isLocationUpdatesPaused = !isLocationUpdatesPaused);
@@ -96,6 +162,8 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     // H: uncommenting this will automatically turn off the location updates when the page is exited
     //LocationService.stopLocationUpdates();
+    didReceiveLocalNotificationStream.close();
+    selectNotificationStream.close();
     super.dispose();
   }
 
@@ -112,7 +180,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
         ),
         body: SingleChildScrollView(child: Center(child: buildPage(context, dp))),
-        bottomNavigationBar: const BottomNavigator(currentIndex: 0),
+        bottomNavigationBar: bottomNavigator(context, 0),
       ),
     );
   }
@@ -164,29 +232,18 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
               width: 175,
               borderWidth: 3,
               shadowWidth: 15,
-              iconSize: 75,
+              iconSize: 90,
+              delay: const Duration(seconds: 3),
+              showSecondShadow: true,
               onPressed: () => conditionFunction(
                 !isSignedIn(),
-                () => _showSignInDialog,
+                _showSignInDialog,
                 () {
                   conditionFunction(
                     customMessagesList.isNotEmpty,
                     () {
                       conditionFunction(sosMessage.isNotEmpty, () {
-                        final newEmergencyAlert = EmergencyAlert.autoIncrement(
-                          type: EmergencyAlert.getAlertTypeFromCustomMessage(sosMessage),
-                          dateTime: DateTime.now(),
-                          location: 'Latitude: $latitude, Longitude: $longitude',
-                          details: 'From ${getProfileInfoFromSharedPreferences().displayName}',
-                          customMessage: sosMessage,
-                          hasLocationData: latitude != 0 && longitude != 0,
-                        );
-
-                        // H: SEND SOS FROM HERE
-
-                        var alerts = emergencyAlerts;
-                        alerts.add(newEmergencyAlert);
-                        emergencyAlerts = alerts;
+                        handleSOS();
 
                         context.toast('Alert Delivered successfully!\nMESSAGE: "$sosMessage"', TextAlign.center, Colors.green.shade300);
                       }, () => context.toast('Default Message Not Selected!', TextAlign.center, Colors.orange.shade300));
@@ -207,10 +264,14 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
               shape: const CircleBorder(),
               backgroundColor: AppColor(theme).miniAlert,
               tooltip: 'Alert for contacts',
-              onPressed: condition(
-                customMessagesList.isEmpty,
-                () => context.toast('No Defined SOS Message!', TextAlign.center, Colors.red.shade300, Colors.white),
-                conditionFunction(!isSignedIn(), () => _showSignInDialog, () => _showSOSDialog),
+              onPressed: conditionFunction(
+                !isSignedIn(),
+                () => _showSignInDialog,
+                () => condition(
+                  customMessagesList.isEmpty,
+                  () => context.toast('No Defined SOS Message!', TextAlign.center, Colors.red.shade300, Colors.white),
+                  _showSOSDialog,
+                ),
               ),
               child: const Icon(CupertinoIcons.mail),
             ),
@@ -226,7 +287,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       SizedBox(height: 0.03.dpH(dp)),
       // 6
       GestureDetector(
-        onTap: () => launch(context, '/cgs'),
+        //onTap: () => launch(context, '/cgs'),
         //onTap: () => replace(context, authenticate ? Constants.authentication : Constants.home), // H: important for restart or so...
         child: Text('Pick the subject to chat', style: TextStyle(fontSize: 16, color: AppColor(theme).text)),
       ),
@@ -248,10 +309,6 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
           return SizedBox(width: double.infinity, height: 155, child: TipSlider(tips: tips, action: () => setState(() {})));
         },
       ),
-
-      0.03.dpH(dp).spY,
-
-      // 8
     ]);
   }
 
@@ -261,10 +318,7 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       builder: (BuildContext context) {
         return SOSDialog(
           sosMessages: customMessagesList,
-          onMessageSelected: (message) {
-            setState(() => sosMessage = message);
-            // Here you can send the SOS message
-          },
+          onMessageSelected: (message) => setState(() => sosMessage = message),
         );
       },
     );
@@ -322,6 +376,22 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
       Builder(builder: (context) {
         return GestureDetector(
           onTap: () {
+            // Show the last known location dialog when clicked
+            _showLastKnownLocationDialog();
+          },
+          child: Row(children: [
+            Column(children: [
+              Blink(data: trim('Open Location'), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: AppColor(theme).text)),
+              const Text('See your location', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.green)),
+            ]),
+            const Icon(CupertinoIcons.location_solid, color: Colors.green, size: 13),
+          ]),
+        );
+      }),
+
+      /*Builder(builder: (context) {
+        return GestureDetector(
+          onTap: () {
             if (_streetAddress != 'Fetching address...' && _streetAddress.isNotEmpty) launch(context, Constants.locationMap);
           },
           child: Row(children: [
@@ -332,7 +402,17 @@ class _HomeState extends State<Home> with WidgetsBindingObserver {
             const Icon(CupertinoIcons.location_solid, color: Colors.green, size: 13),
           ]),
         );
-      }),
+      }),*/
     ]);
   }
+
+  void _showLastKnownLocationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CustomLocationDialog();
+      },
+    );
+  }
 }
+
