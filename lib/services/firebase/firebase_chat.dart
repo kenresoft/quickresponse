@@ -56,7 +56,7 @@ Future<DocumentSnapshot?> getChatMetadata(String chatId) async {
 }
 
 Future<Stream<QuerySnapshot>> getMessages(String userId, String receiverId) async {
-  final user = await getProfileInfoFromSharedPreferences();
+  final user = getProfileInfoFromSharedPreferences();
   String chatId = generateChatId(userId, receiverId); // Generate a chatId based on userIds
 
   if (user.uid == userId) {
