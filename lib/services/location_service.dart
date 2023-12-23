@@ -50,7 +50,8 @@ class LocationService {
         }
 
         // Notify the callback function with the latest location
-        onLocationUpdate(position.log);
+        //position.latitude.log;
+        onLocationUpdate(position);
 
         if (!stopLocationUpdate) {
           break;
