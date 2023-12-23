@@ -5,7 +5,7 @@ import '../../data/constants/styles.dart';
 import '../../providers/settings/prefs.dart';
 
 class ErrorPage extends StatelessWidget {
-  const ErrorPage({Key? key, this.error}) : super(key: key);
+  const ErrorPage({super.key, this.error});
 
   final String? error;
 
