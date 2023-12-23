@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
 
-import '../../data/constants/constants.dart';
 import '../../data/emergency/notification_response_model.dart';
 import '../../main.dart';
-import '../../widgets/display/notifications.dart';
 
 class ReminderPage extends StatefulWidget {
   const ReminderPage({super.key});

@@ -28,20 +28,12 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
 
 //H: EDIT HERE>>>
   void sendSecuritySMS(NotificationSchedule notificationSchedule, int count) {
-    //context.toast('SEND SMS - $count');
-    //ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('content')));
-    addFirebaseSOSHistory(
-      userId: uid,
-      type: EmergencyAlert.getAlertTypeFromCustomMessage(sosMessage),
-      recipient: sosRecipients,
-      message: '${notificationSchedule.recipient} - $sosMessage',
-      latitude: location().latitude.toString(),
-      longitude: location().longitude.toString(),
-    ).whenComplete(() => context.toast('SEND SMS - $count'));
+    handleSOS('travel_alarm', count);
+    context.toast('Alert Delivered successfully!\nMESSAGE: "$sosMessage" - $count', TextAlign.center, Colors.green.shade300);
   }
 
   void _resetCounter() {
-    notificationService.resetCounter((count) => context.toast('Count Reset to: $count'));
+    notificationService.resetCounter((count) => context.toast('Count Reset to: $count', TextAlign.center, Colors.green.shade300, Colors.white));
   }
 
   void _cancelAll() {
@@ -69,9 +61,7 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
                 Expanded(
                   child: TextFormField(
                     keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      hours = int.tryParse(value) ?? 0;
-                    },
+                    onChanged: (value) => hours = int.tryParse(value) ?? 0,
                     decoration: const InputDecoration(labelText: 'Hours'),
                   ),
                 ),
@@ -79,9 +69,7 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
                 Expanded(
                   child: TextFormField(
                     keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      minutes = int.tryParse(value) ?? 0;
-                    },
+                    onChanged: (value) => minutes = int.tryParse(value) ?? 0,
                     decoration: const InputDecoration(labelText: 'Minutes'),
                   ),
                 ),
@@ -89,9 +77,7 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
                 Expanded(
                   child: TextFormField(
                     keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      seconds = int.tryParse(value) ?? 0;
-                    },
+                    onChanged: (value) => seconds = int.tryParse(value) ?? 0,
                     decoration: const InputDecoration(labelText: 'Seconds'),
                   ),
                 ),
