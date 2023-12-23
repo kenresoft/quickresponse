@@ -151,10 +151,10 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
                               '${formatDate(alert.dateTime, dateFormat)} | ${formatTime(alert.dateTime, timeFormat)}',
                               style: const TextStyle(fontWeight: FontWeight.w300),
                             ),
-                            trailing: IconButton(
+                            /*trailing: IconButton(
                               icon: Icon(CupertinoIcons.delete_simple, size: 18, color: AppColor(theme).navIconSelected),
                               onPressed: () => _showDeleteConfirmationDialog(context, alert),
-                            ),
+                            ),*/
                             onTap: () {
                               // Implement navigation to a detailed view of the alert
                               Navigator.push(context, MaterialPageRoute(builder: (context) => EmergencyDetailPage(alert: alert)));
@@ -309,7 +309,9 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
     }
 
     // Update selectedAlerts with the filtered and sorted alerts
-    selectedAlerts = filteredAlerts;
+    /// selectedAlerts = filteredAlerts;
+
+    selectedAlerts = List.from(filteredAlerts);
 
     // Calculate the total number of pages
     totalPages = (selectedAlerts.length / itemsPerPage).ceil(); // Add this line
@@ -364,8 +366,14 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
       // Iterate through the alerts and add them to the exportData string
       for (final alert in alerts) {
         exportData.writeln('Type: ${alert.type}');
-        exportData.writeln('Date & Time: ${alert.dateTime}');
-        exportData.writeln('Location: ${alert.location}');
+        exportData.writeln('Date & Time: ${formatDate(
+          alert.dateTime,
+          dateFormat,
+        )} | ${formatTime(
+          alert.dateTime,
+          timeFormat,
+        )}');
+        exportData.writeln(alert.location);
         exportData.writeln('Details: ${alert.details}');
         exportData.writeln('Custom Message: ${alert.customMessage}');
         exportData.writeln(''); // Add an empty line to separate alerts
@@ -440,12 +448,22 @@ class _EmergencyDetailPageState extends ConsumerState<EmergencyDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text('Date & Time: ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             Text(
-              'Date & Time: ${formatDate(widget.alert.dateTime, dateFormat)} | ${formatTime(widget.alert.dateTime, timeFormat)}',
+              '${formatDate(
+                widget.alert.dateTime,
+                dateFormat,
+              )} | ${formatTime(
+                widget.alert.dateTime,
+                timeFormat,
+              )}\n---------------------',
             ),
-            Text('Location: ${widget.alert.location}'),
-            Text('Details: ${widget.alert.details}'),
-            Text('Custom Message: ${widget.alert.customMessage}'),
+            const Text('Location:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text('${widget.alert.location}\n---------------------'),
+            const Text('Details:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text('${widget.alert.details}\n---------------------'),
+            const Text('Custom Message: :', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(widget.alert.customMessage),
             // Add more details as needed
           ],
         ),
