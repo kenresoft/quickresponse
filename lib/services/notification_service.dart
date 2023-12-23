@@ -1,114 +1,21 @@
-import 'dart:async';
-
-import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
-import 'package:quickresponse/utils/extensions.dart';
-
-import '../data/model/notification_schedule.dart';
-import '../providers/settings/prefs.dart';
-import '../widgets/display/notifications.dart';
-import 'firebase/firebase_notification_schedule.dart';
+import 'package:quickresponse/main.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
 
   factory NotificationService() => _instance;
 
-  NotificationService._internal();
+  NotificationService._internal() {
+    _audioPlayer = AudioPlayer();
+  }
 
+  late final AudioPlayer _audioPlayer;
   final Map<int, Timer> _timers = {};
   int consecutiveAlarms = 1;
   bool isAlarmActive = false;
 
   int maxActiveAlarms = 100;
   int activeAlarmsCount = 0;
-
-/*  Future<void> scheduleNotificationsWithBatch({
-    required DateTime selectedDateTime,
-    required void Function(NotificationSchedule schedule, int count) onTimerCallback,
-    String? title,
-    String? body,
-  }) async {
-    int intervalInSeconds = 10;
-    int notificationIdPrefix = 100;
-    int totalAlarms = (selectedDateTime.difference(DateTime.now()).inSeconds / intervalInSeconds).ceil();
-    int batchSize = 10; // Set your batch size based on your requirements
-
-    totalAlarms.log;
-    cancelExistingSchedules((isReadyToSchedule) {});
-await Future.delayed(Duration(seconds: 1));
-    // Calculate the number of alarms in this batch
-    int alarmsInThisBatch = totalAlarms - activeAlarmsCount;
-    if (alarmsInThisBatch > maxActiveAlarms) {
-      alarmsInThisBatch = maxActiveAlarms;
-    }
-
-    // Split total alarms into batches
-    for (int i = activeAlarmsCount; i < activeAlarmsCount + alarmsInThisBatch; i += batchSize) {
-      int endIndex = (i + batchSize < totalAlarms) ? i + batchSize : totalAlarms;
-
-      // Schedule notifications in the current batch
-      for (int j = i; j < endIndex; j++) {
-        int notificationId = notificationIdPrefix + j + 1;
-        DateTime scheduledTime = DateTime.now().add(Duration(seconds: j * intervalInSeconds));
-
-        if (j == totalAlarms - 1) {
-          scheduledTime = selectedDateTime.copyWith(second: 0);
-          getProfileInfoFromSharedPreferences().then(
-            (profileInfo) => addNotificationSchedule(
-              userId: profileInfo.uid!,
-              time: selectedDateTime.copyWith(second: 0).toString(),
-              recipient: notificationId.toString(),
-              title: title ?? '',
-              message: body ?? '',
-            ),
-          );
-        }
-
-        scheduleNotification(
-          scheduledTime: scheduledTime,
-          notificationId: notificationId,
-          title: title,
-          body: body,
-        );
-        getProfileInfoFromSharedPreferences().then(
-          (profileInfo) => addNotificationSchedule(
-            userId: profileInfo.uid!,
-            time: scheduledTime.toString(),
-            recipient: notificationId.toString(),
-            title: title ?? '',
-            message: body ?? '',
-          ),
-        );
-
-        // Store the timer
-        _timers[notificationId] = Timer(Duration(seconds: (j * intervalInSeconds) + intervalInSeconds), () {
-          stopAlarm();
-          flutterLocalNotificationsPlugin.cancel(notificationId);
-
-          if (j == totalAlarms - 1) {
-            getProfileInfoFromSharedPreferences().then(
-              (profileInfo) => deleteNotificationSchedule(userId: profileInfo.uid!, time: selectedDateTime.copyWith(second: 00).toString()),
-            );
-          } else {
-            getProfileInfoFromSharedPreferences().then(
-              (profileInfo) => deleteNotificationSchedule(userId: profileInfo.uid!, time: scheduledTime.toString()),
-            );
-          }
-
-          consecutiveAlarms++;
-
-          if (consecutiveAlarms >= 3) {
-            onTimerCallback(NotificationSchedule(recipient: notificationId.toString()), consecutiveAlarms);
-          }
-
-          _timers.remove(notificationId);
-        });
-      }
-    }
-
-    // Update the active alarms count
-    activeAlarmsCount += alarmsInThisBatch;
-  }*/
 
   void scheduleNotificationBatch({
     required DateTime selectedDateTime,
@@ -117,13 +24,12 @@ await Future.delayed(Duration(seconds: 1));
     String? title,
     String? body,
   }) {
-    int intervalInSeconds = 10 /** 60*/; //30*60
+    int intervalInSeconds = travelAlarmInterval * 60; //30*60
     int notificationIdPrefix = 100;
 
     // Calculate the total number of alarms required based on the selected time
     final int totalAlarms = (selectedDateTime.difference(DateTime.now()).inSeconds.log / intervalInSeconds).ceil();
 
-    //totalAlarms.log;
     cancelExistingSchedules((isReadyToSchedule) {});
 
     // Schedule the periodic alarms with unique notification IDs
@@ -131,51 +37,33 @@ await Future.delayed(Duration(seconds: 1));
       final int notificationId = notificationIdPrefix + i; // Unique notification ID
       final DateTime scheduledTime = DateTime.now().add(Duration(seconds: i * intervalInSeconds));
 
-      // Check if it's the last alarm and set it to the exact selected time
-      /*if (i == totalAlarms) {
-        scheduleNotification(scheduledTime: selectedDateTime.copyWith(second: 00), notificationId: notificationId, title: title, body: body);
-        addNotificationSchedule(
-          userId: uid,
-          time: selectedDateTime.copyWith(second: 00).toString(),
-          recipient: notificationId.toString(),
-          title: title ?? '',
-          message: body ?? '',
-        );
-        //onScheduleCallback(NotificationSchedule(time: selectedDateTime.copyWith(second: 00).toString(), recipient: notificationId.toString()));
-      } else*/ {
-        scheduleNotification(scheduledTime: scheduledTime, notificationId: notificationId, title: title, body: body);
-        addNotificationSchedule(
-          userId: uid,
-          time: scheduledTime.toString(),
-          recipient: notificationId.toString(),
-          title: title ?? '',
-          message: body ?? '',
-        );
-        //onScheduleCallback(NotificationSchedule(time: scheduledTime.toString(), recipient: notificationId.toString()));
-      }
-
-      // Start the alarm for this notification
-      //startAlarm();
+      scheduleNotification(scheduledTime: scheduledTime, notificationId: notificationId, title: title, body: body);
+      addNotificationSchedule(
+        userId: uid,
+        time: scheduledTime.toString(),
+        recipient: notificationId.toString(),
+        title: title ?? '',
+        message: body ?? '',
+      );
 
       // Schedule a timer for stopping the alarm and canceling this specific notification after 60 seconds
-      final timer = Timer(Duration(seconds: (i * intervalInSeconds)), () {
-        // Stop the alarm for this notification
-        stopAlarm();
+      Timer(Duration(seconds: (i * intervalInSeconds) + intervalInSeconds), () => flutterLocalNotificationsPlugin.cancel(notificationId));
 
-        flutterLocalNotificationsPlugin.cancel(notificationId);
+      final timer = Timer(Duration(seconds: (i * intervalInSeconds)), () {
+        startAlarm();
+        deleteNotificationScheduleById(userId: uid, recipient: notificationId.toString());
         if (i == totalAlarms) {
-          deleteNotificationSchedule(userId: uid, time: selectedDateTime.copyWith(second: 00).toString());
-          cancelExistingSchedules((isReadyToSchedule) {});
+          Timer(Duration(seconds: intervalInSeconds), () => cancelExistingSchedules((isReadyToSchedule) {}));
         } else {
-          deleteNotificationScheduleById(userId: uid, recipient: notificationId.toString() /*scheduledTime.toString()*/);
+          deleteNotificationScheduleById(userId: uid, recipient: notificationId.toString());
         }
         stateCallback();
         consecutiveAlarms++;
 
-        if (consecutiveAlarms >= 3) {
+        if (totalAlarms < 3) {
           onTimerCallback(NotificationSchedule(recipient: notificationId.toString()), consecutiveAlarms);
-
-          ///consecutiveAlarms.log;
+        } else if (consecutiveAlarms >= 3) {
+          onTimerCallback(NotificationSchedule(recipient: notificationId.toString()), consecutiveAlarms);
         }
         // Remove the timer from the list
         _timers.remove(notificationId);
@@ -215,6 +103,7 @@ await Future.delayed(Duration(seconds: 1));
     if (onResetCallback != null) {
       onResetCallback(consecutiveAlarms);
     }
+    stopAlarm();
   }
 
   Future<void> cancelExistingSchedules(Function(bool isReadyToSchedule) callback) async {
@@ -226,16 +115,20 @@ await Future.delayed(Duration(seconds: 1));
   }
 
   void startAlarm() async {
+    stopAlarm();
     if (!isAlarmActive) {
       isAlarmActive = true;
-      await FlutterRingtonePlayer.playAlarm(looping: true);
+      await _audioPlayer.setAsset('assets/alarm.mp3');
+      await _audioPlayer.setLoopMode(LoopMode.one);
+      await _audioPlayer.play();
     }
   }
 
-  void stopAlarm() {
+  // Stop the alarm using just_audio
+  void stopAlarm() async {
     if (isAlarmActive) {
       isAlarmActive = false;
-      FlutterRingtonePlayer.stop();
+      await _audioPlayer.stop();
     }
   }
 }
