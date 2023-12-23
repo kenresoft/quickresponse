@@ -1,11 +1,6 @@
-import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:quickresponse/data/model/location_info.dart';
 import 'package:quickresponse/imports.dart';
-import 'package:quickresponse/utils/extensions.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
