@@ -10,11 +10,11 @@ class OutlinedFab extends StatelessWidget {
 
   const OutlinedFab(
     this.theme, {
-    Key? key,
+    super.key,
     required this.isExpanded,
     required this.child,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
