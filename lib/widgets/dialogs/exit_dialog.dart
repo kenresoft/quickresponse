@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-
-import '../../data/constants/styles.dart';
+import 'package:quickresponse/main.dart';
 
 /// EXIT DIALOG
 Future<bool?> showExitDialog(BuildContext context, bool theme) async {
@@ -28,13 +26,16 @@ Future<bool?> showExitDialog(BuildContext context, bool theme) async {
           const SizedBox(height: 8.0),
           Text('Are you sure you want to exit?', style: TextStyle(fontSize: 16.0, color: AppColor(theme).title_2)),
           const SizedBox(height: 16.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
-              TextButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Exit')),
-            ],
-          ),
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+                exit(0);
+              },
+              child: const Text('Exit'),
+            ),
+          ]),
         ]),
       ),
     ),

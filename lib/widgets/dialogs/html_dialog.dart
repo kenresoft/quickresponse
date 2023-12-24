@@ -13,10 +13,10 @@ class HTMLDialog extends ConsumerStatefulWidget {
   final String htmlAsset2;
 
   const HTMLDialog({
-    Key? key,
+    super.key,
     required this.htmlAsset1,
     required this.htmlAsset2,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<HTMLDialog> createState() => _HTMLDialogState();
