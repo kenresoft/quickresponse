@@ -56,7 +56,8 @@ class _AlertButtonState extends State<AlertButton> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     return InkWell(
       onTap: widget.showSecondShadow ? null : widget.onPressed,
-      onLongPress: () {
+      onLongPress: () async {
+        await Future.delayed(const Duration(seconds: 1));
         if (widget.showSecondShadow) {
           _isPressedNotifier.value = !_isPressedNotifier.value;
           if (widget.onPressed != null) {
@@ -120,10 +121,14 @@ class _AlertButtonState extends State<AlertButton> with TickerProviderStateMixin
                 child: AnimatedBuilder(
                   animation: _iconAnimationController,
                   builder: (context, child) {
-                    return Icon(
-                      widget.iconData ?? CupertinoIcons.hand_raised,
-                      size: widget.iconSize,
-                      color: isPressed ? Colors.red.shade900.withOpacity(1 - _iconAnimationController.value) : CupertinoColors.white,
+                    //return SvgPicture.asset(Constants.help);
+                    return Transform.rotate(
+                      angle: -pi / 2,
+                      child: Icon(
+                        widget.iconData ?? CupertinoIcons.hand_point_right,
+                        size: widget.iconSize,
+                        color: isPressed ? Colors.red.shade900.withOpacity(1 - _iconAnimationController.value) : CupertinoColors.white,
+                      ),
                     );
                   },
                 ),
