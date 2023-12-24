@@ -185,7 +185,7 @@ void handleSOS([String? msg, int? count]) {
   final newEmergencyAlert = EmergencyAlert.autoIncrement(
     type: EmergencyAlert.getAlertTypeFromCustomMessage(msg ?? sosMessage),
     dateTime: DateTime.now(),
-    location: 'Latitude: $latitude, Longitude: $longitude',
+    location: '$locationData \n(Latitude: $latitude, Longitude: $longitude)',
     details: 'From ${getProfileInfoFromSharedPreferences().displayName}',
     customMessage: msg.let((it) => it == 'travel_alarm' ? 'Alarm count is $count' : sosMessage) ?? sosMessage,
     hasLocationData: latitude != 0 && longitude != 0,
