@@ -9,11 +9,11 @@ class OutlinedDropdownButton extends StatelessWidget {
   final Function() onPressed;
 
   const OutlinedDropdownButton({
-    Key? key,
+    super.key,
     required this.label,
     required this.icon,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
