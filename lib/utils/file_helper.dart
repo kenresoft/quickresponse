@@ -1,13 +1,6 @@
-import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:quickresponse/imports.dart';
-import 'package:quickresponse/utils/extensions.dart';
 
-import '../data/constants/styles.dart';
-import '../providers/settings/prefs.dart';
 
 class FileHelper {
   static String getTempFilePath(String fileName) {
