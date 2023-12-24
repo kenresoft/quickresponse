@@ -1,56 +1,45 @@
 import 'package:quickresponse/main.dart';
 
-class BottomNavigator extends StatefulWidget {
-  const BottomNavigator({super.key, required this.currentIndex});
-
-  final int currentIndex;
-
-  @override
-  State<BottomNavigator> createState() => _BottomNavigatorState();
+Widget bottomNavigator(BuildContext context, int currentIndex) {
+  //Future(() => setState(() => theme = theme));
+  return Container(
+    height: 69,
+    color: AppColor(theme).white,
+    child: BottomNavigationBar(
+      landscapeLayout: BottomNavigationBarLandscapeLayout.linear,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      unselectedItemColor: AppColor(theme).navIcon,
+      unselectedLabelStyle: TextStyle(color: AppColor(theme).navIcon, height: 2),
+      type: BottomNavigationBarType.fixed,
+      showUnselectedLabels: true,
+      selectedIconTheme: IconThemeData(color: AppColor(theme).navIconSelected),
+      selectedItemColor: AppColor(theme).navIconSelected,
+      currentIndex: currentIndex,
+      onTap: (index) {
+        if (index case 0) {
+          replace(context, Constants.home);
+        } else if (index case 1) {
+          replace(context, Constants.travellersAlarm);
+        } else if (index case 2) {
+          replace(context, Constants.contacts);
+        } else if (index case 3) {
+          replace(context, Constants.history);
+        } else if (index case 4) {
+          replace(context, Constants.settings);
+        }
+      },
+      items: const [
+        BottomNavigationBarItem(icon: Icon(CupertinoIcons.house), label: 'Home'),
+        BottomNavigationBarItem(icon: Icon(CupertinoIcons.drop_triangle), label: 'Emergency'),
+        BottomNavigationBarItem(icon: Icon(CupertinoIcons.phone_badge_plus), label: 'Contacts'),
+        BottomNavigationBarItem(icon: Icon(CupertinoIcons.clock), label: 'History'),
+        BottomNavigationBarItem(icon: Icon(CupertinoIcons.settings), label: 'Settings'),
+      ],
+    ),
+  );
 }
 
-class _BottomNavigatorState extends State<BottomNavigator> {
-  @override
-  Widget build(BuildContext context) {
-    Future(() => setState(() => theme = theme));
-    return Container(
-      height: 69,
-      color: AppColor(theme).white,
-      child: BottomNavigationBar(
-        landscapeLayout: BottomNavigationBarLandscapeLayout.linear,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        unselectedItemColor: AppColor(theme).navIcon,
-        unselectedLabelStyle: TextStyle(color: AppColor(theme).navIcon, height: 2),
-        type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: true,
-        selectedIconTheme: IconThemeData(color: AppColor(theme).navIconSelected),
-        selectedItemColor: AppColor(theme).navIconSelected,
-        currentIndex: widget.currentIndex,
-        onTap: (index) {
-          if (index case 0) {
-            replace(context, Constants.home);
-          } else if (index case 1) {
-            replace(context, Constants.travellersAlarm);
-          } else if (index case 2) {
-            replace(context, Constants.contacts);
-          } else if (index case 3) {
-            replace(context, Constants.history);
-          } else if (index case 4) {
-            replace(context, Constants.settings);
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(CupertinoIcons.house), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(CupertinoIcons.drop_triangle), label: 'Emergency'),
-          BottomNavigationBarItem(icon: Icon(CupertinoIcons.phone_badge_plus), label: 'Contacts'),
-          BottomNavigationBarItem(icon: Icon(CupertinoIcons.clock), label: 'History'),
-          BottomNavigationBarItem(icon: Icon(CupertinoIcons.settings), label: 'Settings'),
-        ],
-      ),
-    );
-  }
-}
 /*
 import 'package:bottom_nav/bottom_nav.dart';
 import 'package:flutter/cupertino.dart';
