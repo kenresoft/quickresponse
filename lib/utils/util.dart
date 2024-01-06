@@ -96,13 +96,35 @@ class Util {
   }
 }
 
-sendMessage(String phoneNumber, String message, {int? simSlot}) async {
+/*sendMessage(String phoneNumber, String message, {int? simSlot}) async {
   var result = await BackgroundSms.sendMessage(phoneNumber: phoneNumber, message: message, simSlot: simSlot);
   if (result == SmsStatus.sent) {
     "Sent".log;
   } else {
     "Failed".log;
   }
+}*/
+
+sendMessage(String phoneNumber, String message, {int? simSlot}) async {
+  if (!isValidPhoneNumber(phoneNumber)) {
+    log('Invalid phone number format: $phoneNumber');
+    return;
+  }
+
+  try {
+    var result = await BackgroundSms.sendMessage(phoneNumber: phoneNumber, message: message, simSlot: simSlot);
+
+    log(switch (result) { SmsStatus.sent => 'Message Sent: $message to $phoneNumber', SmsStatus.failed => 'Failed to Send Message: $message to $phoneNumber', _ => 'Unexpected SMS Status: $result' });
+  } catch (e) {
+    log('Error sending SMS: $e');
+  }
+}
+
+bool isValidPhoneNumber(String phoneNumber) {
+  // Basic validation for demonstration purposes
+  // You may need to implement more robust validation based on your requirements
+  final RegExp phoneRegExp = RegExp(r'^\+?[0-9]+$');
+  return phoneRegExp.hasMatch(phoneNumber);
 }
 
 //_sendMessage(String number) async {
