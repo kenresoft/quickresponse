@@ -57,7 +57,7 @@ dependencies:
   record: ^5.0.1
   just_audio: ^0.9.36
   #flutter_sound: ^9.2.13
-  #background_sms: ^0.0.4
+  background_sms: ^0.0.4
   contacts_service: ^0.6.3
   flutter_ringtone_player: ^4.0.0 #not used anymore verify
   flutter_svg: ^2.0.9
