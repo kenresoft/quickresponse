@@ -91,6 +91,7 @@ export 'utils/file_helper.dart';
 export 'utils/util.dart';
 export 'utils/wrapper.dart';
 export 'widgets/dialogs/exit_dialog.dart';
+export 'widgets/dialogs/location_dialog.dart';
 export 'widgets/dialogs/sos_dialog.dart';
 export 'widgets/display/blinking_text.dart';
 export 'widgets/display/logo_card.dart';
