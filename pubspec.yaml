@@ -32,7 +32,7 @@ dependencies:
 
   # --Location/Map
   geolocator: ^10.1.0
-  google_maps_flutter: ^2.5.0
+  google_maps_flutter: ^2.5.1
   geocoding: ^2.1.1
   flutter_polyline_points: ^2.0.0 # --- uses a higher version of http
   #open_route_service: ^1.2.3 # --- uses a lower version of http
@@ -51,13 +51,13 @@ dependencies:
   file_picker: ^6.1.1
   image_picker: ^1.0.4 #not used anymore verify
   flutter_image_compress: ^2.1.0
-  cached_network_image: ^3.3.0
+  cached_network_image: ^3.3.1
   video_player: ^2.8.1
   video_thumbnail: ^0.5.3
   record: ^5.0.1
   just_audio: ^0.9.36
   #flutter_sound: ^9.2.13
-  background_sms: ^0.0.4
+  #background_sms: ^0.0.4
   contacts_service: ^0.6.3
   flutter_ringtone_player: ^4.0.0 #not used anymore verify
   flutter_svg: ^2.0.9
