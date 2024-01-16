@@ -40,7 +40,7 @@ dependencies:
   # --Data/File
   shared_preferences: ^2.2.2
   sqflite: ^2.3.0 #not used anymore verify
-  path_provider: ^2.1.1
+  path_provider: ^2.1.2
   path: ^1.8.3
   intl: ^0.18.1
   dio: ^5.3.3 #not used anymore verify
@@ -74,19 +74,19 @@ dependencies:
   #sensors_plus: ^3.0.3
 
   # Google
-  firebase_core: ^2.22.0
-  firebase_auth: ^4.14.0
-  firebase_analytics: ^10.7.0
-  firebase_storage: ^11.5.1
-  cloud_firestore: ^4.13.1
-  google_sign_in: ^6.1.6
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.16.0
+  firebase_analytics: ^10.8.0
+  firebase_storage: ^11.6.0
+  cloud_firestore: ^4.14.0
+  google_sign_in: ^6.2.1
   in_app_purchase: ^3.1.11
 
   # Device
   flutter_local_notifications: ^16.1.0
   timezone: ^0.9.2
   flutter_timezone: ^1.0.8
-  connectivity_plus: ^5.0.1
+  connectivity_plus: ^5.0.2
   webview_flutter: ^4.4.2
   device_preview: ^1.1.0
 
