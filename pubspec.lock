@@ -226,14 +226,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.4"
-  contacts_service:
-    dependency: "direct main"
-    description:
-      name: contacts_service
-      sha256: f6d5ea33b31dfcdcd2e65d8abdc836502e04ddb0f66a96aa726fa9891ea9671e
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.6.3"
   convert:
     dependency: transitive
     description:
@@ -589,14 +581,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  flutter_ringtone_player:
-    dependency: "direct main"
-    description:
-      name: flutter_ringtone_player
-      sha256: bb60a67b8626967fb177418f52ef4f4849c3e33818365c7f5163066d2fe87203
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.0"
   flutter_riverpod:
     dependency: "direct main"
     description:
