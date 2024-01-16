@@ -74,7 +74,7 @@ dependencies:
   #sensors_plus: ^3.0.3
 
   # Google
-  firebase_core: ^2.22.0
+  firebase_core: ^2.24.2
   firebase_auth: ^4.14.0
   firebase_analytics: ^10.7.0
   firebase_storage: ^11.5.1
