@@ -26,13 +26,13 @@ dependencies:
       ref: master
 
   cupertino_icons: ^1.0.6
-  go_router: ^12.1.1
-  flutter_riverpod: ^2.4.6
+  go_router: ^13.0.1
+  flutter_riverpod: ^2.4.9
   font_awesome_flutter: ^10.6.0
 
   # --Location/Map
   geolocator: ^10.1.0
-  google_maps_flutter: ^2.5.1
+  google_maps_flutter: ^2.5.3
   geocoding: ^2.1.1
   flutter_polyline_points: ^2.0.0 # --- uses a higher version of http
   #open_route_service: ^1.2.3 # --- uses a lower version of http
@@ -47,9 +47,9 @@ dependencies:
 
   # Media/Phone
   carousel_slider: ^4.2.1
-  camera: ^0.10.5+5
+  camera: ^0.10.5+9
   file_picker: ^6.1.1
-  image_picker: ^1.0.4 #not used anymore verify
+  image_picker: ^1.0.7 #not used anymore verify
   flutter_image_compress: ^2.1.0
   cached_network_image: ^3.3.1
   video_player: ^2.8.1
@@ -67,10 +67,10 @@ dependencies:
   # Utilities
   #phone_state: ^1.0.3
   #screen_protector: ^1.3.0
-  permission_handler: ^11.0.1
+  permission_handler: ^11.1.0
   share_plus: ^7.2.1
   #in_app_update: ^4.2.0
-  local_auth: ^2.1.7
+  local_auth: ^2.1.8
   #sensors_plus: ^3.0.3
 
   # Google
