@@ -327,7 +327,7 @@ class _MyAppState extends State<MyApp> {
         return HeroPage(tip: tip);
       }),
 
-      route(Constants.contactsPage, const ContactPage()),
+      ///route(Constants.contactsPage, const ContactPage()),
       //route(Constants.call, const Call()),
       route(Constants.locationMap, const LocationMap()),
       route(Constants.alarm, const AlarmScreen()),
