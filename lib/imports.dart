@@ -35,7 +35,7 @@ export 'package:intl/intl.dart' hide TextDirection;
 export 'package:just_audio/just_audio.dart';
 export 'package:path_provider/path_provider.dart';
 export 'package:quickresponse/widgets/dialogs/sign_in_dialog.dart';
-export 'package:share_plus/share_plus.dart';
+///export 'package:share_plus/share_plus.dart';
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:timezone/data/latest.dart';
 export 'package:uuid/uuid.dart';
