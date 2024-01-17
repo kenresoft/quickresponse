@@ -383,7 +383,7 @@ class _EmergencyHistoryPageState extends ConsumerState<EmergencyHistoryPage> {
       final String exportText = exportData.toString();
 
       // Share the exported data using the share package
-      Share.share(exportText, subject: 'Emergency Alerts - Export');
+      ///Share.share(exportText, subject: 'Emergency Alerts - Export');
     } else {
       context.toast('SOS History is empty!');
     }
