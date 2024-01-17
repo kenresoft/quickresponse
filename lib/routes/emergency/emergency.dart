@@ -286,7 +286,7 @@ class _TravellersAlarmState extends ConsumerState<Emergency> {
             elevation: 0,
             child: ListTile(
               title: const Text('Settings'),
-              subtitle: const Text('VView App Settings'),
+              subtitle: const Text('View App Settings'),
               trailing: const Icon(CupertinoIcons.settings),
               onTap: () => launch(context, Constants.settings),
             ),
