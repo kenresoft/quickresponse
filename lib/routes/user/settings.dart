@@ -19,7 +19,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (widget.settingType == SettingType.none) {
+        if (widget.settingType == SettingType.none || widget.settingType == SettingType.locationUpdate) {
           launch(context, Constants.home);
           return false;
         }
