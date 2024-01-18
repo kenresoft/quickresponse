@@ -221,7 +221,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   void shareNote() {
     if (note.isNotEmpty) {
-      Share.share(note, subject: 'Emergency Alerts - Export');
+      ///Share.share(note, subject: 'Emergency Alerts - Export');
     } else {
       context.toast('Note is empty!', TextAlign.center, Colors.red.shade300, Colors.white);
     }
