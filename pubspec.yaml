@@ -6,7 +6,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.1 <4.0.0'
+  sdk: '>=3.2.3 <4.0.0'
 
 dependencies:
   flutter:
@@ -52,9 +52,9 @@ dependencies:
   image_picker: ^1.0.7 #not used anymore verify
   flutter_image_compress: ^2.1.0
   cached_network_image: ^3.3.1
-  video_player: ^2.8.1
+  video_player: ^2.8.2
   video_thumbnail: ^0.5.3
-  record: ^5.0.1
+  record: ^5.0.4
   just_audio: ^0.9.36
   #flutter_sound: ^9.2.13
   background_sms: ^0.0.4
@@ -80,10 +80,10 @@ dependencies:
   firebase_storage: ^11.6.0
   cloud_firestore: ^4.14.0
   google_sign_in: ^6.2.1
-  in_app_purchase: ^3.1.11
+  in_app_purchase: ^3.1.13
 
   # Device
-  flutter_local_notifications: ^16.1.0
+  flutter_local_notifications: ^16.3.0
   timezone: ^0.9.2
   flutter_timezone: ^1.0.8
   connectivity_plus: ^5.0.2
