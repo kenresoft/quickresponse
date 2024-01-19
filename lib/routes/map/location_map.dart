@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+
 ///import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geocoding/geocoding.dart';
@@ -13,7 +14,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:quickresponse/data/constants/constants.dart';
 import 'package:quickresponse/data/model/pin_pill_info.dart';
-import 'package:quickresponse/utils/extensions.dart';
 import 'package:quickresponse/widgets/map/map_pin_pill.dart';
 
 import '../../data/constants/styles.dart';
@@ -65,7 +65,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
   List<Placemark>? placemarks;
 
   PinInformation currentlySelectedPin = PinInformation(
-    pinPath: Constants.spaceship,
+    pinPath: Constants.logo2,
     avatarPath: Constants.destinationMapMarker,
     location: const LatLng(0, 0),
     locationName: '',
@@ -88,10 +88,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     setSourceAndDestinationIcons();
   }
 
-  final CameraPosition _destination = const CameraPosition(
-    target: DEST_LOCATION,
-    zoom: 14.4746,
-  );
+  final CameraPosition _destination = const CameraPosition(target: DEST_LOCATION, zoom: 14.4746);
 
   @override
   Widget build(BuildContext context) {
@@ -100,19 +97,9 @@ class _LocationMapState extends ConsumerState<LocationMap> {
     updatePosition();
     polyL();
 
-    CameraPosition initialCameraPosition = const CameraPosition(
-      target: SOURCE_LOCATION,
-      zoom: CAMERA_ZOOM,
-      tilt: CAMERA_TILT,
-      bearing: CAMERA_BEARING,
-    );
+    CameraPosition initialCameraPosition = const CameraPosition(target: SOURCE_LOCATION, zoom: CAMERA_ZOOM, tilt: CAMERA_TILT, bearing: CAMERA_BEARING);
     //if (currentLocation != null) {
-    initialCameraPosition = CameraPosition(
-      target: LatLng(latitude.toDouble(), longitude.toDouble()),
-      zoom: CAMERA_ZOOM,
-      tilt: CAMERA_TILT,
-      bearing: CAMERA_BEARING,
-    );
+    initialCameraPosition = CameraPosition(target: LatLng(latitude.toDouble(), longitude.toDouble()), zoom: CAMERA_ZOOM, tilt: CAMERA_TILT, bearing: CAMERA_BEARING);
     //}
 
     return Scaffold(
@@ -145,37 +132,32 @@ class _LocationMapState extends ConsumerState<LocationMap> {
         ),
         //Toast(placemarks?.lastOrNull.toString(), show: showToast),
         ...[
-          widget.disableWidgets
+          /*widget.disableWidgets
               ? const SizedBox()
               : Align(
-            alignment: Alignment.bottomCenter,
-            widthFactor: 2.2,
-            child: SizedBox(
-              width: 0.30.dpW(dp),
-              height: 35,
-              child: MaterialButton(
-                color: AppColor(theme).alert_1.withOpacity(0.7),
-                padding: const EdgeInsets.all(10),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-                onPressed: () async {
-                  final GoogleMapController controller = await _controller.future;
-                  controller.animateCamera(CameraUpdate.newCameraPosition(_destination));
-                },
-                child: Row(children: [
-                  Icon(Icons.directions_run, color: AppColor(theme).white),
-                  Text('Destination', style: TextStyle(color: AppColor(theme).white)),
-                ]),
-              ),
-            ),
-          )
+                  alignment: Alignment.bottomCenter,
+                  widthFactor: 2.2,
+                  child: SizedBox(
+                    width: 0.30.dpW(dp),
+                    height: 35,
+                    child: MaterialButton(
+                      color: AppColor(theme).alert_1.withOpacity(0.7),
+                      padding: const EdgeInsets.all(10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+                      onPressed: () async {
+                        final GoogleMapController controller = await _controller.future;
+                        controller.animateCamera(CameraUpdate.newCameraPosition(_destination));
+                      },
+                      child: Row(children: [
+                        Icon(Icons.directions_run, color: AppColor(theme).white),
+                        Text('Destination', style: TextStyle(color: AppColor(theme).white)),
+                      ]),
+                    ),
+                  ),
+                )*/
         ],
         ...[
-          widget.disableWidgets
-              ? const SizedBox()
-              : MapPinPillComponent(
-            pinPillPosition: pinPillPosition,
-            currentlySelectedPin: currentlySelectedPin,
-          ),
+          widget.disableWidgets ? const SizedBox() : MapPinPillComponent(pinPillPosition: pinPillPosition, currentlySelectedPin: currentlySelectedPin),
         ]
       ]),
     );
@@ -251,7 +233,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
       locationName: "Start Location",
       location: LatLng(latitude.toDouble(), longitude.toDouble()),
       pinPath: Constants.drivingPin,
-      avatarPath: Constants.profile,
+      avatarPath: Constants.logo2,
       labelColor: Colors.blueAccent,
     );
 
@@ -259,7 +241,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
       locationName: "End Location",
       location: DEST_LOCATION,
       pinPath: Constants.destinationMapMarker,
-      avatarPath: Constants.moon,
+      avatarPath: Constants.logo2,
       labelColor: Colors.purple,
     );
 
@@ -357,7 +339,7 @@ class _LocationMapState extends ConsumerState<LocationMap> {
 
     // Map route coordinates to a list of LatLng (requires google_maps_flutter package)
     // to be used in the Map route Polyline.
-    final List<LatLng> routePoints = [] /*routeCoordinates*/.map((coordinate) => LatLng(coordinate.latitude, coordinate.longitude)).toList();
+    final List<LatLng> routePoints = [] /*routeCoordinates*/ .map((coordinate) => LatLng(coordinate.latitude, coordinate.longitude)).toList();
 
     if (routePoints.isNotEmpty && !widget.disableWidgets) {
       for (var point in routePoints) {
