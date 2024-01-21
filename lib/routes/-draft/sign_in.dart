@@ -78,7 +78,7 @@ class _SignInState extends State<SignIn> {
       body: Stack(
         children: [
           // Background Image with Blur
-          Container(
+          SizedBox(
             width: double.infinity,
             height: double.infinity,
             child: Image.asset(Constants.logo2, fit: BoxFit.cover),
