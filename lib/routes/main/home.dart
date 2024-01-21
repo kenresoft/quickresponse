@@ -1,4 +1,3 @@
-import '../../a.dart';
 import '../../main.dart';
 
 class Home extends ConsumerStatefulWidget {
@@ -16,9 +15,6 @@ class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late Future<List<EmergencyTip>> _tips;
 
-  //final LocationService _locationService = LocationService();
- /* String? _locationData;
-  late String _streetAddress;*/
   bool _isPermissionDenied = false;
   bool _notificationsEnabled = false;
 
@@ -28,11 +24,9 @@ class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     _tips = loadEmergencyTips();
-   /* _locationData = 'Fetching location...';
-    _streetAddress = 'Fetching address...';*/
     WidgetsBinding.instance.addObserver(this);
     _isAndroidPermissionGranted();
-    _requestPermissions();
+    _requestPermissions();;
     _checkLocationPermission();
     _configureDidReceiveLocalNotificationSubject();
     _configureSelectNotificationSubject();
@@ -116,10 +110,10 @@ class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
               position.log;
               _getAddressFromCoordinates(position.latitude, position.longitude);
             });
-*//*
+*/ /*
             _locationData = 'Latitude: ${position.latitude}, Longitude: ${position.longitude}';
             position.log;
-            _getAddressFromCoordinates(position.latitude, position.longitude);*//*
+            _getAddressFromCoordinates(position.latitude, position.longitude);*/ /*
           }*/
         });
       },
@@ -130,8 +124,6 @@ class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
 
     setState(() => _isPermissionDenied = isPermissionDenied);
   }
-
-
 
   // void _toggleLocationUpdates() {
   //   setState(() => isLocationUpdatesPaused = !isLocationUpdatesPaused);
@@ -410,9 +402,8 @@ class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return CustomLocationDialog();
+        return const CustomLocationDialog();
       },
     );
   }
 }
-
