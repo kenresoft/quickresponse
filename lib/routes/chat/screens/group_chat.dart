@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quickresponse/main.dart';
 
-import '../../../data/model/chat/chat.dart' as c;
 import '../model.dart';
 import '../service.dart';
 import '../helper.dart';
