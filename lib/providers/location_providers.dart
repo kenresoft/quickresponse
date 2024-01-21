@@ -1,8 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:quickresponse/imports.dart';
 import 'package:sqflite/sqflite.dart';
-
-import '../data/db/database_client.dart';
 
 //final locationProvider = StateProvider<Position?>((ref) => null);
 
@@ -40,7 +37,15 @@ final positionProvider = StateNotifierProvider<PositionNotifier, Position?>((ref
 });
 
 class PositionNotifier extends StateNotifier<Position?> {
-  PositionNotifier() : super(null);
+  PositionNotifier()
+      : super(
+          Position.fromMap(
+            <String, double>{
+              'latitude': latitude,
+              'longitude': longitude,
+            },
+          ),
+        );
 
   set setPosition(Position? index) => state = index;
 }
