@@ -91,7 +91,7 @@ class _GroupsScreenState extends State<GroupsScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Join Requests'),
-          content: Container(
+          content: SizedBox(
             width: double.maxFinite,
             height: 200,
             child: ListView.builder(
