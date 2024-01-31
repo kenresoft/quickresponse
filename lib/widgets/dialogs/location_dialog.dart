@@ -13,10 +13,8 @@ class _CustomLocationDialogState extends State<CustomLocationDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
+    return PopScope(
+      canPop: false,
       child: Consumer(
         builder: (BuildContext context, WidgetRef ref, Widget? child) {
           final position = ref.watch(positionProvider.select((value) => value));
