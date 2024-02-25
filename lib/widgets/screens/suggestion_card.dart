@@ -61,7 +61,7 @@ class SuggestionCard extends StatelessWidget {
 
     Future<bool> isPermissionGranted() async => await Permission.sms.status.isGranted;
 
-    Future<bool?> supportCustomSim() async => await BackgroundSms.isSupportCustomSim;
+   /* Future<bool?> supportCustomSim() async => await BackgroundSms.isSupportCustomSim;
 
     if (await isPermissionGranted()) {
       if ((await supportCustomSim())!) {
@@ -71,6 +71,6 @@ class SuggestionCard extends StatelessWidget {
       }
     } else {
       getPermission();
-    }
+    }*/
   }
 }

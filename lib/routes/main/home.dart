@@ -26,7 +26,7 @@ class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
     _tips = loadEmergencyTips();
     WidgetsBinding.instance.addObserver(this);
     _isAndroidPermissionGranted();
-    _requestPermissions();;
+    _requestPermissions();
     _checkLocationPermission();
     _configureDidReceiveLocalNotificationSubject();
     _configureSelectNotificationSubject();
@@ -162,8 +162,8 @@ class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final dp = Density.init(context);
-    return WillPopScope(
-      onWillPop: () async => (await showExitDialog(context, theme))!,
+    return PopScope(
+      onPopInvoked: (b) async => (await showExitDialog(context, theme))!,
       child: Scaffold(
         key: _scaffoldKey,
         backgroundColor: theme ? AppColor(theme).background : AppColor(theme).backgroundDark,
@@ -298,7 +298,7 @@ class _HomeState extends ConsumerState<Home> with WidgetsBindingObserver {
             return const Center(child: CircularProgressIndicator());
           }
           final tips = snapshot.data!;
-          return SizedBox(width: double.infinity, height: 155, child: TipSlider(tips: tips, action: () => setState(() {})));
+          return SizedBox(width: double.infinity, height: 165, child: TipSlider(tips: tips, action: () => setState(() {})));
         },
       ),
     ]);
