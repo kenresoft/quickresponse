@@ -9,7 +9,7 @@ export 'dart:isolate';
 export 'dart:math' hide log;
 export 'dart:typed_data';
 
-export 'package:background_sms/background_sms.dart';
+//export 'package:background_sms/background_sms.dart';
 export 'package:cached_network_image/cached_network_image.dart';
 export 'package:camera/camera.dart' hide ImageFormat;
 export 'package:cloud_firestore/cloud_firestore.dart';

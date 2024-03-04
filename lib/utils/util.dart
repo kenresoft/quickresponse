@@ -111,13 +111,13 @@ sendMessage(String phoneNumber, String message, {int? simSlot}) async {
     return;
   }
 
-  try {
+/*  try {
     var result = await BackgroundSms.sendMessage(phoneNumber: phoneNumber, message: message, simSlot: simSlot);
 
     log(switch (result) { SmsStatus.sent => 'Message Sent: $message to $phoneNumber', SmsStatus.failed => 'Failed to Send Message: $message to $phoneNumber', _ => 'Unexpected SMS Status: $result' });
   } catch (e) {
     log('Error sending SMS: $e');
-  }
+  }*/
 }
 
 bool isValidPhoneNumber(String phoneNumber) {

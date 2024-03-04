@@ -286,7 +286,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   final GoRouter _router = GoRouter(
-    redirect: (context, state) {
+   /* redirect: (context, state) {
       bool isAuthenticated = isSignedIn();
       if (!isAuthenticated) {
         if (authenticate) {
@@ -295,7 +295,7 @@ class _MyAppState extends State<MyApp> {
         return Constants.home;
       }
       return null;
-    },
+    },*/
     routes: <GoRoute>[
       route(Constants.root, authenticate ? const DeviceAuthentication() : const Home()),
       route(Constants.home, const Home()),
