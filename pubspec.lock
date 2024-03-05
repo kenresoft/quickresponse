@@ -57,15 +57,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
-  bottom_nav:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: master
-      resolved-ref: "5dcc6ea99c2d5e28c12950f78b1ca2d91cd0bb8c"
-      url: "git@github.com:kenresoft/bottom_nav.git"
-    source: git
-    version: "0.0.1"
   cached_network_image:
     dependency: "direct main"
     description:
@@ -301,12 +292,11 @@ packages:
   extensionresoft:
     dependency: "direct main"
     description:
-      path: "."
-      ref: master
-      resolved-ref: "9c148dd0c81c43e1e67f7504b81f763f72993c60"
-      url: "git@github.com:kenresoft/extensionresoft.git"
-    source: git
-    version: "0.0.1"
+      name: extensionresoft
+      sha256: "71fba024c86f96f187752aabc79e6a2abbd3895d1e9f1a06974db8a326746412"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   fake_async:
     dependency: transitive
     description:
@@ -626,12 +616,11 @@ packages:
   fontresoft:
     dependency: "direct main"
     description:
-      path: "."
-      ref: master
-      resolved-ref: "3b8b23d961e99144c3e2d20f0a7a2913a4ace68f"
-      url: "git@github.com:kenresoft/fontresoft.git"
-    source: git
-    version: "0.0.1"
+      name: fontresoft
+      sha256: b909c8913e34ab9d9380cb7420cac492faaf39931aa6e01b766bb386342414a9
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   freezed_annotation:
     dependency: transitive
     description:
