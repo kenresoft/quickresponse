@@ -45,3 +45,8 @@ app.*.map.json
 
 android/app/google-services.json
 lib/data/constants/api.dart
+kenresoft
+kenresoft.pub
+firestore.rules
+firestore.indexes.json
+firebase.json
