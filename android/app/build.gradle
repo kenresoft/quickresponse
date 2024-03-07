@@ -75,7 +75,7 @@ android {
 /*
 keytool -genkeypair -v -keystore my-release-key.keystore -keyalg RSA -keysize 2048 -validity 10000 -alias my-key-alias
 \Program Files\Android\Android Studio\jbr\bin
-keytool -list -v -alias quick-response-key -keystore \Users\\user\AndroidStudioPlugins\keystore\sharpresponse.jks
+keytool -list -v -alias quick-response-key -keystore \Users\\amadi\AndroidStudioPlugins\keystore\sharpresponse.jks
 * */
 
 flutter {
