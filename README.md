@@ -13,8 +13,7 @@ Powered by Flutter, QuickResponse ensures rapid assistance and peace of mind dur
 
 ## Screenshots
 
-| Screenshot                                                                                                                                          | Description                |
-|-----------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
-| <img alt="Screenshot 1" height="550" src="https://github.com/kenresoft/quickresponse/blob/master/screenshots/flutter_01.png?raw=true" width="250"/> | Settings page - Dark Theme |
-| <img alt="Screenshot 2" height="550" src="https://github.com/kenresoft/quickresponse/blob/master/screenshots/flutter_02.png?raw=true" width="250"/> | Home Page - Light Theme    |
-| <img alt="Screenshot 3" height="550" src="https://github.com/kenresoft/quickresponse/blob/master/screenshots/flutter_02.png?raw=true" width="250"/> | Emergency Screen           |
+| Screenshot                                                                                                                                          | Description                | Screenshot                                                                                                                                          | Description             |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|
+| <img alt="Screenshot 1" height="450" src="https://github.com/kenresoft/quickresponse/blob/master/screenshots/flutter_01.png?raw=true" width="250"/> | Settings page - Dark Theme | <img alt="Screenshot 2" height="450" src="https://github.com/kenresoft/quickresponse/blob/master/screenshots/flutter_02.png?raw=true" width="250"/> | Home Page - Light Theme |
+| <img alt="Screenshot 3" height="450" src="https://github.com/kenresoft/quickresponse/blob/master/screenshots/flutter_03.png?raw=true" width="250"/> | Emergency Screen           |                                                                                                                                                     |                         |
