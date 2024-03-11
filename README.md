@@ -14,9 +14,9 @@ Powered by Flutter, QuickResponse ensures rapid assistance and peace of mind dur
 ## Screenshots
 
 | ![Screenshot 1](https://github.com/kenresoft/quickresponse/blob/master/screenshots/flutter_01.png?raw=true) | ![Screenshot 2](https://github.com/kenresoft/quickresponse/blob/master/screenshots/flutter_02.png?raw=true) |
-|---------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| **Description**: Settings page - Dark Theme                                                                       | **Description**: Home Page - Light Theme                                                                         |
+|-------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| **Description**: Settings page - Dark Theme                                                                 | **Description**: Home Page - Light Theme                                                                    |
 
 | ![Screenshot 3](https://github.com/kenresoft/quickresponse/blob/master/screenshots/flutter_03.png?raw=true) | ![Screenshot 4](https://github.com/kenresoft/quickresponse/blob/master/screenshots/Screen_2.png?raw=true) |
-|---------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|
-| **Description**: Emergency Screen                                                                                  | **Description**: Sign In Prompt                                                                         |
+|-------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| **Description**: Emergency Screen                                                                           | **Description**: Sign In Prompt                                                                           |
