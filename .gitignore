@@ -52,3 +52,4 @@ firestore.indexes.json
 firebase.json
 storage.rules
 .firebaserc
+assets/data
